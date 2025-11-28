@@ -1,0 +1,1658 @@
+##Content Research & Ideation V6 beta
+##Analyzes multiple sources to provide comprehensive copywriting insights and final production.
+#Show: "This tool helps professional copywriters conduct in-depth research & ideation."
+
+## Initialize defaults
+#Text: is_reaction
+"n"
+#Text: react_url
+""
+#Text: own_content_text
+""
+#Text: competitor_content_text
+""
+#Text: trend_content_text
+""
+#Text: react_content_text
+""
+#Text: react_prompt
+""
+#Text: additional_content_text
+""
+#Text: content_exit
+"n"
+#Text: llm
+"claude"
+## Default to claude, switch to gemini for long content
+
+## Initialize Interview defaults
+#Text: interview_block
+""
+
+## Language selection
+#Question: language
+"What language would you prefer for your research results?
+('e'= english)"
+
+#If [language]="e" #Begin
+  #Text: language
+  "english"
+#End
+
+#Show: "Great! We'll conduct our research in [language].
+(I will continue talking english to you)"
+
+
+
+
+
+
+
+
+
+
+## Project context/type & LENGTH DEFINITION
+#Text: project_type_q_valid
+"n"
+#Loop-Until: [project_type_q_valid]="y"
+    #Question: project_type_q
+    "What type of copywriting/content project are you working on?
+
+    1. Web page (General content, About Us, Home, etc.)
+    2. Landing page (Sales page, Squeeze page, Funnel)
+    3. Product/service description
+    4. Newsletter
+    5. SoMe Post
+    6. SoMe or Blog Article
+    7. Talking head Video
+    8. Corporate Video
+    9. Explainer/info Video
+    10. Other
+
+    Please select one number:"
+
+    #If [project_type_q]="1" #Begin
+        #Text: project_type
+        "Web page (Standard website content)"
+        #Question: len_input
+        "Approximate desired length (e.g. '500 words' or '3 sections'):"
+        #Text: length
+        "Format: Web Page Content.
+        Length: [len_input]"
+        #Text: project_type_q_valid
+        "y"
+    #End
+
+    #If [project_type_q]="2" #Begin
+        #Text: project_type
+        "Landing page (Conversion/Sales focused)"
+        #Question: len_input
+        "Approximate desired length (e.g. 'Long form sales letter' or 'Short squeeze page'):"
+        #Text: length
+        "Format: Landing Page (High Conversion).
+        Length: [len_input]"
+        #Text: project_type_q_valid
+        "y"
+    #End
+
+    #If [project_type_q]="3" #Begin
+        #Text: project_type
+        "Product/service description"
+        #Text: length
+        "Format: Product Description.
+        Length: Approx 300-500 words."
+        #Text: project_type_q_valid
+        "y"
+    #End
+
+    #If [project_type_q]="4" #Begin
+        #Text: project_type
+        "Newsletter"
+        #Text: length
+        "Format: Newsletter.
+        Length: Approx 600-1000 words."
+        #Text: project_type_q_valid
+        "y"
+    #End
+
+    #If [project_type_q]="5" #Begin
+        #Text: project_type
+        "SoMe post"
+        #Text: length
+        "Format: Social Media Post.
+        Length: Approx 1000-1500 characters (Short form)."
+        #Text: project_type_q_valid
+        "y"
+    #End
+
+    #If [project_type_q]="6" #Begin
+        #Text: project_type
+        "SoMe or Blog Article"
+        #Question: len_article
+        "Select Article Length:
+        1. Standard (Approx 800-1200 words)
+        2. Long Form / Deep Dive (2000+ words)
+       
+        Select 1 or 2:"
+        
+        #If [len_article]="1" #Begin
+            #Text: length
+            "Format: Standard Article.
+            Length: 800-1200 words."
+        #End
+        #If [len_article]="2" #Begin
+            #Text: length
+            "Format: Long Form Article.
+            Length: 2000+ words."
+            #Text: llm
+            "gemini"
+        #End
+        #Text: project_type_q_valid
+        "y"
+    #End
+
+    #If [project_type_q]="7" #Begin
+        #Text: project_type
+        "Short talking head video"
+        #Text: length
+        "Format: Video Script. Duration: Approx 60-90 seconds."
+        #Text: project_type_q_valid
+        "y"
+    #End
+
+    #If [project_type_q]="8" #Begin
+        #Text: project_type
+        "Corporate Video"
+        #Text: length
+        "Format: Video Script.
+        Duration: Approx 2-3 minutes."
+        #Text: project_type_q_valid
+        "y"
+    #End
+
+    #If [project_type_q]="9" #Begin
+        #Text: project_type
+        "Explainer/info video"
+        #Text: length
+        "Format: Video Script.
+        Duration: Approx 2-3 minutes."
+        #Text: project_type_q_valid
+        "y"
+    #End
+
+    #If [project_type_q]="10" #Begin
+        #Question: custom_project
+        "Please briefly describe your project (one sentence is fine):"
+        #Question: custom_len
+        "What is the desired length?"
+        #Text: project_type
+        "[custom_project]"
+        #Text: length
+        "Format: Custom ([custom_project]).
+        Length: [custom_len]"
+        #Text: project_type_q_valid
+        "y"
+    #End
+#End
+
+
+
+
+
+
+
+
+
+
+
+
+## Content level input
+#Text: project_level_q_valid
+"n"
+
+## SPECIAL LOGIC: Type 3 (Product Description) -> Auto-set to BOFU
+#If [project_type_q]="3" #Begin
+    #Show: "Project Type is Product Description.
+Setting Content Level to: BOFU (Drive action, sell)."
+    
+    #Text: project_level
+    "BOFU (Bottom of Funnel):
+    - Goal: Drive action — sign up, try, buy now.
+    - Content focus: Clear benefits and outcomes of your products or services
+    - Social proof (testimonials, results)
+    - Strong CTA (try free, book demo, download guide)
+    - Address objections (pricing, learning curve, etc.)"
+    
+    #Text: project_level_q_valid
+    "y"
+#End
+
+## SPECIAL LOGIC: Type 9 (Explainer Video) -> Limit to MOFU or BOFU
+#If [project_type_q]="9" #Begin
+    #Loop-Until: [project_level_q_valid]="y"
+        #Question: project_level_q
+        "For Explainer Videos, please select the specific goal:
+
+        1. MOFU - Educate on how the solution works
+        2. BOFU - Drive action / Why choose us?
+        Please select one number:"
+
+        #If [project_level_q]="1" #Begin
+            #Text: project_level
+            "MOFU (Middle of Funnel):
+            - Goal: Educate and show how your product helps.
+            - Content focus: Share how you (or others) solved a specific problem
+            - Explain a workflow, process, or feature
+            - Offer small wins, tutorials, or behind-the-scenes
+            - Invite conversation but also link to your solution"
+            #Text: project_level_q_valid
+            "y"
+        #End
+
+        #If [project_level_q]="2" #Begin
+            #Text: project_level
+            "BOFU (Bottom of Funnel):
+            - Goal: Drive action — sign up, try, buy now.
+            - Content focus: Clear benefits and outcomes of your products or services
+            - Social proof (testimonials, results)
+            - Strong CTA (try free, book demo, download guide)
+            - Address objections (pricing, learning curve, etc.)"
+            #Text: project_level_q_valid
+            "y"
+        #End
+    #End
+#End
+
+## STANDARD LOGIC: Run for all other types if level is not yet valid
+#If [project_level_q_valid]="n" #Begin
+    #Loop-Until: [project_level_q_valid]="y"
+        #Question: project_level_q
+        "What primary content LEVEL do you want to target?
+        1. Thought leadership - Build authority
+        2. TOFU - Pain points & Awareness
+        3. MOFU - Info about products & solutions
+        4. BOFU - Drive action, sell
+        5. Other
+
+        Please select one number:"
+
+        #If [project_level_q]="1" #Begin
+            #Text: project_level
+            "Thought Leadership (Above TOFU):
+            - Goal: Build authority, spark conversations, and earn trust over time.
+            - Content focus: Share insights, opinions, or industry trends
+            - Challenge conventional thinking
+            - Position yourself (or the brand) as a voice worth following
+            - No direct pitch — it’s about ideas, not selling"
+            #Text: project_level_q_valid
+            "y"
+        #End
+ 
+        #If [project_level_q]="2" #Begin
+            #Text: project_level
+            "TOFU (Top of Funnel):
+            - Goal: Create awareness by highlighting relatable pain points.
+            - Content focus: Talk about common struggles
+            - Ask open-ended questions
+            - Light storytelling, memes, or observations
+            - Soft and broad — no product push"
+            #Text: project_level_q_valid
+            "y"
+        #End
+        #If [project_level_q]="3" #Begin
+            #Text: project_level
+            "MOFU (Middle of Funnel):
+            - Goal: Educate and show how your product helps.
+            - Content focus: Share how you (or others) solved a specific problem
+            - Explain a workflow, process, or feature
+            - Offer small wins, tutorials, or behind-the-scenes
+            - Invite conversation but also link to your solution"
+            #Text: project_level_q_valid
+            "y"
+        #End
+        #If [project_level_q]="4" #Begin
+            #Text: project_level
+            "BOFU (Bottom of Funnel):
+            - Goal: Drive action — sign up, try, buy now.
+            - Content focus: Clear benefits and outcomes of your products or services
+            - Social proof (testimonials, results)
+            - Strong CTA (try free, book demo, download guide)
+            - Address objections (pricing, learning curve, etc.)"
+            #Text: project_level_q_valid
+            "y"
+        #End
+  
+        #If [project_level_q]="5" #Begin
+            #Question: custom_level
+            "Please briefly describe your project LEVEL (one sentence is fine):"
+
+            #Text: project_level
+            "[custom_level]"
+            #Text: project_level_q_valid
+            "y"
+        #End
+    #End
+#End
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Content Collection Module
+#Question: ok
+"You will now enter the content adding module.
+Here you can add base content for the research (URLs or text snippets).
+You need to add at least ONE item about your own products/services.
+Say 'ok' when you are ready to start."
+
+#Loop-Until: [content_exit]="y"
+    #Text: content_add_valid
+    "n"
+    #Loop-Until: [content_add_valid]="y"
+        #Question: content_add
+        "Add base content:
+
+        1. Info on my own products & services
+        2. Interview with Expert (Have or need help to do)
+        3. Competitor info
+        4. Reaction Mode (Find/have article to comment on)
+        5. Market news & trends
+        6. Other / Additional Source
+        7. Exit - I am done adding content
+
+        Please choose ONE number (please start with 1)"
+
+        #If [content_add]="1" #Begin
+            #Text: content_add_valid
+            "y"
+        #End
+        #If [content_add]="2" #Begin
+            #Text: content_add_valid
+            "y"
+        #End
+        #If [content_add]="3" #Begin
+            #Text: content_add_valid
+            "y"
+        #End
+        #If [content_add]="4" #Begin
+            #Text: content_add_valid
+            "y"
+        #End
+        #If [content_add]="5" #Begin
+            #Text: content_add_valid
+            "y"
+        #End
+        #If [content_add]="6" #Begin
+            #Text: content_add_valid
+            "y"
+        #End
+        #If [content_add]="7" #Begin
+            #Text: content_add_valid
+            "y"
+        #End
+    #End
+
+    #If [content_add]="1" #Begin
+        ##Own content source
+        #Text: own_source_q_valid
+        "n"
+        #Loop-Until: [own_source_q_valid]="y"
+            #Question: own_source_q
+            "Let's add info on YOUR PRODUCT OR SERVICE.
+            Would you like to:
+            1. Provide a webpage URL
+            2. Paste text content
+            Select one number:"
+
+            #If [own_source_q]="1" #Begin
+                #Text: own_source_q_valid
+                "y"
+            #End
+            #If [own_source_q]="2" #Begin
+                #Text: own_source_q_valid
+                "y"
+            #End
+        #End
+
+        #If [own_source_q]="1" #Begin
+            #Question: own_url
+            "Please enter the URL of your webpage or specific product/service page.
+            (will only scrape this specific page, not the whole site)"
+            #Show: "Scraping your website... (10-45 sec)"
+            #scrape: own_content_raw
+            "[own_url]"
+            #Show: "Analyzing your content...(10-45 sec)"
+            ## Updated to chatGPT (v4) for HTML parsing
+            #gemini: own_content_gpt
+            "Extract all the readable content from this HTML code, include button text and ALT image texts, don't include cookie information.
+            Format nicely. HTML: [own_content_raw]"
+            #Text: own_content_text
+            "[own_content_text]\n\n-----Own product/service content:\n[own_content_gpt]"
+        #Else-Begin
+            #Question: own_content_text_q
+            "Please paste content about your product/service:"
+            #Text: own_content_text
+            "[own_content_text]\n\n-----Own product/service content:\n[own_content_text_q]"
+        #End
+        #Show: "Thanks for adding content!
+        You can now add more if you want!"
+    #End
+
+
+    #If [content_add]="2" #Begin
+        ## INTERVIEW MODULE
+        #Question: int_mode
+        "Interview Status:
+        1. I already have the interview transcript/text
+        2. I need help preparing questions for an expert
+        Select 1 or 2:"
+
+        #If [int_mode]="1" #Begin
+            #Question: expert_info
+            "Interview Setup:
+            What is the Expert's Name and Role/Title?
+            (e.g. Jane Doe, Chief Product Officer)"
+            
+            #Question: interview_raw
+            "Please paste the transcribed interview text here:"
+            
+            #Text: interview_block
+            "----------------------------------------------------------------------\n*** PRIMARY SOURCE (PRIORITIZE THIS INFO) ***\nSOURCE CONTEXT: [expert_info]\nINTERVIEW TRANSCRIPT:\n[interview_raw]\n----------------------------------------------------------------------"
+            
+            #Show: "Thanks!
+            Interview added as a Priority Source."
+        #End
+
+        #If [int_mode]="2" #Begin
+            ## Interview Preparation Mode
+            
+            #Question: int_prep_check
+            "To generate relevant questions, it is highly recommended to have background info added first (Own products, Competitors, Trends).
+
+            Do you feel you have added enough info to generate high-quality interview questions?
+            1. Yes, proceed to preparation
+            2. No, I want to add more background info first
+            Select 1 or 2:"
+
+            #If [int_prep_check]="2" #Begin
+                 #Show: "Okay! Please use the main menu options (1, 3, 5 etc) to add more content.
+                 Come back here (Option 2) when you are ready!"
+            #Else-Begin
+                #Question: int_why
+                "Why are you doing this interview?
+                (e.g. To get a specific quote, to verify facts, to get a full case study, etc)"
+
+                #Question: expert_info
+                "Interview Setup:
+                What is the Expert's Name and Role/Title?
+                (e.g. Jane Doe, Chief Product Officer)"
+
+                #Question: int_knowledge
+                "Preparation:
+                What do you already know about the subject? 
+                (Briefly summarize key facts you don't need to ask about)"
+
+                #Question: int_goal
+                "What do you hope the expert can contribute?
+                (e.g. Specific technical details, opinion on a trend, a personal story)"
+
+                #Question: int_level
+                "Select Interview Level:
+                1. 3 Quick questions in a mail
+                2. 15 min meeting + interview
+                3. 30 min meeting + interview
+                Select 1, 2 or 3:"
+
+                #Show: "Generating interview materials based on your project settings and background info..."
+
+                #chatGPT: int_prep_result
+                "Act as a professional journalist and researcher.
+                I am writing a [project_type].
+                The strategic goal/level is: [project_level].
+                
+                Interview Context:
+                - Reason for interview: [int_why]
+                - Expert Name/Role: [expert_info]
+                - My current knowledge: [int_knowledge]
+                - What I need from the expert: [int_goal]
+                
+                --- BACKGROUND MATERIAL ALREADY COLLECTED:
+                [own_content_text]
+                [competitor_content_text]
+                [trend_content_text]
+                [additional_content_text]
+                ---
+                
+                TASK: Generate interview material based on Level [int_level].
+                Use the 'Background Material' to ask specific, insightful questions that bridge the gap between what we know and what the expert knows.
+                
+                IF Level = 1: Write a professional, concise email to [expert_info] including 3 high-impact questions.
+                IF Level = 2: Write a script for a 15-minute interview (approx 5-7 distinct questions).
+                IF Level = 3: Write a deep-dive script for a 30-minute interview (approx 10-12 questions with follow-up prompts).
+                
+                Output the email or script only."
+
+                #Show: "## Interview Preparation Material ##
+                [int_prep_result]"
+
+                #Show: "NEXT STEPS:
+                1. Copy the text above and use it to interview [expert_info].
+                2. IMPORTANT: Use the 'Save' button in the menu now to pause this app and create a Save Point.
+                3. Come back later, run the app from the Save Point, and select 'I already have the interview transcript' to paste the results!"
+            #End
+        #End
+    #End
+
+
+    #If [content_add]="3" #Begin
+        ##Competitor content source
+        #Text: competitor_source_q_valid
+        "n"
+        #Loop-Until: [competitor_source_q_valid]="y"
+            #Question: competitor_source_q
+            "Now, let's analyze a COMPETITOR.
+            Would you like to:
+            1. Provide a competitor website URL
+            2. Paste competitor content
+            Select one number:"
+            #If [competitor_source_q]="1" #Begin
+                #Text: competitor_source_q_valid
+                "y"
+            #End
+            #If [competitor_source_q]="2" #Begin
+                #Text: competitor_source_q_valid
+                "y"
+            #End
+        #End
+
+        #If [competitor_source_q]="1" #Begin
+            #Question: competitor_url
+            "Please enter the URL of your competitor's website:"
+            #Show: "Scraping competitor website... (10-45 sec)"
+            #scrape: competitor_content_raw
+            "[competitor_url]"
+            #Show: "Analyzing competitor content...(10-45 sec)"
+            ## Updated to chatGPT (v4) for HTML parsing
+            #gemini: competitor_content_gpt
+            "Extract all the readable content from this HTML code, include button text and ALT image texts, don't include cookie information.
+            Format nicely. HTML: [competitor_content_raw]"
+            #Text: competitor_content_text
+            "[competitor_content_text]\n\n-----Competitor product/service content:\n[competitor_content_gpt]"
+        #Else-Begin
+            #Question: competitor_content_text_q
+            "Please paste content about your competitor's product/service:"
+            #Text: competitor_content_text
+            "[competitor_content_text]\n\n-----Competitor product/service content:\n[competitor_content_text_q]"
+        #End
+        #Show: "Thanks for adding content!
+        You can now add more if you want!"
+    #End
+
+    #If [content_add]="4" #Begin
+        ## Reaction Mode (Moved from old sub-menu)
+        #Question: topic_mode
+        "REACTION MODE:
+        How do you want to define the topic you want to react to?
+        1. I will type the topic myself
+        2. Suggest topics based on already added Base Content, Project Type & Level
+        3. I have the URL of an article already
+        Select 1, 2 or 3:"
+
+        #If [topic_mode]="3" #Begin
+            #Question: target_url
+            "Please paste the URL of the article you want to react to:"
+        #End
+
+        #If [topic_mode]="1" #Begin
+             #Question: react_topic
+             "What topic do you want to find articles on?"
+        #End
+
+        #If [topic_mode]="2" #Begin
+             #Show: "Brainstorming relevant topics based on your data..."
+             
+             #Text: topic_suggestion_prompt
+             "I am writing a [project_type].
+             The Strategic Goal (Level) is: [project_level].
+             
+             HERE IS THE CONTEXT WE HAVE SO FAR (Some may be empty):
+             [interview_block]
+             1. My Product/Service: [own_content_text]
+             2. Competitor Info: [competitor_content_text]
+             3. Additional Context: [additional_content_text]
+             
+             TASK:
+             Based on the context above, suggest 5 specific, trending topics I should find an article to write a reaction/commentary piece on.
+             GUIDELINES:
+             - If 'My Product' is known, find trends that affect my specific niche.
+             - If 'Competitor Info' is known, suggest topics where we could offer a counter-narrative or highlight a gap they miss.
+             - If no specific context is known, focus purely on the Project Level (e.g. TOFU vs Thought Leadership).
+             Format:
+             1. [Topic Name]
+             ...
+             5. [Topic Name]
+             Output the numbered list only."
+             
+             #chatgpt: topic_suggestions
+             "[topic_suggestion_prompt]"
+
+             #Question: topic_choice_num
+             "Based on what you've told me so far, here are 5 topics to explore:
+             [topic_suggestions]
+
+             Which topic should we search for?
+             (Enter the number)"
+
+             #chatgpt: react_topic
+             "Look at this list:
+             [topic_suggestions]
+             Extract ONLY the text of the topic corresponding to number [topic_choice_num].
+             Output just the topic text, no numbering."
+        #End
+
+        ## Only run the search logic if we do NOT have a direct URL (Mode 1 or 2)
+        #If [topic_mode]<>"3" #Begin
+            #Show: "Searching for articles on '[react_topic]'..."
+
+            #chatgptsearch: article_list
+            "Find 10 high-quality, recent articles relevant to: [react_topic].
+            Present them as a strictly numbered list (1-10).
+            Format:
+            1. [Title] - [Very brief summary]
+            [URL]
+            ...
+            10. [Title] - [Very brief summary]
+            [URL]
+            Dont give back any other text or information."
+
+            #Question: article_choice
+            "I found these articles:
+            [article_list]
+
+            Which one do you want to comment on?
+            (Enter the number, e.g. 3)"
+
+            #Show: "Retrieving article content..."
+
+            #chatgpt: target_url
+            "Look at this list:
+            [article_list]
+            Extract ONLY the URL corresponding to item number [article_choice]
+            Output nothing else, just the clean URL."
+        #End
+
+        ## Save reaction context for the writer
+        #Text: is_reaction
+        "y"
+        #Text: react_url
+        "[target_url]"
+
+        #Show: "Scraping [target_url]..."
+
+        #scrape: raw_article
+        "[target_url]"
+
+        #gemini: clean_article
+        "Extract the main body text and key arguments from this HTML.
+        HTML: [raw_article]"
+
+        #Show: "Article contents added to background material - We will react to this: 
+        [clean_article]"
+
+        #Text: react_content_text
+        "[react_content_text]\n\n----- PRIMARY SOURCE (Article to Comment/React to):\n[clean_article]"
+
+        #Text: react_prompt
+        "1. You MUST frame this text as a commentary/reaction.
+        2. Start the text with a variation of: 'I just read an interesting article...' or 'I stumbled upon this piece regarding...'
+        3. You MUST include the Reference URL in the text (e.g. 'Read the full article here: [react_url]' or inline).
+        4. Do not just summarize the article; use the 'Differentiation' and 'Own Content' strategies to add a unique perspective or counter-argument that interest our target audience and helps our cause.
+        ------ Content to react to:
+        [react_content_text]
+        ------"
+
+    #End
+
+    #If [content_add]="5" #Begin
+        ## Industry trends (General - stripped of reaction mode)
+        #Text: trend_source_q_valid
+        "n"
+        #Loop-Until: [trend_source_q_valid]="y"
+            #Question: trend_source_q
+            "Let's analyze INDUSTRY NEWS & TRENDS.
+            Would you like to:
+
+            1. Do a general AI web search for trends
+            2. Provide a specific URL
+            3. Paste text content
+
+            Select one number:"
+
+            #If [trend_source_q]="1" #Begin
+                #Text: trend_source_q_valid
+                "y"
+            #End
+            #If [trend_source_q]="2" #Begin
+                #Text: trend_source_q_valid
+                "y"
+            #End
+            #If [trend_source_q]="3" #Begin
+                #Text: trend_source_q_valid
+                "y"
+            #End
+        #End
+
+        ## OLD: General Search
+        #If [trend_source_q]="1" #Begin
+            #Question: trend_search
+            "Look for news & trends in the area of: (please specify)"
+            #Show: "Searching for news & trends... (10-45 sec)"
+            #chatgptsearch: trend_search_content_raw
+            "---Look for current news & trends in this area:
+            [trend_search]
+            ---Considering I am doing research for content of this type:
+            [project_level]"
+            #Text: trend_content_text
+            "[trend_content_text]\n\n-----Industry trends/news/info:\n[trend_search_content_raw]"
+        #End
+
+        ## OLD: Specific URL
+        #If [trend_source_q]="2" #Begin
+            #Question: trend_url
+            "Please enter the URL of the industry news page:"
+            #Show: "Scraping content..."
+            #scrape: trend_content_raw
+            "[trend_url]"
+            #gemini: trend_content_gpt
+            "Extract readable content.
+            HTML: [trend_content_raw]"
+            #Text: trend_content_text
+            "[trend_content_text]\n\n-----Industry trends/news/info:\n[trend_content_gpt]"
+        #End
+
+        ## OLD: Paste
+        #If [trend_source_q]="3" #Begin
+            #Question: trend_content_text_q
+            "Please paste the content/news:"
+            #Text: trend_content_text
+            "[trend_content_text]\n\n-----Industry trends/news/info:\n[trend_content_text_q]"
+        #End
+
+        #Show: "Thanks for adding content!
+        You can now add more if you want!"
+    #End
+
+    #If [content_add]="6" #Begin
+        ##Additional source
+        #Text: additional_source_q_valid
+        "n"
+        #Loop-Until: [additional_source_q_valid]="y"
+            #Question: additional_source_q
+            "Finally, let's analyze any ADDITIONAL SOURCE.
+            1. Provide an additional content URL
+            2. Paste additional content
+            Select one number:"
+            #If [additional_source_q]="1" #Begin
+                #Text: additional_source_q_valid
+                "y"
+            #End
+            #If [additional_source_q]="2" #Begin
+                #Text: additional_source_q_valid
+                "y"
+            #End
+        #End
+
+        #If [additional_source_q]="1" #Begin
+            #Question: additional_url
+            "Please enter the URL of additional content:"
+            #Show: "Scraping additional content... (10-45 sec)"
+            #scrape: additional_content_raw
+            "[additional_url]"
+            #Show: "Analyzing additional content...(10-45 sec)"
+            ## Updated to chatGPT (v4) for HTML parsing
+            #gemini: additional_content_gpt
+            "Extract readable content. HTML: [additional_content_raw]"
+            #Question: additional_content_info
+            "What is the nature/purpose/content of this additional content?"
+            #Text: additional_content_text
+            "[additional_content_text]\n\n-----[additional_content_info]:\n[additional_content_gpt]"
+        #Else-Begin
+            #Question: additional_content_text_q
+            "Please paste any additional content:"
+            #Question: additional_content_info
+            "What is the nature/purpose/content of this additional content?"
+            #Text: additional_content_text
+            "[additional_content_text]\n\n-----[additional_content_info]:\n[additional_content_text_q]"
+        #End
+        #Show: "Thanks for adding content!
+        You can now add more if you want!"
+    #End
+
+    #If [content_add]="7" #Begin
+        #If [own_content_text]="" #Begin
+            #Show: "You need to add at least one base content about your own product/service.
+            Please choose '1' in the menu to do that."
+        #Else-Begin
+            #Text: content_exit
+            "y"
+        #End
+    #End
+#End
+
+
+
+
+
+
+
+
+
+
+## Automatic target audience identification
+#Show: "Identifying potential target audiences... (10-45 sec)"
+
+#Text: audience_prompt
+"Based on all the content analyzed, identify 15 specific, well-defined target audience segments.
+Present this as a numbered list.
+--- Language: [language]
+--- Content:
+[interview_block]
+[own_content_text]
+[competitor_content_text]
+[trend_content_text]
+[additional_content_text]
+[react_content_text]"
+
+##Show: "Debug - audience_prompt:
+##Show: "[audience_prompt]"
+
+#chatGPT: audience_gpt
+"[audience_prompt]"
+
+#Question: ta_choice
+"Based on my analysis of all sources, here are potential TARGET AUDIENCES:
+(Select 1-3 numbers, separated by commas, or enter 'm' to specify your own)
+[audience_gpt]
+Which target audience segment(s) would you like to focus on?"
+
+#If [ta_choice]="m" #Begin
+    #Question: target_audience_custom
+    "Please describe your preferred target audience:"
+    #Text: ta_final
+    "[target_audience_custom]"
+#Else-Begin
+    ## REUSE audience_gpt to maintain context
+    #chatGPT: audience_gpt
+    "My selection(s) from the list are: [ta_choice]
+    Extract ONLY THAT/THOSE specific list items with their text and combine them into a new list, with no additional information."
+    #Text: ta_final
+    "[audience_gpt]"
+#End
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Automatic pain points identification
+#Show: "Identifying TA pain points... (10-45 sec)"
+
+#Text: pain_prompt
+"Identify 15 specific, well-defined pain points of the target audience that is:[ta_final].
+Present this as a numbered list.
+--- Language: [language]
+--- Project type: [project_type]
+--- Project level: [project_level]
+--- Content:
+[interview_block]
+[own_content_text]
+[competitor_content_text]
+[trend_content_text]
+[additional_content_text]
+[react_content_text]"
+
+##Show: "Debug - pain_prompt:
+##Show: "[pain_prompt]"
+
+#chatGPT: pain_gpt
+"[pain_prompt]"
+
+#Question: pain_choice
+"Here are potential PAIN POINTS of the target audience:
+(Select 1-3 numbers, separated by commas, or enter 'm' to specify your own)
+[pain_gpt]
+Which pain points(s) would you like to focus on?"
+
+#If [pain_choice]="m" #Begin
+    #Question: pain_custom
+    "Please describe your preferred pain points:"
+    #Text: pain_final
+    "[pain_custom]"
+#Else-Begin
+    ## REUSE pain_gpt to maintain context
+    #chatGPT: pain_gpt
+    "My selection(s) from the list are: [pain_choice]
+    Extract ONLY THAT/THOSE specific list items with their text and combine them into a new list, with no additional information."
+    #Text: pain_final
+    "[pain_gpt]"
+#End
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Competitor differentiation analysis
+#Text: diff_final
+""
+#If [competitor_content_text]<>"" #Begin
+	#Show: "Analyzing competitive differentiation... (10-45 sec)"
+	
+    #Text: diff_prompt
+    "Identify 10 potential differentiators that could set the client's content apart from competitors.
+    Present as a numbered list.
+    --- Language: [language]
+    --- Project type: [project_type]
+    --- Project level: [project_level]
+    --- Target Audience: [ta_final]
+    --- [interview_block]
+    --- [own_content_text]
+    --- [competitor_content_text]
+    --- [react_content_text]"
+    
+    ##Show: "Debug - diff_prompt:
+    ##Show: "[diff_prompt]"
+
+	#chatGPT: differentiator_gpt
+    "[diff_prompt]"
+
+	#Question: diff_choice
+	"Here are potential DIFFERENTIATORS:
+	(Select 1-3 numbers, or 'm' to specify your own, 'n'=none)
+	[differentiator_gpt]
+	Which differentiation points would you like to emphasize?"
+
+	#If [diff_choice]="n" #Begin
+        #Text: diff_final
+        "none specified"
+    #Else-Begin
+        #If [diff_choice]="m" #Begin
+            #Question: custom_diff
+            "Please describe your preferred differentiation points:"
+            #Text: diff_final
+            "[custom_diff]"
+        #Else-Begin
+            ## REUSE differentiator_gpt to maintain context
+            #chatGPT: differentiator_gpt
+            "My selection(s) from the list are: [diff_choice]
+            Extract ONLY THAT/THOSE specific list items with their text and combine them into a new list, with no additional information."
+            #Text: diff_final
+            "[differentiator_gpt]"
+        #End
+    #End
+#End
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Trends strategy
+#Text: trends_final
+""
+#If [trend_content_text]<>"" #Begin
+	#Show: "Analyzing news & trends... (10-45 sec)"
+	
+    #Text: trends_str_prompt
+    "Identify 10 potential news & trends to highlight.
+    Present as a numbered list.
+    --- Language: [language]
+    --- Project type: [project_type]
+    --- Project level: [project_level]
+    --- Target Audience: [ta_final]
+    --- [interview_block]
+    --- [own_content_text]
+    --- [trend_content_text]
+    --- [react_content_text]"
+
+    ##Show: "Debug - trends_prompt:
+    ##Show: "[trends_str_prompt]"
+
+	#chatGPT: trends_gpt
+    "[trends_str_prompt]"
+
+	#Question: trends_choice
+	"Here are potential news & trends to use:
+	(Select 1-3 numbers, or 'm' to specify your own, 'n'=none)
+	[trends_gpt]
+	Which trends would you like to emphasize?"
+
+	#If [trends_choice]="n" #Begin
+        #Text: trends_final
+        "none specified"
+    #Else-Begin
+        #If [trends_choice]="m" #Begin
+            #Question: custom_trends
+            "Please describe your preferred news & trends:"
+            #Text: trends_final
+            "[custom_trends]"
+        #Else-Begin
+            ## REUSE trends_gpt to maintain context
+            #chatGPT: trends_gpt
+            "My selection(s) from the list are: [trends_choice]
+            Extract ONLY THAT/THOSE specific list items with their text and combine them into a new list, with no additional information."
+            #Text: trends_final
+            "[trends_gpt]"
+        #End
+    #End
+#End
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Content angle exploration
+#Show: "Developing unique content angles... (10-60 sec)"
+
+#Text: angle_prompt
+"Based on the information below, suggest 10 unique content angles.
+IMPORTANT: Consider that the final format will be: [length]
+Present this as ONE numbered list 1-10, starting with a very short headline for each, presenting the angle. And then a 3 line summary of each angle.
+--- Language: [language]
+--- Project type: [project_type]
+--- Project level: [project_level]
+--- Write for this target audience: [ta_final]
+--- IMPORTANT: The content should address these pain points: [pain_final]
+--- Try to bring up these differentiations from the competition: [diff_final]
+--- Try to bring up these trends: [trends_final]
+--- [react_prompt]
+--- Base Content:
+[interview_block]
+[own_content_text]
+[competitor_content_text]
+[trend_content_text]
+[additional_content_text]"
+
+##Show: "Debug - angle_prompt:
+##Show: "[angle_prompt]"
+
+#chatGPT: angle_gpt
+"[angle_prompt]"
+
+#Question: angle_choice
+"Based on my analysis, here are unique content ANGLES to explore:
+(Select ONE number to make a content draft)
+[angle_gpt]
+Which content angles would you like to focus on?"
+
+#chatGPT: angle_gpt
+"My selection(s) from the list are: [angle_choice]
+Extract ONLY THAT/THOSE specific list items with their text and combine them into a new list, with no additional information."
+
+## Final detailed content outline
+#Show: "Creating detailed content outline... (10-60 sec)"
+
+#Text: outline_prompt
+"Develop a detailed outline for ONE high-value content piece.
+Make this outline detailed enough that a professional copywriter could immediately begin writing from it.
+The chosen angle of the text is: [angle_gpt]
+
+--- Language: [language]
+--- IMPORTANT: Consider that the final format will be: [length]
+--- Project type: [project_type]
+--- Project level: [project_level]
+--- [react_prompt]
+--- IMPORTANT: Write for this target audience: [ta_final]
+--- IMPORTANT: Addressmainly these pain points: [pain_final]
+--- IMPORTANT: Try to bring up these differentiations from the competition: [diff_final]
+--- IMPORTANT: Try to bring up these trends: [trends_final]
+--- Base Content:
+[interview_block]
+[own_content_text]
+[competitor_content_text]
+[trend_content_text]
+[additional_content_text]"
+
+##Show: "Debug - _prompt:
+##Show: "[outline_prompt]"
+
+#chatGPT: outline_gpt
+"[outline_prompt]"
+
+#Show: "## Suggested Content Outline ##
+[outline_gpt]"
+
+## User feedback loop
+#Question: angle_feedback
+"Now in chat mode.
+Do you have any feedback or instructions on the outline?
+('n' = stop)"
+
+#Loop-Until: [angle_feedback]="n"
+    #Show: "Processing feedback....(10-45 sec)"
+    #chatGPT: outline_gpt
+    "[angle_feedback]"
+    #Show: "[outline_gpt]"
+    #Question: angle_feedback
+    "Do you have any more feedback or instructions?
+('n' = stop) "
+#End
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#Question: image_q
+"Do you want to generate an image for this text?
+1. Photo
+2. Illustration
+3. No thanks"
+
+#If [image_q]="1" #Begin
+    ## Automated Image Generation
+    #Show: "Generating visualization... (15-45 sec)"
+    #chatGPT: img_prompt
+    "Extract the image prompt from the content outline below.
+    If there is no specific image prompt, write a creative one based on the Headline and Tone.
+    STYLE: The image should be in an extremely realist photo style.
+    Output ONLY the prompt text and STYLE, nothing else.
+    Outline: [outline_gpt]"
+    #Show: "Image Prompt: [img_prompt]"
+    #chatgpt-img: generated_img
+    size: 1024x1024
+    "[img_prompt]"
+    #showimage: [generated_img]
+#End
+#If [image_q]="2" #Begin
+    ## Automated Image Generation
+    #Show: "Generating visualization... (15-45 sec)"
+    #chatGPT: img_prompt
+    "Extract the image prompt from the content outline below.
+    If there is no specific image prompt, write a creative one based on the Headline and Tone.
+    STYLE: The image should be in an toned down illustration style.
+    Output ONLY the prompt text and STYLE, nothing else.
+    Outline: [outline_gpt]"
+    #Show: "Image Prompt: [img_prompt]"
+    #chatgpt-img: generated_img
+    size: 1024x1024
+    "[img_prompt]"
+    #showimage: [generated_img]
+#End
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Save Point
+#Question: save_q
+"The outline and research are complete.
+Do you want to proceed to writing the full article now or exit?
+y=enter article writing module
+n=exit
+Tip: Use the Save function now to be able to come back to this point next time you runt the app."
+
+#If [save_q]="n" #Begin
+   #Show: "Progress saved.
+Exiting..."
+#Else-Begin
+
+    #Text: full_q
+    "n"
+    #Loop-Until: [full_q]="y"
+       #Question: full
+       "Writing Configuration:
+       1. Standard - Write a great article/text by answering a few questions
+       2. Advanced - More control: specify tone, Real SEO data, style details
+       Please choose 1 or 2!"
+
+       #If [full]="2" #Begin
+          #Text: full_q
+          "y"
+          #Text: full
+          "y"
+       #End
+       #If [full]="1" #Begin
+          #Text: full_q
+          "y"
+          #Text: full
+          "n"
+       #End
+    #End
+
+
+
+
+
+
+
+
+
+
+
+
+   
+    ## Tone of voice source
+    #If [full]="y" #Begin
+        #Text: tone_valid
+        "n"
+        #Loop-Until: [tone_valid]="y"
+            #Question: tone
+            "How would you like to specify the basic style & tone of voice of the text?
+            1. I will provide instructions
+            2. I will provide a text style example
+            3. Try to emulate the style of your own base content
+            Please answer with one number, eg 3"
+
+            #If [tone]="1" #Begin
+                #Question: tone_prompt
+                "Describe the style & tone you want:"
+                #Text: tone_valid
+                "y"
+            #End
+            #If [tone]="2" #Begin
+                #Question: tone_q
+                "Provide a sample text for me to try to emulate:"
+                #Show: "Analyzing your sample text...."
+                #chatgpt: tone_analysis
+                "Analyze the writing style of the following text.
+                Provide only a brief summary in one paragraph of the style that can be used as a reference for emulating it in future writing prompts.\nThe text: [tone_q]"
+                #Text: tone_prompt
+                "[tone_analysis]"
+                #Text: tone_valid
+                "y"
+        
+            #End
+            #If [tone]="3" #Begin
+                #Show: "Analyzing your base text tone...."
+                #chatgpt: tone_analysis
+                "Analyze the writing style of the following text.
+                Provide only a brief summary in one paragraph of the style that can be used as a reference for emulating it in future writing prompts.
+                Tweak the style to match this content type: [project_type]
+                The text: [own_content_text]"
+                #Text: tone_prompt
+                "[tone_analysis]"
+                #Text: tone_valid
+                "y"
+        
+            #End
+        #End
+    #Else-Begin
+        #Show: "Analyzing your base text...."
+        #chatgpt: tone_analysis
+        "Analyze the writing style of the following text.
+        Provide only a brief summary in one paragraph of the style that can be used as a reference for emulating it in future writing prompts.\nThe text: [own_content_text]"
+        #Text: tone_prompt
+        "[tone_analysis]"
+    #End
+
+    ## Additional tone style addons
+    #if [full] = "y" #Begin
+       #Text: style
+       "1.Slightly funny - Make the text just slightly funny, not too much.
+       2. Funny - Make it a litte bit funny.
+       3. Hilarious - Make it very funny.
+       4. A few abbreviations - Include 1-3 'fast texting abbreviations'.
+       5. Many Abbreviations - Include very few 'fast texting abbreviations'.
+       6. A few typos - Include 1-2 typos in the first sentence.
+       7. Many typos - Include typos throughout the text.
+       8. Bad grammar - Include 1-2 occurences of bad or wrong grammar.
+       9. Weeeird spelling - Primarily in the hook, include 1-2 words with too many vocals, example: 'waaaay to good'.
+       10. CAPITALS - Include 1-2 words emphasized in CAPITALS for max emotions.
+       11. !!!! ???? ?!?!? - Include 1-2 occurences of many !!!!! or ???? or ?!?!?!.
+       12. ... ( ) - Use dots like ... to indicate hesitation or thinking, and sometimes parts of sentences in parenthesis instead of using comma.
+       13. Odd sentence lengths - Use extremely different sentence lengths, sentences can be one word or very long with many commas.
+       14. Short sentences & paragraphs - Write using extremely short sentences and short paragraphs.
+       15. Conversational - Write like you're having a real conversation.
+       16. Personal - Include occasional casual phrases and conversational transitions like 'you know,' 'actually,' 'well,' but don't overdo it.
+       17. Provocative - Write with some provocative ideas.
+       18. Emotional - Express lots of feelings.
+       19. Opinionated - Write in a very opinionated style.
+       20. Less certain - Use a lot of phrases like 'I think,' 'maybe,' or 'it seems that' to show uncertainty or nuanced thinking.
+       21. Rhetorical -  Pose questions to engage the reader and stimulate thought.
+       22. No rethorical - Don't use rhetorical question.
+       23. No 'Here's the....' - Don't use phrasing like 'Here's the kicker' or 'Here's the plot twist'.
+       24. Digressions - Include digressions, occasionally go off on brief, relevant tangents as humans often do in conversation or writing.
+       25. No corporate BS - Use everyday words over formal alternatives, be specific instead of metaphorical, choose simple and clear words over complex ones, avoid buzzwords and business jargon, write actively and directly, avoid corporate style and language.
+       26. No statistics - Remove all statistics and numbers like '38%' or 'every 8 out of 10' or '5000 dollars' etc.
+       27. Few Headlines - Headlines frequency: Only use very few headlines, headlines are in BOLD.
+       28. Many Headlines - Insert sub headlines in BOLD where it is logical, but not too many.
+       29. No lists - Remove all bullet points and lists.
+       30. One list - The text should somewhere contain ONE list with bullet points.
+       31. Many lists - Have lots of lists with bullet points.
+       32. Hook - Start the text with a strong hook in a short sentence.
+       33. Intro - Make a strong lede in the text, meant to sum up the text but also make you want to read more.
+       34. CTA - Write a strong CTA at the end of the text.
+       35. Question CTA - Write a strong CTA in the form of a question at the end of the text.
+       36. No selling - Do not talk about us or try to sell.
+       37. Selling - Write about us and sell us or our products or services to the reader in a subtle way."
+
+       #Show: "Analyzing styles...."
+       #chatgpt: menu
+       "Show me the following numbered menu, but don't show the prompt part after '-' and dont add any other text before or after.
+       [style]"
+
+       #Question: choices
+       "What additional style elements do you want in your text?
+       (choose the ones you like, for eexample 13,16,20,22,23,24,25,26,27,29,32,33,34,36)
+       [menu]
+       Reply with all the numbers you like:"
+
+       #Show: "Optimizing styles...."
+       #chatgpt: style_choices
+       "From the menu below I select the lines: [choices].
+       Now, reply with the all the selections I made, one per line.
+       IMPORTANT: Reply ONLY with the part of each line that is AFTER the minus sign '-' in each line.
+       Do not reply with any other information.
+       The original menu: [style]"
+    #Else-Begin
+       #Text: style_choices
+       "- Use extremely different sentence lengths, sentences can be one word or very long with many commas.
+       - Use everyday words over formal alternatives, be specific instead of metaphorical, choose simple and clear words over complex ones, avoid buzzwords and business jargon, write actively and directly, avoid corporate style and language.
+       - Insert sub headlines in BOLD where it is logical, but not too many.
+       - Start the text with a strong hook in a short sentence.
+       - Make a strong lede in the text, meant to sum up the text but also make you want to read more."
+    #End
+
+
+
+
+
+
+
+
+
+
+
+
+    #If [full]="y" #Begin
+       #Question: seo_mode
+       "SEO Configuration:
+       1. Use Real Data (Search Volume/Competition) - Recommended
+       2. Manual keywords
+       3. No SEO
+       Choose 1, 2 or 3:"
+
+       #If [seo_mode]="1" #Begin
+ 
+            ## Initialize the master list variable
+            #Text: all_selected_kws
+            ""
+
+            ## Initialize loop control
+            #Text: search_again
+            "y"
+
+            #Show: "Configuring SEO location and language ect...10-30sec"
+
+ 
+            #chatgpt: lang_code
+            "give me the language code according to ISO 639-1 of the language most fitting the following text
+            IMPORTANT: dont give back any other information, just the clean code.
+            Text: [language]"
+
+            #chatgpt: loc_code
+            "give me the numeric 'Geotarget ID' code used by google ads API (for example 2840 for USA, 2752 for sweden) of the place most fitting the following language.
+            IMPORTANT: dont give back any other information, just ONE clean code.
+            Language: [language]"
+
+            #Text: seo_start
+            "From the info below, suggest 10 SEO keywords for the text.
+            Give back only a comma separated list, no othe rinformation.
+            --- Write for this target audience: [ta_final]
+            --- Address mainly these pain points: [pain_final]
+            --- Outline for the text to apply SEO to: [outline_gpt]
+            --- Our Base Content or website content:
+            [own_content_text]"
+
+            #chatGPT: kw_suggest
+            "[seo_start]"
+
+            #Show: "You will now enter the SEO keyword research module where you can enter a seed keyword and find related ones.
+            You can do this several times for new seeds, on at a time."
+
+            ## Start the Search Loop
+            #Loop-Until: [search_again]="n"
+
+                ## Flush LLM context so it forgets the previous list of keywords
+                #chatGPT: seo_analysis
+                "--flush"
+                #chatGPT: seo_final_list
+                "--flush"
+
+                #Question: seed_kw
+                "Enter seed keyword(s) to discover high-potential terms:
+                (suggestions could be one of these: [kw_suggest])"
+
+     
+                #Show: "Fetching live data from DataForSEO... (Wait)"
+                #seo: seo_data
+                URL = https://api.dataforseo.com/v3/dataforseo_labs/google/keyword_suggestions/live
+                JSON = {"keyword":"${seed_kw}", "location_code":${loc_code}, "language_code":"${lang_code}","include_serp_info": true, "include_seed_keyword": true,"limit": 10}
+
+                #Show: "Analyzing SEO opportunities..."
+     
+                #chatGPT: seo_analysis
+                "Analyze the following JSON from DataForSEO 'keyword suggestions'.
+                Extract all keywords and present them as a numbered list. Give back no other information, just the numbered list.
+                If the keywords have Volume and Competition values, include those and rank them, with most volume first.
+                JSON: [seo_data]"
+
+                #Question: seo_select
+                "Here are the top opportunities found:
+                [seo_analysis]
+
+                Which keywords do you want to add to your list?
+                (e.g. 1,3,5)
+                (in the next step you can give a new seed keyword also)"
+
+                #chatgpt: seo_final_list
+                "Extract the keywords corresponding to numbers [seo_select] from the list below.
+                Return ONLY a comma-separated list of the keywords.
+                List: [seo_analysis]"
+
+                ## Add new keywords to the master list
+                #Text: all_selected_kws
+                "[all_selected_kws], [seo_final_list]"
+
+                #Question: search_again
+                "Do you want to provide another Seed Keyword to find more terms (y/n)"
+
+            #End
+
+            ## Manual Entry Section
+            #Question: manual_kws
+            "Do you want to manually add extra keywords?
+            Type them here (comma separated) or type 'n' to skip:"
+
+            #If [manual_kws]<>"n" #Begin
+                #Text: all_selected_kws
+                "[all_selected_kws], [manual_kws]"
+            #End
+
+            ## Final Cleanup
+            #chatgpt: cleaned_list
+            "Look at the following list of keywords.
+            Clean it up by removing any duplicates and ensuring it is a clean comma-separated list.
+            Remove any leading or trailing commas. 
+            Give back only the keyword list, no additional information.
+            List: [all_selected_kws]"
+
+            #Text: seo_prompt
+            "Primary SEO keywords (Include naturally in headers and body): [cleaned_list]"
+
+       #End
+
+       #If [seo_mode]="2" #Begin
+
+          #Question: kws
+          "Your comma separated keyword list:"
+          
+          #Text: seo_prompt
+          "Primary SEO keywords (Include naturally in headers and body): [kws]"
+       #End
+
+       #If [seo_mode]="3" #Begin
+          #Text: seo_prompt
+          "No specific SEO keywords required."
+       #End
+    #Else-Begin
+        #Text: seo_prompt
+        "No specific SEO keywords required."
+    #End
+
+
+ 
+
+
+
+
+
+
+
+
+    ## Main text output
+    #Text: cld_prompt
+    "Write the full content piece based on the instructions below.
+    --- BASE CONSTRAINTS:
+    --- Language: [language]
+    --- Length Constraint: [length]
+ 
+    --- STYLE:
+    --- Headlines in BOLD
+    --- Tone & Style: [tone_prompt]
+    --- Specific Style Rules: [style_choices]
+
+    --- CONTENT TYPE:
+    --- Project type: [project_type]
+    --- Project level: [project_level]
+    --- [react_prompt]
+
+    --- STRATEGY:
+    --- Target Audience: [ta_final]
+    --- Pain Points: [pain_final]
+    --- Differentiation: [diff_final]
+    --- Try to bring up these trends: [trends_final]
+    --- Text is based on this brief: [angle_gpt]
+    --- SEO Instructions: [seo_prompt]
+
+    --- BASE OUTLINE (Follow this structure):
+    --- [outline_gpt]
+
+    --- BASE CONTENT:
+    [interview_block]
+    [own_content_text]
+    [competitor_content_text]
+    [trend_content_text]
+    [additional_content_text]
+
+    --- OUTPUT:
+    Only give me the final text.
+    No pre-amble."
+
+    ##Show: "Debug - cld_prompt:
+    ##Show: "[cld_prompt]"
+
+    #Show: "Writing article....(30-60 sec)"
+
+    ## Select LLM based on output size
+    #If [llm]="claude" #Begin
+       #Claude: article
+       "[cld_prompt]"
+    #End
+    #If [llm]="gemini" #Begin
+       #gemini: article
+       "[cld_prompt]"
+    #End
+
+    #Show: "[article]"
+
+    ## Feedback loop until user is happy
+    #Question: feedback
+    "Now in chat mode.
+    Do you have any feedback on this text?
+    ('n' = stop) "
+
+    #Loop-Until: [feedback]="n"
+       #Show: "Re-writing....(30 sec)"
+      #If [llm]="claude" #Begin
+       #Claude: article
+       "[feedback]"
+      #End
+      #If [llm]="gemini" #Begin
+       #gemini: article
+       "[feedback]"
+      #End
+
+       #Show: "[article]"
+
+       #Question: feedback
+       "Now in chat mode.
+       Do you have any feedback on this text?
+       (n = stop) "
+    #End
+
+#End
+
+#Show: "Thanks for using purposewrite!"
+
