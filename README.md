@@ -57,5 +57,10 @@ apps/
 
 templates/
 
+    purposewrite-script-language-code templates.txt
+
 script-language/
+
+    purposewrite-script-language-reference 251128.txt
+    
 
