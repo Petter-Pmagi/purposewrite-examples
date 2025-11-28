@@ -1,0 +1,489 @@
+General comments on the SaaS and UI:
+
+The UI is in english, but input and output can be any language.
+
+The UI is purely text based, like a scripted conversation with a chatbot.
+
+The SaaS contains a list of apps the user can choose to run.
+An admin user (normal user) can make sub users for free, so no cost per additional seat. Those sub users will use the admin users credits.
+An admin user can make their own scripts, by oploading or editing a text file. This is not a visual programming interface.
+Soon, the app making prompt above will be made into an app in purposewrite, so the user can make apps without having to learn the scripting language.
+An admin can also choose to share an app they made with other specific admin users. They will then use their own credits to run the script and the creator will be given a kick back in the form of 10% of the other admins used credits.
+
+NOTE: The scripts are meant to be run in one sitting, by one user.
+However, the user can at any point while running a script make a "save point" and in the future come back to exactly that point in the app run, with any information given or generated being remembered.
+This can be used to for example stop, save, go and get feedback from another person and then continue, or to store base data in the app for future runs based on the same base data.
+
+Each time the script stops to let the user input an answer, it will show all the old answers to that question. That is, answers to that question variable on pervious app runs. This can help to speed up input in the future. 
+The user can also give instructions to not remeber the answer by starting it with ## and also to remember the answer but give it a "display name" like this [display name] that will show up instead of the alswer on future runs. If chosen the full answer will be given, not the display name.  
+As the entry save is based on the variable name, this could for example be used to make an app with several branches, where you can easily get back old base data from a previous run when you run a new branch.
+Branching example at the app start, taking advantage of nameing the vars the same in the 2 branches:
+1. Do Research
+var: company name, website
+2. Write the report
+var: company name, website
+
+Other APIs will be added in the future. Could for example be intergrations to CRM systems or design tools.
+
+
+The language supports these commands:
+
+## keywords are not case sensitive
+
+## --- Comment Syntax (CRITICAL PARSING RULE) ---
+## COMMENTS ARE DEFINED AS FOLLOWS:
+## 1. A comment line MUST start with '##' at the VERY BEGINNING of the line.
+## 2. A comment line MUST NOT contain any other script command or text BEFORE the '##'.
+## 3. A comment line MUST NOT have any script command or text AFTER the comment text on the SAME line.
+##
+## IN OTHER WORDS: A '##' comment ALWAYS OCCUPIES ITS OWN LINE.
+##
+## ***** INLINE COMMENT STRICTLY FORBIDDEN:THEY WILL BREAK THE SCRIPT PARSER. *****
+##
+## CORRECT USAGE:
+## This is a standalone comment.
+#Show: "This is a command"
+## This is another standalone comment following a command.
+##
+## INCORRECT USAGE (DO NOT EVER DO THIS):
+#Show: "text" ## This is an INVALID inline comment.
+#Text: variable ## Also INVALID.
+"text"
+##
+## IF YOU WRITE AN INLINE COMMENT, THE SCRIPT WILL FAIL.
+## ALWAYS PLACE COMMENTS ON A SEPARATE, DEDICATED LINE.
+## --- End of Comment Syntax ---
+
+## The user can not ever input an empty response, so never assume that, for example dont look for #If [answer]="" #Begin 
+## IMPORTANT: The user can not press ENTER only, they need to input something first, so it you ask for a default answer maby say "Press 'e' for english" and not "Press Enter for default"
+## for the questions where you have a suggested answer, please make it fast and easy for the user to give that answer for example by saying "Press 'e' for english", do this for ALL suggested answers
+## So, always use a quick key like "e" to keep the old/suggested/default answer
+
+## Always try to minimize and simplify user input, try to suggest good defaults, make choice menus instead of free text inputs etc
+
+## line breaks are important, for example:
+#Text: variable 
+"text"
+#If [variable]="text" #Begin
+## However the #Show command should have the text start on the same line: #Show: "text"
+
+
+#Show: "text" 
+## to show a text to the user, "...text must start on the SAME line as #Show: as in the example
+## standard markup is supported, for example **bold** and ## headline 2 ## 
+## line breaks are respected, and can also be forced with \n
+
+#Question: variable 
+"text" 
+## to ask the user a question and store it in a variable 
+## IMPORTANT: The content "..." must start on a new line as in the example
+## the user can not answer with nothing, like "", it is not possible in the user interface
+## questions can refer to [varaiable]
+## when refering to a question [variable] will contain the user input, and [variable.q] will contain the question text asked
+
+## variables names are case sensitive
+
+#Text: variable 
+"text"
+## to store a string in a variable
+## when a menu is not llm generated but fixed, start with storing it once in a variable and then use that to reference the menu
+## strings do not support math, like: "[variable]+1" 
+## IMPORTANT: The content "..." must start on a new line as in the example
+## IMPORTANT: the same variable name can be used for #Text: and #Question: and will then share the data, however other keyword types should not share the same variable name, for example this sequence is NOT allowed:
+#Text: aaa
+""
+#chatGPT: aaa
+"prompt"
+
+
+#Text: variable
+"[variable]\nNew content"
+## example of use of variables in strings
+
+
+#chatGPT: variable
+"prompt"
+## to call chatGPT 4o API with a prompt
+## can not search the web
+## #chatGPT: calls will retain context from old calls, so use that to ask follow up questions or for example select from a generated number or choices. If you call #chatGPT: with a new variable name, there wil be no context to refer to.
+## if the llm call like chatGPT did not generate a menu for example, you need to provide that menu for reference when making a choice from it.
+## the prompt for a new llm call needs to contain the actual menu a user choice is refering to, not just the users answer 
+## llm variables are not the same type as #Text or #Question variables, so you can not do for example: 
+#Text: variable
+"text"
+#chatgpt: variable
+"prompt"
+
+#chatGPT35: variable
+"prompt"
+## older version of chatGPT, way cheaper, can be used for simple tasks
+## use this ONLY for VERY simple tasks, like "show me text nr3 from this list of 4 texts"
+## do not use if for any kind of analysis or extracting data from raw web content for example
+## can not search the web
+
+#claude: variable
+"prompt"
+## was claude 3.5 sonnet, now 4.5 
+## can not search the web
+## For final writing it is often better to call claude than chatGPT 
+
+#gemini: variable
+"prompt"
+## gemini 2.5 pro preview
+## can search the web and provide links
+## Gemini supports longer output
+
+
+##The script language supports flushing the context window for an llm variable, this can be useful in specific situations like in a loop where we dont want the old context to remain, to save tokens or to start with a clean context)
+#chatGPT: var
+"--flush"
+#chatGPT35: var
+"--flush"
+#claude: var
+"--flush"
+#gemini: var
+"--flush"
+
+
+#Scrape: variable
+"url"
+## to scrape the contents of a single web page using jina.ai
+## will return a json with title, description, html contents etc
+## use gemini to clean the raw scraped data, chatgpt can give an error for some site, probably if they are too big
+
+####meta title, description not working?
+#scrape: content2
+"Title :[url]"
+
+## scrape only H1
+#scrape: content3
+"h1 :[url]"
+
+## scrape only P
+#scrape: content4
+"p :[url]"
+
+## scrape only Title, H1, P
+#scrape: content5
+"title, h1, p :[url]"
+
+
+
+
+#chatgptsearch: variable
+"search terms"
+## web search, returns a summary + source links, will remember the contect if called with the same variable again
+
+
+
+
+##generate image using chatgpt: gpt image 1
+##Supported Sizes: 1024x1024, 1024x1536, 1536x1024, auto (defaults to 1024x1024)
+#chatgpt-img: img
+size: widthxheight
+"[prompt]"
+
+##generate image using gemini 2.5 Flash Image Preview (nano-banana)
+##Supported Sizes: only defaults to 1024x1024
+#gemini-img: img
+"[prompt]"
+
+##show an image to the user, allowing download also
+#showimage: [img]
+
+
+
+##API access for a large number of SEO oriented endpoints from dataforseo - see documentation: https://docs.dataforseo.com/v3/
+##The input is the endpoint url + the json with input data for the endpoint.
+##The url and json can most easily be generated in their playground: https://app.dataforseo.com/api-playground/serp
+##Note that some endpoint json input data need https://www and some should not have it in an url/domain name
+##Also note that sometimes the language can only be selected from a valid list for the chosen country, USA=english+spanish for example
+##quotation marks are allowed in the json, and purposewrite script variable can be accessed by ${variable_name} in the json - example:
+#SEOkw: seo_answer
+URL = https://api.dataforseo.com/v3/serp/google/organic/live/advanced
+JSON = {"keyword":"${kw}", "location_code":${location}, "language_code":"${language}", "device":"desktop", "os":"windows", "depth":30, "load_async_ai_overview":true, "people_also_ask_click_depth":4}
+##The file SEO.txt gives examples of exactly how to use each endpoint.
+
+#If [variable]="text" #Begin
+...
+#Else-Begin
+...
+#End
+## Note the ususual syntax for #Else-Begin
+## IMPORTANT: #Begin is needed, and on the same line
+## The statements after the #If #Begin must come on a new line, not the same line. 
+
+
+#Loop-Until: [variable]="text"
+...
+#End
+## loop, does not support OR, AND etc, only = and <>
+## Note no #Begin is used
+
+
+## if and loop supports complex conditions: and, or, not, <,>, <=, >=, =, <>, () 
+## Matching only the whole string, not parts
+## For example: ((([ a ] = "1") and ([ b ] = "2") ) or ( not ([ c ] = "4")))
+
+
+##Special multi list code to present a menu to the user, let the user select multiple choices and then ask the user about each choice
+#Multi-List: expertise
+#Start-List: "The choices are:"
+#List: "1. Choice 1 - The prompt for choice 1
+2. Choice 2 - The prompt for choice 2
+3. Choice 3 - The prompt for choice 3"
+#End-List: "Please choose (multi choice is ok eg 1,3)"
+## this will display a multi-list menu and lets the user reply with a comma separated list of numbers in a string 
+
+##Loop over all choices from a #Multi-List: and build a prompt from the choices made
+#Text: expertise_prompt
+""
+#For-All i=[expertise] #Begin
+    #Question: expertise_part{i}
+    "Regarding [expertise.i]\nWhat is YOUR input about that area?"
+
+    #Text: expertise_prompt
+    "[expertise_prompt]\n[expertise.i] : [expertise_part{i}]"
+#End
+
+
+
+
+##Building block example- dataforseo API call
+      #Question: input
+      "Site ranking kws, URL to analyze:"
+
+      ##domain analysis without https://www otherwise page analysis
+      #chatGPT35: url
+      "give me the full URL excluding https:// and www for the following web adress, dont give me any other information, just the clean url: [input]"
+
+      #Question: location_ans
+      "Country"
+
+      #Question: language_ans
+      "Language"
+
+      #chatGPT: location
+      "give me the numeric 'Geotarget ID' code used by google ads API (for example 2840 for USA, 2752 for sweden) of the place most fitting the following text, dont give me any other information, just the code.
+      Text: [location_ans]"
+
+      #chatGPT35: language
+      "give me the language code according to ISO 639-1 of the language most fitting the following text, dont give me any other information, just the ISO code.
+      Text: [language_ans]"
+
+      #Show: "Working....[url] - [location] - [language]"
+
+      #SEOkw: seo_answer
+      URL = https://api.dataforseo.com/v3/dataforseo_labs/google/ranked_keywords/live
+      JSON = {"target":"${url}", "location_code":${location}, "language_code":"${language}", "historical_serp_mode":"live", "ignore_synonyms":false, "include_clickstream_data":false, "item_types":["organic", "featured_snippet", "local_pack", "ai_overview_reference"], "load_rank_absolute":false, "limit":100}
+
+      #Show: "Analyzing...."
+
+      #chatGPT: analysis
+      "Analyze the following json and give the data in correct format with markdowns.
+      Just return the actual results, so don't include sections 'General information', 'Task Details', 'Data'. 
+      Also do not start or end with any text of your own like 'Here are the results...', just clean results with markdown layout.
+      json: [seo_answer]"
+
+      #Show: "Analysis: 
+      [analysis]"
+
+
+
+
+##Building block example- LLM generated menu:
+#Show: "Analyzing pain points...."
+#chatGPT: pp_analysis
+"Provide suggestions for 15 pain points of our target audience with regards to the text and the base idea below. Present this as a numbered list. Each main line in BOLD.
+Target audience: [target_audience]
+[base_idea]
+The text: [content]"
+#Question: pp_choice
+"Here is a list of possible pain points & interests for your target audience in this context.
+(select 1 to 5 of these, like 2,4,5)
+
+[pp_analysis]
+
+Which ones would you like to focus on?
+(you can answer with multiple numbers, eg 2,3,4, or 'm' to enter your own)"
+#If [pp_choice]="m" #Begin
+    #Question: pain_points
+    "What relevant pain points or interests does you Target Audience have in this context?"
+#Else-Begin
+    #Show: "Optimizing pain points...."
+    #chatGPT: pp_analysis
+    "I choose to focus on the pain points # [pp_choice] from the list.
+    Please write a short summary of the pain points that I selected in one paragraph."
+    #Text: pain_points
+    "[pp_analysis]"
+#End
+
+
+
+
+##Building block example- Feedback loop for final results:
+   #Claude: article
+   "Write an article based on the following info.
+   - We are writing for ideal customer: [ideal_customers]
+   - We are trying to highlight our expertise: [expertise_prompt] 
+   - Tone and writing style: [tone_prompt]
+   - Article key points: [suggest5]"
+   #Show: "[article]"
+   #Question: feedback
+   "Do you have any feedback on this text? ('n' = stop) "
+   #Loop-Until: [feedback]="n"
+      #Claude: article
+      "[feedback]"
+      #Show: "[article]"
+      #Question: feedback
+      "Do you have any feedback on this text? (n = stop) "
+   #End
+   #Show: "Thanks for using purposewrite!"
+
+
+
+##Building block example- Check for valid user input
+#Text: full_q
+"n"
+#Loop-Until: [full_q]="y"
+   #Question: full
+   "Article Writer can run in 2 different modes: 
+   1. Standard - Write a great article by answering 7 questions
+   2. Advanced - More control:specify tone, SEO, length etc
+   Please choose 1 or 2!"
+   #If [full]="2" #Begin
+      #Text: full_q
+      "y"
+      #Text: full
+      "y"
+   #End
+   #If [full]="1" #Begin
+      #Text: full_q
+      "y"
+      #Text: full
+      "n"
+   #End
+#End
+
+
+
+##Building block example- Prompt builder Menu with build in prompts that are not shown to the user but used to build a prompt
+#Text: type_list
+"1. Tutorial - How to & tutorial style video.
+2. Strategy - Video about strategy and insight.
+3. Problem - Video about problem & solution.
+4. Inspiration - An inspirational & motivational video.
+5. Teaching - An educational video."
+#chatGPT: menu
+"Show me the following menu, but don't show the prompt part after '-' and dont add any other text before or after. 
+[type_list]"
+#Question: choices
+"What type of video do you want to make?
+[menu]
+Reply with the numbers, multi choice is ok, like 1,3,9:"
+#chatGPT: video_types
+"From the menu below I select the lines: [choices].
+Now, reply with the all the selections made, one per line. But only reply with the line part AFTER the minus '-' for each line, no other text before or after.
+The original menu: [type_list]"
+
+
+
+##Work with defaults:
+#Question: language
+"What language do you want me to write the article in?
+(I will continue talking English to you, but you can answer in any language, 'e'=english)"
+#If [language]="e" #Begin
+   #Text: language
+   "english"
+#End
+
+
+
+##Building block example- Add some debug info to check results while testing: 
+#Show:  "Debug - variable: [variable]"
+
+
+
+##Building block example - code embedding
+#Text: code_prompt
+"In the script code replace the exact strings only:
+'Question q1' replace with 'Test 1'
+'Question q2' replace with 'Test 2'
+
+Do not make any other changes to the script. Keep comments in the script with their markup.
+
+Then return ONLY the script, remove #[ and ]# and anything else outside the text. Dont use markup to mark the result as code.
+
+The script: 
+
+##[
+
+#Question: q1
+"Question q1: "
+
+#Question: q2
+"Question q2: "
+
+##comments like this inside should have no space after hashtags to not be displyed wrong in the output
+
+#Show: "Show: q1 answer = [q1] !"
+
+#Show: "Show: q1 question = [q1.q] !"
+
+]##
+"
+
+
+
+## Building block example - use of dynamic menus
+#question: userIdea
+"What do you want your menu to be about?"
+
+#show: "Generating menu..."
+
+#claude: dynamicMenu
+"I need you to create a menu of 3 options of [userIdea] the user could choose
+the menu needs to be in the following format:
+1. Choice A
+2. Choice B
+3. Choice C
+Just make sure to use indexes before writing the options"
+
+#Show: " The menu returned from claude is:
+[dynamicMenu]"
+
+#Text: prompt
+"Prompt start."
+
+#Multi-List: expertise
+#Start-List: "A list:"
+#List: "[dynamicMenu]"
+#End-List: "Please choose the options: "
+
+#For-All i=[expertise] #Begin
+   #Show: "Your chosen option is: [expertise.i]"
+   #question: answers{i}
+   "What can you say about this?"
+   #Show: "The user's response is: [answers{i}]"
+   #Text: prompt
+   "[prompt]\n[answers{i}]"
+   #Show: "[prompt]"
+
+#End
+
+#Show: "Final prompt: [prompt]"
+
+
+
+## Since we can do limited used input checks, make sure to always have a good default kick in if the user inputs something unexpected. Like in a menu 1,2,3 they input 23, you should defualt to the best choice, usually #1.
+
+
+## Most common bugs:
+- Using comments that are not at the start of a line (inline comments).
+- Using the same variable for #Text: and llm, like #chatGPT:
+- Not following the line break rules for syntax of #Text: #Question etc
+- When specifying user choices as numbers in an llm prompt, only give the number like "The user chose: [choice]" and not something like "The user chose: #[choice]." - so dont add a # in the prompt to the llm.
+- Space at the end of a line (syntax bug in interpreter, can not handle this)
+- Each llm variable remembers its own context history, so if you want to refer to old context you must keep refering to the same llm variable name, this is better than manually injecting old context data into the new prompt in a new llm variable  
+- The dataforseo api is sensitive to the combination of location + language, only some specific languages are allowed for each country, and may result in an error code, so we can not allow free choice here
+
