@@ -45,11 +45,15 @@ You can:
 ## Repo Structure
 
 apps/
+
   content-research/
+  
     script.pw.txt      # full Content Research app
+ 
     README.md          # what it does, how to run it
+  
     demo.gif           # optional demo animation
-/
+    
 
 templates/
 
