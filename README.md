@@ -62,9 +62,9 @@ All of them are designed so you can:
 
 apps/
 
-  content-research/
+  content-research-and-ideation/
   
-    script.pw.txt      # full Content Research app   
+    content-research-and-ideation.txt      #one of the most advanced example apps
 
 code-snippets-and-templates/
 
@@ -76,5 +76,5 @@ script-language-reference/
     
 
 app-writing-app/
-    purposewrite-app-writing-prompt-for-gemini
+    purposewrite-app-writing-prompt-for-gemini.txt    #use this to generated apps through an interactive process, without coding
 
