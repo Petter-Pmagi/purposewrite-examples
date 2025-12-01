@@ -1,0 +1,250 @@
+## Video reels content - 250307
+## Come up with ideas for linkedin videos &  write talking points or scripts for them.
+
+#Show: "Welcome to video reels script maker!"
+
+
+
+
+#Text: type_list
+"1. How to/Tutorial - How to & tutorial style video.
+2. Insight/Strategy - Video about strategy and insight.
+3. Problem-Solution - Video about problem & solution.
+4. Inspiration/Motivation - An inspirational & motivational video.
+5. Education/Teaching - An educational video."
+
+#Show: "Analyzing..."
+
+#chatGPT: menu
+"Show me the following menu, but don't show the prompt part after '-' and dont add any other text before or after. 
+[type_list]"
+
+#Question: choices
+"What type of video do you want to make?
+[menu]
+Reply with the numbers, multi choice is ok, like 1,3,9:"
+
+#Show: "Analyzing..."
+
+#chatGPT: video_types
+"From the menu below I select the lines: [choices].
+Now, reply with the all the selections made, one per line. But only reply with the line part AFTER the minus '-' for each line, no other text before or after.
+The original menu: [type_list]"
+
+##Show: "Debug - Video Types: [video_types]"
+
+
+
+
+#Question: length
+"How long should the video be in seconds? (20 for example)"
+
+#Question: language
+"What language should the videos be?"
+
+#Question: topic
+"Give me 1-2 sentences where you describe what you want to talk about. In the correct language." 
+
+#Question: target_audience
+"What is your target audience for this? (In the correct language. Try to give info that matters for the topic)"
+
+#Question: pain_points
+"What are the target audience typical pain points relevant to the topic? In the correct language."
+
+
+
+
+#Text: CTA_list
+"1. Resource Download - Resource download.
+2. Community Join - Community join.
+3. Follow me for more - Follow me for more of this.
+4. Service/Product - Find out more about our service or product.
+5. Free trial - Get a free trial.
+6. Newsletter Signup - Sign up for the newletter for more of this."
+
+#Show: "Analyzing..."
+
+#chatGPT: CTA_menu
+"Show me the following menu, but don't show the prompt part after '-' and dont add any other text before or after. 
+[CTA_list]"
+
+#Question: CTA_choice
+"What CTA type do you want?
+[CTA_menu]
+Reply with a number:"
+
+#Show: "Analyzing..."
+
+#chatGPT: CTAs
+"From the menu below I select the lines: [CTA_choice].
+Now, reply with the all the selections made, one per line. But only reply with the line part AFTER the minus '-' for each line, no other text before or after.
+The original menu: [CTA_list]"
+
+##Show: "Debug - CTA: [CTAs]"
+
+
+
+
+#Text: styles_list
+"1. Formal - Write in a very formal style.
+2. Corporate - Write in a coprorate style.
+3. Professional  - Write in a professional voice.
+4. Normal - Write the video script in a relaxed style,  the way people actually talk. 
+5. Relaxed -  Write the video script in a very relaxed and messy style,  the way people actually talk to each other.
+6. Sloppy - you are a professional copywriter who know all the rules but decides to break them all to make the text feel super relaxed, personal, natural, human and even totally messy, without being cringy.
+7. Far out - you write in a super messy style, following no writing rules, go crazy!"
+
+#Show: "Analyzing..."
+
+#chatGPT: styles_menu
+"Show me the following menu, but don't show the prompt part after '-' and dont add any other text before or after. 
+[styles_list]"
+
+#Question: style_choice
+"What style do you want for this video?
+[styles_menu]
+Reply with a number:"
+
+#Show: "Analyzing..."
+
+#chatGPT: style
+"From the menu below I select the lines: [style_choice].
+Now, reply with the all the selections made, one per line. But only reply with the line part AFTER the minus '-' for each line, no other text before or after.
+The original menu: [styles_list]"
+
+##Show: "Debug - Video Style: [style]"
+
+
+
+
+#Text: hooks_prompt
+"I want to make short talking head style reels videos for linkedin.
+ 
+Now help me create compelling hooks for [target_audience] having these pain points: [pain_points] 
+Who are interested in: [topic] 
+Video type is: [video_types]  
+Video style is: [style] 
+Video language is: [language]
+
+For each hook, consider these key elements:
+
+Start with shock value/surprising statistic/counterintuitive statement
+Target the primary pain point or desire
+Include specificity (numbers, timeframes, or concrete results)
+Use power words that evoke emotion
+
+Consider different hook styles:
+'How to' hooks
+Question-based hooks
+Story-based hooks
+Problem-solution hooks
+List-based hooks
+Secret/insider hooks
+Statement hooks that challenge common beliefs
+Question hooks that address pain points
+Story starter hooks that tease transformation
+Tips/hack hooks that promise quick wins
+Insider knowledge hooks that reveal secrets
+
+Please provide 10 hooks in a numbered list. Each main item in BOLD.
+IMPORTANT! Don't give any other text or information.
+
+For each hook, keep it at 50 to 150 characters and focus on creating immediate curiosity or tension that makes people want to watch more.
+
+Make sure each hook:
+States or implies clear value
+Uses conversational language
+Creates urgency or FOMO
+Targets specific audience pain points
+Can be delivered in 3-7 seconds"
+
+##Show: "Debug - Hook prompt: [hooks_prompt]"
+
+#Show: "Analyzing..."
+
+#Claude: hooks
+"[hooks_prompt]"
+
+#Question: hook_choice
+"Here is a list of possible hooks:
+[hooks]
+Which hooks would you like to write scripts for? (multi choice is ok like 1,3,5)"
+
+#Text: scripts_prompt
+"For the hooks with numbers [hook_choice], write a suggested full script that can be delivered in [length] seconds including Hook and CTA. 
+
+Remember the style should be: [style]
+Video language should be: [language]
+
+Also write each script as a set of short and very concrete talking points to use instead of the full script.
+
+For each script+hook, generate 3 CTA options:
+IMPORTANT! Remember we want CTAs of this type: [CTAs]
+CTA methods to consider:
+Bridge-style: 'Insight from content → Future value promise'
+Question-style: 'Pain point/desire question → Follow-on benefit'
+Direct-style: 'Clear value → Specific action'
+Extract the core value proposition
+Identify target viewer profile
+Map content themes to follow-on benefits
+Suggest natural bridges
+
+For each hook individually: 
+Present the hook + full script + the 3 suggested CTAs
+
+Give me a clean script (no extra info, as this will be put in a teleprompter) for each hook, formatted like this: 
+'----Full script for teleprompter:'
+Hook text in BOLD
+Full script 
+The three CTAs
+
+and
+
+'----Talking points version:'
+Hook text in BOLD
+Talking points 
+The three CTAs
+"
+
+##Show: "Debug - scripts_prompt: [scripts_prompt]"
+
+#Show: "Analyzing..."
+
+#Claude:hooks
+"[scripts_prompt]"
+
+#Show: "[hooks]"
+
+
+#Question: feedback
+   "Do you have any feedback on this before we move on? ('no' = stop) "
+
+#Loop-Until: [feedback]="no"
+      
+	  #Show: "Analyzing..."
+
+      #Claude: hooks
+      "[feedback]"
+
+      #Show: "[hooks]"
+
+      #Question: feedback
+      "Do you have any feedback on this? (no = stop) "
+
+#End
+
+#Question: clean
+"Would you like the scripts in a super clean format for copy/paste? (y/n)"
+
+#If [clean]<>"n" #Begin
+
+      #Show: "Analyzing..."
+
+      #Claude: hooks
+      "Now give me the script in super clean form for easy cop-paste to a teleprompter. Both the full script versions and the talking points versions. Include the 3 CTAs in each version. Hooks in BOLD."
+      #Show: "[hooks]"
+#End
+
+#Show: "Thanks for using purposewrite!"
+
+

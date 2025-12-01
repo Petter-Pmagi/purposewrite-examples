@@ -1,0 +1,691 @@
+#Show: "SEO playground"
+
+#Text: quit 
+"n"
+
+#Loop-Until: [quit]="y"
+
+    #Show: "Choose one:
+
+    1. SERP - Google Organic
+    2. SERP - Google News
+    3. SERP - Google Local
+    4. Keywords search volume
+    5. Keywords difficulty
+    6. Google Trends
+    7. Site - ranking keywords
+    8. Compare to competitor - kws missing
+    9. Domain - best pages
+    10. Whois Advanced
+    11. Domain KW+backlink analysis - NA
+    12. Competitor links I dont have - NA
+    13. On-page analysis
+    14. Page KW density - NA
+    15. Google Lighthouse performace report
+    16. Brand&reputation Analysis
+    17. My business report
+    18. Keyword Suggestions
+    99. Quit
+
+    Choose one:
+    "
+
+    #Question: menu
+    "Menu choice"
+
+    #Text: menu_ok
+    "n"
+
+    #If [menu]="1" #Begin
+
+        #Text: menu_ok
+        "y"
+
+        #Question: kw
+        "SERP Organic - Keyword to analyze:"
+
+        #Question: location_ans
+        "Country"
+
+        #Question: language_ans
+        "Language"
+
+        #chatGPT: location
+        "give me the numeric 'Geotarget ID' code used by google ads API (for example 2840 for USA, 2752 for sweden) of the place most fitting the following text, dont give me any other information, just the code.
+        Text: [location_ans]"
+
+        #chatGPT35: language
+        "give me the language code according to ISO 639-1 of the language most fitting the following text, dont give me any other information, just the ISO code.
+        Text: [language_ans]"
+
+        #Show: "Working....[kw] - [location] - [language] - Desktop - Windows - Depth 30 - Ai overview - People also ask 4"
+
+        #seo: seo_answer
+        URL =  
+        https://api.dataforseo.com/v3/serp/google/organic/live/advanced
+        JSON = {"keyword":"${kw}", "location_code":${location}, "language_code":"${language}", "device":"desktop", "os":"windows", "depth":30, "load_async_ai_overview":true, "people_also_ask_click_depth":4}
+
+        #Show: "Analyzing...."
+        #chatGPT: analysis
+        "Analyze the following json and give the data in correct format with markdowns.
+        Just return the actual results, so don't include sections 'General information', 'Task Details', 'Data', 'Result'. 
+        Also do not start or end with any text of your own like 'Here are the results...', just clean results with markdown layout.
+        json: [seo_answer]"
+        #Show: "Analysis: 
+
+        [analysis]"
+    #End
+    #If [menu]="2" #Begin
+        #Text: menu_ok
+        "y"
+
+        #Question: kw
+        "SERP News - Keyword to analyze:"
+
+        #Question: location_ans
+        "Country"
+
+        #Question: language_ans
+        "Language"
+
+        #chatGPT: location
+        "give me the numeric 'Geotarget ID' code used by google ads API (for example 2840 for USA, 2752 for sweden) of the place most fitting the following text, dont give me any other information, just the code.
+        Text: [location_ans]"
+
+        #chatGPT35: language
+        "give me the language code according to ISO 639-1 of the language most fitting the following text, dont give me any other information, just the ISO code.
+        Text: [language_ans]"
+
+        #Show: "Working....[kw] - [location] - [language] - Desktop - Windows - Depth 30"
+
+        #seo: seo_answer
+        URL =  
+        https://api.dataforseo.com/v3/serp/google/news/live/advanced
+        JSON = {"keyword":"${kw}", "location_code":${location}, "language_code":"${language}", "device":"desktop", "os":"windows", "depth":30}
+
+        #Show: "Analyzing...."
+        #chatGPT: analysis
+        "Analyze the following json and give the data in correct format with markdowns.
+        Just return the actual results, so don't include sections 'General information', 'Task Details', 'Data', 'Result'. 
+        Also do not start or end with any text of your own like 'Here are the results...', just clean results with markdown layout.
+        json: [seo_answer]"
+        #Show: "Analysis: 
+
+        [analysis]"
+    #End
+    #If [menu]="3" #Begin
+        #Text: menu_ok
+        "y"
+
+        #Question: kw
+        "SERP Local - Keyword to analyze:"
+
+        #Question: location_ans
+        "Country"
+
+        #Question: language_ans
+        "Language"
+
+        #chatGPT: location
+        "give me the numeric 'Geotarget ID' code used by google ads API (for example 2840 for USA, 2752 for sweden) of the place most fitting the following text, dont give me any other information, just the code.
+        Text: [location_ans]"
+
+        #chatGPT35: language
+        "give me the language code according to ISO 639-1 of the language most fitting the following text, dont give me any other information, just the ISO code.
+        Text: [language_ans]"
+
+        #Show: "Working....[kw] - [location] - [language] - Desktop - Windows - Depth 30"
+
+        #seo: seo_answer
+        URL =  
+        https://api.dataforseo.com/v3/serp/google/local_finder/live/advanced
+        JSON = {"keyword":"${kw}", "location_code":${location}, "language_code":"${language}", "device":"desktop", "os":"windows", "depth":30}
+
+        #Show: "Analyzing...."
+        #chatGPT: analysis
+        "Analyze the following json and give the data in correct format with markdowns.
+        Just return the actual results, so don't include sections 'General information', 'Task Details', 'Data', 'Result'. 
+        Also do not start or end with any text of your own like 'Here are the results...', just clean results with markdown layout.
+        json: [seo_answer]"
+        #Show: "Analysis: 
+
+        [analysis]"
+    #End
+    #If [menu]="4" #Begin
+        #Text: menu_ok
+        "y"
+
+        #Question: kw_ans
+        "KW search volume - Keywords to analyze, comma separated:"
+
+        #chatGPT: kw
+        "Due to syntax restrictions, in this prompt I will use ' as quotation mark. 
+        If the following string of keywords has any comma in it, for exmaple 'word1,word2', split it up into a comma separeted list of strings, like 'word1','word2' but each surrounded by real quotation marks 
+        Just return the actual results. Remember to use real quotation marks for the results, not '
+        Also do not start or end with any text of your own like 'Here are the results...', just clean results.
+        String: [kw_ans]"
+
+        #Show: "Working....[kw] - Relevance"
+
+        #seo: seo_answer
+        URL =  
+        https://api.dataforseo.com/v3/keywords_data/google_ads/search_volume/live
+        JSON = {"keywords":[${kw}], "sort_by":"relevance"}
+
+        #Show: "Analyzing...."
+        #chatGPT: analysis
+        "Analyze the following json and give the data in correct format with markdowns.
+        Just return the actual results, so don't include sections 'General information', 'Task Details', 'Data', 'Result'. 
+        Also do not start or end with any text of your own like 'Here are the results...', just clean results with markdown layout.
+        json: [seo_answer]"
+        #Show: "Analysis: 
+
+        [analysis]"    
+    #End
+    #If [menu]="5" #Begin
+        #Text: menu_ok
+        "y"
+
+        #Question: kw_ans
+        "KW Difficulty - Keywords to analyze, comma separated"
+
+        #chatGPT: kw
+        "Due to syntax restrictions, in this prompt I will use ' as quotation mark. 
+        If the following string of keywords has any comma in it, for exmaple 'word1,word2', split it up into a comma separeted list of strings, like 'word1','word2' but each surrounded by real quotation marks 
+        Just return the actual results. Remember to use real quotation marks for the results, not '
+        Also do not start or end with any text of your own like 'Here are the results...', just clean results.
+        String: [kw_ans]"
+
+        #Question: location_ans
+        "Country"
+
+        #chatGPT: location
+        "give me the numeric 'Geotarget ID' code used by google ads API (for example 2840 for USA, 2752 for sweden) of the place most fitting the following text, dont give me any other information, just the code.
+        Text: [location_ans]"
+
+        ## only valid languages allowed for each country
+        #chatGPT35: language
+        "give me the language code according to ISO 639-1 of the language most fitting the following location, dont give me any other information, just the ISO code.
+        Location: [location_ans]"
+
+        #Show: "Working....[kw] - [location] - [language]"
+
+        #seo: seo_answer
+        URL =  
+        https://api.dataforseo.com/v3/dataforseo_labs/google/bulk_keyword_difficulty/live
+        JSON = {"keywords":[${kw}], "location_code":${location}, "language_code":"${language}"}
+
+        #Show: "Analyzing...."
+        #chatGPT: analysis
+        "Analyze the following json and give the data in correct format with markdowns.
+        Just return the actual results, so don't include sections 'General information', 'Task Details', 'Data', 'Result'. 
+        Also do not start or end with any text of your own like 'Here are the results...', just clean results with markdown layout.
+        json: [seo_answer]"
+        #Show: "Analysis: 
+
+        [analysis]"
+    #End
+    #If [menu]="6" #Begin
+        #Text: menu_ok
+        "y"
+
+        #Question: kw_ans
+        "Google Trends - Keywords to analyze, comma separated"
+
+        #Question: location_ans
+        "Country"
+
+        #Question: language_ans
+        "Language"
+
+        #chatGPT: kw
+        "Due to syntax restrictions, in this prompt I will use ' as quotation mark. 
+        If the following string of keywords has any comma in it, for exmaple 'word1,word2', split it up into a comma separeted list of strings, like 'word1','word2' but each surrounded by real quotation marks 
+        Just return the actual results. Remember to use real quotation marks for the results, not '
+        Also do not start or end with any text of your own like 'Here are the results...', just clean results.
+        String: [kw_ans]"
+
+        #chatGPT: location
+        "give me the numeric 'Geotarget ID' code used by google ads API (for example 2840 for USA, 2752 for sweden) of the place most fitting the following text, dont give me any other information, just the code.
+        Text: [location_ans]"
+
+        #chatGPT35: language
+        "give me the language code according to ISO 639-1 of the language most fitting the following text, dont give me any other information, just the ISO code.
+        Text: [language_ans]"
+
+        ##some item_types only works for 1 kw  
+        #Show: "Working....[kw] - [location] - [language] - 30 days - web - graph"
+
+        #seo: seo_answer
+        URL =  
+        https://api.dataforseo.com/v3/keywords_data/google_trends/explore/live
+        JSON = {"time_range":"past_30_days", "category_code":0, "type":"web", "item_types":["google_trends_graph"], "keywords":[${kw}], "location_code":${location}, "language_code":"${language}"}
+
+        #Show: "Analyzing...."
+        #chatGPT: analysis
+        "Analyze the following json and give the data in correct format with markdowns.
+        Just return the actual results, so don't include sections 'General information', 'Task Details', 'Data', 'Result'. 
+        Also do not start or end with any text of your own like 'Here are the results...', just clean results with markdown layout.
+        json: [seo_answer]"
+        #Show: "Analysis: 
+
+        [analysis]"
+    #End
+    #If [menu]="7" #Begin
+        #Text: menu_ok
+        "y"
+
+        #Question: input
+        "Site ranking kws, URL to analyze:"
+
+        ##domain analysis without https://www otherwise page analysis
+        #chatGPT35: url
+        "give me the full URL excluding https:// and www for the following web adress, dont give me any other information, just the clean url: [input]"
+
+        #Question: location_ans
+        "Country"
+
+        #Question: language_ans
+        "Language"
+
+        #chatGPT: location
+        "give me the numeric 'Geotarget ID' code used by google ads API (for example 2840 for USA, 2752 for sweden) of the place most fitting the following text, dont give me any other information, just the code.
+        Text: [location_ans]"
+
+        #chatGPT35: language
+        "give me the language code according to ISO 639-1 of the language most fitting the following text, dont give me any other information, just the ISO code.
+        Text: [language_ans]"
+
+        #Show: "Working....[url] - [location] - [language] - Organic, featured,local, ai"
+
+        #seo: seo_answer
+        URL =  
+        https://api.dataforseo.com/v3/dataforseo_labs/google/ranked_keywords/live
+        JSON = {"target":"${url}", "location_code":${location}, "language_code":"${language}", "historical_serp_mode":"live", "ignore_synonyms":false, "include_clickstream_data":false, "item_types":["organic", "featured_snippet", "local_pack", "ai_overview_reference"], "load_rank_absolute":false, "limit":100}
+
+        #Show: "Analyzing...."
+        #chatGPT: analysis
+        "Analyze the following json and give the data in correct format with markdowns.
+        Just return the actual results, so don't include sections 'General information', 'Task Details', 'Data'. 
+        Also do not start or end with any text of your own like 'Here are the results...', just clean results with markdown layout.
+        json: [seo_answer]"
+        #Show: "Analysis: 
+
+        [analysis]"
+    #End
+    #If [menu]="8" #Begin
+        #Text: menu_ok
+        "y"
+
+        #Question: input1
+        "Competitor kw missing - Your URL:"
+
+        #Question: input2
+        "Competitor kw missing - Their URL"
+
+        #Question: location_ans
+        "Country"
+
+        ## only valid languages allowed for each country
+        #chatGPT35: language
+        "give me the language code according to ISO 639-1 of the language most fitting the following location, dont give me any other information, just the ISO code.
+        Location: [location_ans]"
+
+        ##no htts www
+        #chatGPT35: url1
+        "give me the full URL excluding https:// and www for the following web adress, dont give me any other information, just the clean url: [input1]"
+
+        ##no htts www
+        #chatGPT35: url2
+        "give me the full URL excluding https:// and www for the following web adress, dont give me any other information, just the clean url: [input2]"
+
+        #chatGPT: location
+        "give me the numeric 'Geotarget ID' code used by google ads API (for example 2840 for USA, 2752 for sweden) of the place most fitting the following text, dont give me any other information, just the code.
+        Text: [location_ans]"
+
+        #Show: "Working....[url1] - [url2] - [location] - [language] - Not ads"
+
+        #seo: seo_answer
+        URL =  
+        https://api.dataforseo.com/v3/dataforseo_labs/google/domain_intersection/live
+        JSON = {"target1":"${url2}", "target2":"${url1}", "location_code":${location}, "language_code":"${language}", "include_serp_info":false, "include_clickstream_data":false, "intersections":false, "limit":100}
+
+        #Show: "Analyzing...."
+        #chatGPT: analysis
+        "Analyze the following json and give the data in correct format with markdowns.
+        Just return the actual interesting results, so don't include sections 'General information', 'Task Details', 'Data'. 
+        Also do not start or end with any text of your own like 'Here are the results...', just clean results with markdown layout for easy reading.
+        json: [seo_answer]"
+        #Show: "Analysis: 
+
+        [analysis]"
+    #End
+    #If [menu]="9" #Begin
+        #Text: menu_ok
+        "y"
+
+        #Question: input
+        "Site best pages - URL:"
+
+        #Question: location_ans
+        "Country"
+
+        ##no htts www
+        #chatGPT35: url
+        "give me the full URL excluding https:// and www for the following web adress, dont give me any other information, just the clean url: [input]"
+
+        #chatGPT: location
+        "give me the numeric 'Geotarget ID' code used by google ads API (for example 2840 for USA, 2752 for sweden) of the place most fitting the following text, dont give me any other information, just the code.
+        Text: [location_ans]"
+
+        ## only valid languages allowed for each country
+        #chatGPT35: language
+        "give me the language code according to ISO 639-1 of the language most fitting the following location, dont give me any other information, just the ISO code.
+        Location: [location_ans]"
+
+        #Show: "Working....[url] - [location] - [language] - Not ads"
+
+        #seo: seo_answer
+        URL =  
+        https://api.dataforseo.com/v3/dataforseo_labs/google/relevant_pages/live
+        JSON = {"target":"${url}", "location_code":${location}, "language_code":"${language}", "historical_serp_mode":"live", "ignore_synonyms":false, "include_clickstream_data":false, "limit":100}
+
+        #Show: "Analyzing...."
+
+        ##chatgpt gave error
+        #gemini: analysis
+        "Analyze the following json and give the data in correct format with markdowns.
+        Also do not start or end with any text of your own like 'Here are the results...', just clean results with markdown layout.
+        json: [seo_answer]"
+        #Show: "Analysis: 
+
+        [analysis]"
+    #End
+    #If [menu]="10" #Begin
+       #Text: menu_ok
+        "y"
+
+        #Question: input
+        "Whois overview - Domain to analyze:"
+
+        ##no htts www
+        #chatGPT35: url
+        "give me the full URL excluding https:// and www for the following web adress, dont give me any other information, just the clean url: [input]"
+
+        #Show: "Working....[url]"
+
+        #seo: seo_answer
+        URL =  
+        https://api.dataforseo.com/v3/domain_analytics/whois/overview/live
+        JSON = {"limit":100, "filters":["domain", "=", "${url}"]}
+
+        #Show: "Analyzing...."
+        #chatGPT: analysis
+        "Analyze the following json and give the data in correct format with markdowns.
+        Just return the actual results, so don't include sections 'General information', 'Task Details', 'Data', 'Result'. 
+        Also do not start or end with any text of your own like 'Here are the results...', just clean results with markdown layout.
+        json: [seo_answer]"
+        #Show: "Analysis: 
+
+        [analysis]"
+    #End
+    #If [menu]="11a" #Begin
+
+       ##minimum commitment of $100 per month
+
+       #Text: menu_ok
+        "y"
+
+        #Question: input
+        "Domain Backlinks - Domain to analyze"
+
+        ##no htts www = domain, otherwise page
+        #chatGPT35: url
+        "give me the full URL excluding https:// and www for the following web adress, dont give me any other information, just the clean url: [input]"
+
+        #Show: "Working....[url]"
+
+        #seo: seo_answer
+        URL = 
+        https://api.dataforseo.com/v3/backlinks/backlinks/live
+        JSON = {"target":"${url}", "limit":100, "internal_list_limit":10, "backlinks_status_type":"live", "include_subdomains":false, "exclude_internal_backlinks":true, "include_indirect_links":true, "mode":"as_is", "rank_scale":"one_hundred"}
+
+        #Show: "Analyzing...."
+        #chatGPT: analysis
+        "Analyze the following json and give the data in correct format with markdowns.
+        Just return the actual results, so don't include sections 'General information', 'Task Details', 'Data', 'Result'. 
+        Also do not start or end with any text of your own like 'Here are the results...', just clean results with markdown layout.
+        json: [seo_answer]"
+        #Show: "Analysis: 
+
+        [analysis]"
+    #End
+    #If [menu]="12a" #Begin
+
+       ##minimum commitment of $100 per month
+
+       #Text: menu_ok
+        "y"
+        #Question: input1
+        "Refering domain gap - Competitor Website to analyze"
+
+        ##no htts www = domain, otherwise page
+        #chatGPT35: url1
+        "give me the full URL excluding https:// and www for the following web adress, dont give me any other information, just the clean url: [input1]"
+
+        #Question: input2
+        "Refering domain gap - Your Website to analyze"
+
+        ##no htts www = domain, otherwise page
+        #chatGPT35: url2
+        "give me the full URL excluding https:// and www for the following web adress, dont give me any other information, just the clean url: [input2]"
+
+        #Show: "Working....[url1] - [url2]"
+
+        #seo: seo_answer
+        URL =  
+        https://api.dataforseo.com/v3/backlinks/domain_intersection/live
+        JSON = {"targets":{"Competitor":"${url1}", "You":"${url2}"}, "limit":100, "internal_list_limit":10, "backlinks_status_type":"live", "include_subdomains":true, "intersection_mode":"all", "exclude_internal_backlinks":true, "include_indirect_links":true, "rank_scale":"one_hundred"}
+        
+        #Show: "Analyzing...."
+        #chatGPT: analysis
+        "Analyze the following json and give the data in correct format with markdowns.
+        Just return the actual results, so don't include sections 'General information', 'Task Details', 'Data', 'Result'. 
+        Also do not start or end with any text of your own like 'Here are the results...', just clean results with markdown layout.
+        json: [seo_answer]"
+        #Show: "Analysis: 
+
+        [analysis]"
+    #End
+    #If [menu]="13" #Begin
+        #Text: menu_ok
+        "y"
+        #Question: variables
+        "OnPage Analysis - Website to analyze"
+
+        #chatGPT35: url
+        "give me the full URL including https:// for the following web adress, dont give me any other information, just the clean url: [variables]"
+
+        #Show: "Working....[url]"
+
+        #seo: seo_answer
+        URL =  
+        https://api.dataforseo.com/v3/on_page/instant_pages
+        JSON = {"url":"${url}", "check_spell":false, "disable_cookie_popup":false, "return_despite_timeout":false, "load_resources":false, "enable_javascript":false, "enable_browser_rendering":false}
+
+        #Show: "Analyzing...."
+        #chatGPT: analysis
+        "Analyze the following json and give the data in correct format with markdowns.
+        Just return the actual interesting results, so don't include sections 'General information', 'Task Details', 'Data'. 
+        Also do not start or end with any text of your own like 'Here are the results...', just clean results with markdown layout for easy reading.
+        json: [seo_answer]"
+        #Show: "Analysis: 
+
+        [analysis]"
+    #End
+    #If [menu]="14" #Begin
+        #Text: menu_ok
+        "y"
+    #End
+    #If [menu]="15" #Begin
+        #Text: menu_ok
+        "y"
+        #Question: variables
+        "Google Lighthouse Analysis - Website to analyze"
+
+        #Question: language_ans
+        "Language"
+
+        #chatGPT35: language
+        "give me the language code according to ISO 639-1 of the language most fitting the following text, dont give me any other information, just the ISO code.
+        Text: [language_ans]"
+
+
+        #chatGPT35: url
+        "give me the full URL including https:// for the following web adress, dont give me any other information, just the clean url: [variables]"
+
+        #Show: "Working....[url]"
+
+        #seo: seo_answer
+        URL = 
+        https://api.dataforseo.com/v3/on_page/lighthouse/live/json
+        JSON = {"url":"${url}", "language_code":"${language}", "categories":["seo", "pwa", "performance", "best_practices", "accessibility"], "for_mobile":false}
+
+        #Show: "Analyzing...."
+
+        ##chatgpt error
+        #gemini: analysis
+        "Analyze the following json and give the data in correct format with markdowns.
+        Just return the actual results, so don't include sections 'General information', 'Task Details', 'Data', 'Result'. 
+        Also do not start or end with any text of your own like 'Here are the results...', just clean results with markdown layout.
+        json: [seo_answer]"
+        #Show: "Analysis: 
+
+        [analysis]"
+    #End
+    #If [menu]="16" #Begin
+        #Text: menu_ok
+        "y"
+        #Question: variables
+        "Brand&Reputation - Keyword to analyze:"
+
+
+        #Show: "Working....[variables]"
+
+        #seo: seo_answer
+        URL = 
+        https://api.dataforseo.com/v3/content_analysis/sentiment_analysis/live
+        JSON = {"keyword":"${variables}", "search_mode":"as_is", "internal_list_limit":10, "positive_connotation_threshold":0.4, "sentiments_connotation_threshold":0.4, "rank_scale":"one_hundred"}
+
+        #Show: "Analyzing...."
+
+        ##chatgpt error
+        #gemini: analysis
+        "Analyze the following json and give the data in correct format with markdowns.
+        Just return the actual results, so don't include sections 'General information', 'Task Details', 'Data', 'Result'. 
+        Also do not start or end with any text of your own like 'Here are the results...', just clean results with markdown layout.
+        json: [seo_answer]"
+        #Show: "Analysis: 
+
+        [analysis]"
+    #End
+    #If [menu]="17" #Begin
+        #Text: menu_ok
+        "y"
+        #Question: variables
+        "Google MyBusiness - Business to analyze:"
+
+        #Question: location_ans
+        "Country"
+
+        #Question: language_ans
+        "Language"
+
+        #chatGPT: location
+        "give me the numeric 'Geotarget ID' code used by google ads API (for example 2840 for USA, 2752 for sweden) of the place most fitting the following text, dont give me any other information, just the code.
+        Text: [location_ans]"
+
+        #chatGPT35: language
+        "give me the language code according to ISO 639-1 of the language most fitting the following text, dont give me any other information, just the ISO code.
+        Text: [language_ans]"
+
+        #Show: "Working....[variables] - [location] - [language]"
+
+        #seo: seo_answer
+        URL = 
+        https://api.dataforseo.com/v3/business_data/google/my_business_info/live
+        JSON = {"keyword":"${variables}", "location_code":${location}, "language_code":"${language}"}
+
+        #Show: "Analyzing...."
+        #chatGPT: analysis
+        "Analyze the following json and give the data in correct format with markdowns.
+        Just return the actual results, so don't include sections 'General information', 'Task Details', 'Data', 'Result'. 
+        Also do not start or end with any text of your own like 'Here are the results...', just clean results with markdown layout.
+        json: [seo_answer]"
+        #Show: "Analysis: 
+
+        [analysis]"
+    #End
+    #If [menu]="18" #Begin
+        #Text: menu_ok
+        "y"
+
+        #Question: kw
+        "KW Suggestions - Seed keyword"
+
+        #Question: location_ans
+        "Country (this will automatically set the keyword suggestions language too)"
+
+        #chatGPT: location
+        "give me the numeric 'Geotarget ID' code used by google ads API (for example 2840 for USA, 2752 for sweden) of the place most fitting the following text, dont give me any other information, just the code.
+        Text: [location_ans]"
+
+        ## only valid languages allowed for each country
+        #chatGPT35: language
+        "give me the language code according to ISO 639-1 of the language most fitting the following location, dont give me any other information, just the ISO code.
+        Location: [location_ans]"
+
+        #Show: "Working....[kw] - [location] - [language]"
+
+        #seo: seo_answer
+        URL =  
+        https://api.dataforseo.com/v3/dataforseo_labs/google/keyword_suggestions/live
+        JSON = {"keyword":"${kw}", "location_code":${location}, "language_code":"${language}","include_serp_info": true,
+        "include_seed_keyword": true,"limit": 10}
+
+        #Show: "Analyzing...."
+        #chatGPT: analysis
+        "Analyze the following json and give the data in correct format with markdowns.
+        Just return the actual results, so don't include sections 'General information', 'Task Details', 'Data', 'Result'. 
+        Also do not start or end with any text of your own like 'Here are the results...', just clean results with markdown layout.
+        json: [seo_answer]"
+        #Show: "Analysis: 
+
+        [analysis]"
+    #End
+    #If [menu]="99" #Begin
+        #Text: quit
+        "y"
+        #Text: menu_ok
+        "y"
+    #End
+
+    #If [menu_ok]="n" #Begin
+        #Show: "You need to answer with one number from the menu, please."
+    #End
+#End
+
+#Show: "Thanks for using the purposewrite SEO app."
+
+
+
+
+
+
+
+
+
+
+
+
+

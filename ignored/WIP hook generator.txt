@@ -1,0 +1,330 @@
+## SoMe Hook Generator 250520 v2
+
+#Show: "Welcome to the SoMe Hook Generator!
+Let's create some catchy hooks for your social media posts."
+
+## --- Main App Loop ---
+#Text: main_loop_control
+"continue"
+#Loop-Until: [main_loop_control]="quit"
+
+    ## --- Core Content Input ---
+    #Text: content_input_control
+    "continue"
+    #Loop-Until: [content_input_control]="done"
+        #Question: post_base_content_input
+        "Please provide the core content for your social media post.
+        You can paste:
+        *   A brief description of your post's main topic/message, OR
+        *   Your full post content (or a draft).
+        The more detail you provide, the better the hook suggestions might be.
+        (Or type 'qqq' to quit the app)"
+
+        #If [post_base_content_input]="qqq" #Begin
+            ## Signal to exit main app loop
+            #Text: main_loop_control
+            "quit"
+            ## Exit this inner loop
+            #Text: content_input_control
+            "done"
+            ## Ensure refinement loop also exits if active
+            #Text: refinement_loop_control
+            "quit_refinement"
+        #Else-Begin
+            #Text: actual_base_content
+            "[post_base_content_input]"
+            ## Proceed with this content
+            #Text: content_input_control
+            "done"
+
+            ## --- Language Detection and Selection ---
+            #Show: "Detecting language of your provided content..."
+            #chatGPT: lang_detection_result
+            "Analyze the following text and identify the primary language it is written in. Respond with only the name of the language (e.g., 'English', 'Spanish', 'French'). If the language is unclear or mixed, respond with 'Undetermined'.
+            Text to analyze: '[actual_base_content]'"
+
+            #Text: detected_language
+            "[lang_detection_result]"
+
+            #If [detected_language]="Undetermined" #Begin
+                #Text: detected_language_display
+                "Could not automatically determine the language of your content."
+                #Question: language_override_undetermined
+                "Please specify the language you want the hooks to be in (e.g., English, Spanish):"
+                #Text: language ## Final language for prompts
+                "[language_override_undetermined]"
+            #Else-Begin
+                #Text: detected_language_display
+                "It looks like your content is in [detected_language]."
+                #Question: user_language_choice_override
+                "Hooks will be generated in [detected_language].
+                If you'd like to use a *different* language, enter it now (e.g., 'French').
+                Otherwise, just press 'k' to **k**eep using [detected_language]."
+
+                #If [user_language_choice_override]="k" #Begin
+                    #Text: language ## Final language for prompts
+                    "[detected_language]"
+                #Else-Begin
+                    ## User entered a specific language
+                    #Text: language ## Final language for prompts
+                    "[user_language_choice_override]"
+                #End
+            #End
+            #Show: "Great! Hooks will be generated in: [language]"
+        #End
+    #End
+
+    ## Conditional execution: If user typed 'qqq', skip the rest of the main loop iteration
+    #If [main_loop_control]<>"quit" #Begin
+
+        ## --- Refinement Loop (for TA, Tone, Hooks etc. based on SAME base_content) ---
+        #Text: refinement_loop_control
+        "continue_refinement"
+        #Loop-Until: [refinement_loop_control]="quit_refinement"
+
+            ## --- Target Audience & Pain Point Analysis ---
+            #Show: "Analyzing your content to suggest target audiences..."
+            #chatGPT: llm_ta_suggestions
+            "Based on the following content: '[actual_base_content]', suggest 5 potential target audiences for a social media post. Present as a numbered list. Each item should be a concise description of the audience (e.g., '1. Small business owners looking for marketing tips'). Ensure the suggestions are in [language]."
+
+            #Question: user_ta_choice
+            "Here are some suggested target audiences:
+            [llm_ta_suggestions]
+
+            Please choose one number from the list above, or press 'm' to enter your own."
+
+            #If [user_ta_choice]="m" #Begin
+                #Question: manual_target_audience
+                "Who is your primary target audience for this post?"
+                #Text: final_selected_ta
+                "[manual_target_audience]"
+            #Else-Begin
+                #Show: "Fetching your TA choice..."
+                ## Re-use var for context with SAME LLM call type
+                #chatGPT: llm_ta_suggestions
+                "From the list of target audiences you previously provided (shown below), the user chose option [user_ta_choice]
+                Please provide only the text for that chosen option, without any numbering or prefix.
+                Original list for your reference:
+                [llm_ta_suggestions]"
+                #Text: final_selected_ta
+                "[llm_ta_suggestions]"
+            #End
+            #Show: "Target Audience set to: [final_selected_ta]"
+
+            #Show: "Analyzing potential pain points for '[final_selected_ta]' based on your content..."
+            #chatGPT: llm_pp_suggestions
+            "For the target audience '[final_selected_ta]' and based on the post content: '[actual_base_content]', suggest 5 key pain points or strong interests this post could address. Present as a numbered list (e.g., '1. Feeling overwhelmed by social media trends'). Ensure suggestions are in [language]."
+
+            #Question: user_pp_choice
+            "Here are some suggested pain points/interests:
+            [llm_pp_suggestions]
+
+            Please choose one number from the list above, or press 'm' to enter your own."
+
+            #If [user_pp_choice]="m" #Begin
+                #Question: manual_pain_point
+                "What primary pain point or interest is this post addressing?"
+                #Text: final_selected_pp
+                "[manual_pain_point]"
+            #Else-Begin
+                #Show: "Fetching your Pain Point choice..."
+                ## Re-use var for context with SAME LLM call type
+                #chatGPT: llm_pp_suggestions
+                "From the list of pain points you previously provided (shown below), the user chose option [user_pp_choice]
+                Please provide only the text for that chosen option, without any numbering or prefix.
+                Original list for your reference:
+                [llm_pp_suggestions]"
+                #Text: final_selected_pp
+                "[llm_pp_suggestions]"
+            #End
+            #Show: "Pain Point/Interest set to: [final_selected_pp]"
+
+            ## --- Tone & Style Selection ---
+            #Show: "Suggesting tones for your post..."
+            #chatGPT: llm_tone_suggestions
+            "Based on the post content: '[actual_base_content]', target audience: '[final_selected_ta]', and pain point: '[final_selected_pp]', suggest 5 relevant tones for a social media hook. Examples: Intriguing, Bold, Funny, Urgent, Empathetic, Educational, Inspirational. Present as a numbered list. Ensure suggestions are in [language]."
+
+            #Question: user_tone_choice
+            "Here are some suggested tones:
+            [llm_tone_suggestions]
+
+            Choose one number from the list, press 's' for 'Surprise Me!', or 'm' to specify your own."
+
+            #If [user_tone_choice]="s" #Begin
+                #Text: final_selected_tone
+                "A surprising and engaging tone"
+            #Else-Begin
+                #If [user_tone_choice]="m" #Begin
+                    #Question: manual_tone
+                    "What tone would you like for the hooks?"
+                    #Text: final_selected_tone
+                    "[manual_tone]"
+                #Else-Begin
+                    ## User chose a number from the list
+                    #Show: "Fetching your Tone choice..."
+                    ## Re-use var for context with SAME LLM call type
+                    #chatGPT: llm_tone_suggestions
+                    "From the list of tones you previously provided (shown below), the user chose option [user_tone_choice]
+                    Please provide only the text for that chosen option, without any numbering or prefix.
+                    Original list for your reference:
+                    [llm_tone_suggestions]"
+                    #Text: final_selected_tone
+                    "[llm_tone_suggestions]"
+                #End
+            #End
+            #Show: "Tone set to: [final_selected_tone]"
+
+            ## --- Hook Type Preference ---
+            #Show: "Suggesting hook types..."
+            #chatGPT: llm_hook_type_suggestions
+            "Based on post content: '[actual_base_content]', TA: '[final_selected_ta]', pain point: '[final_selected_pp]', and tone: '[final_selected_tone]', suggest 5 relevant hook types. Examples: Question, Statistic/Fact, Story Tease, Problem/Solution, Bold Statement. Present as a numbered list. Ensure suggestions are in [language]."
+
+            #Question: user_hook_type_choice
+            "Here are some suggested hook types:
+            [llm_hook_type_suggestions]
+
+            Choose one number from the list, press 'a' for 'Any Effective Type', or 'm' to specify your own."
+
+            #If [user_hook_type_choice]="a" #Begin
+                #Text: final_selected_hook_type
+                "any effective hook type"
+            #Else-Begin
+                #If [user_hook_type_choice]="m" #Begin
+                    #Question: manual_hook_type
+                    "What hook type would you prefer (e.g., Question, Story Tease)?"
+                    #Text: final_selected_hook_type
+                    "[manual_hook_type]"
+                #Else-Begin
+                    ## User chose a number from the list
+                    #Show: "Fetching your Hook Type choice..."
+                    ## Re-use var for context with SAME LLM call type
+                    #chatGPT: llm_hook_type_suggestions
+                    "From the list of hook types you previously provided (shown below), the user chose option [user_hook_type_choice]
+                    Please provide only the text for that chosen option, without any numbering or prefix.
+                    Original list for your reference:
+                    [llm_hook_type_suggestions]"
+                    #Text: final_selected_hook_type
+                    "[llm_hook_type_suggestions]"
+                #End
+            #End
+            #Show: "Hook Type set to: [final_selected_hook_type]"
+
+            ## --- Hook Generation ---
+            #Show: "Generating 10 catchy hooks for you..."
+            #Text: llm_hook_generation_prompt_text
+            "Generate 10 distinct and engaging social media hooks.
+            Ensure the generated hooks are in [language].
+            Base Content: '[actual_base_content]'
+            Target Audience: '[final_selected_ta]'
+            Pain Point/Interest: '[final_selected_pp]'
+            Desired Tone: '[final_selected_tone]'
+            Preferred Hook Type (be flexible if 'any effective type' is chosen): '[final_selected_hook_type]'
+            Present as a numbered list 1-10. Each hook should be concise and compelling. Avoid repeating hooks you might have generated previously for this same request if this is a retry."
+
+            #Claude: llm_generated_hooks_result
+            "[llm_hook_generation_prompt_text]"
+            #Show: "
+            --- Here are 10 hooks for you! ---
+            [llm_generated_hooks_result]
+            ------------------------------------"
+
+            ## --- Iteration & Refinement Options ---
+            #Text: next_step_control
+            "continue_next_step_loop"
+            #Loop-Until: [next_step_control]="exit_next_step_loop"
+                #Question: user_next_action_choice
+                "
+                What would you like to do next?
+                1. Get another set of 10 *new* hooks (keeps current TA, Tone, etc.).
+                2. Get 5-7 variations of one of *these* hooks (e.g., 'more like #3').
+                3. Refine TA, Tone, etc. for *this same post content* (restarts from TA selection).
+                4. Start over with *new post content*.
+                5. Quit.
+                Please enter a number (1-5):"
+
+                ## New set of hooks, same inputs
+                #If [user_next_action_choice]="1" #Begin
+                    ## Exit this inner next_action loop
+                    #Text: next_step_control
+                    "exit_next_step_loop"
+                    ## Stay in refinement loop to regenerate hooks
+                    #Text: refinement_loop_control
+                    "continue_refinement"
+                #End
+
+                ## Variations of one hook
+                #If [user_next_action_choice]="2" #Begin
+                    #Question: user_variation_hook_number
+                    "Which hook number (1-10 from the list above) would you like variations of?"
+                    #Show: "Extracting selected hook for variation..."
+                    ## Using a new variable name for the LLM call that *extracts* the hook text
+                    ## as its primary job is extraction, not generation based on prior list context.
+                    #chatGPT: llm_extracted_hook_for_variation
+                    "From the following list of 10 hooks that you (the LLM) might have generated or seen:\n[llm_generated_hooks_result]\nPlease provide *only* the text of hook number [user_variation_hook_number], with no numbering or prefix."
+                    #Text: text_hook_to_vary
+                    "[llm_extracted_hook_for_variation]"
+
+                    #Show: "Generating 5-7 variations for the hook: '[text_hook_to_vary]'..."
+                    #Text: llm_variation_prompt_text
+                    "Generate 5-7 engaging and distinct variations of the following social media hook: '[text_hook_to_vary]'.
+                    Ensure the generated hooks are in [language].
+                    Maintain the core idea but explore different angles, phrasing, lengths, or calls to action.
+                    The original context for this hook was:
+                    Base Content: '[actual_base_content]'
+                    Target Audience: '[final_selected_ta]'
+                    Pain Point/Interest: '[final_selected_pp]'
+                    Desired Tone: '[final_selected_tone]'
+                    Present as a numbered list."
+                    ## Overwrite with variations
+                    #Claude: llm_generated_hooks_result
+                    "[llm_variation_prompt_text]"
+                    #Show: "
+                    --- Here are 5-7 variations ---
+                    [llm_generated_hooks_result]
+                    ------------------------------------"
+                    ## Stay in next_action_loop to re-ask "What next?"
+                    #Text: next_step_control
+                    "continue_next_step_loop"
+                #End
+
+                ## Refine TA, Tone, etc. (for SAME base_content)
+                #If [user_next_action_choice]="3" #Begin
+                    ## Exit this inner next_action loop
+                    #Text: next_step_control
+                    "exit_next_step_loop"
+                    ## Stay in refinement loop, will restart from TA selection
+                    #Text: refinement_loop_control
+                    "continue_refinement"
+                #End
+
+                ## Start over with NEW post content
+                #If [user_next_action_choice]="4" #Begin
+                    ## Exit this inner next_action loop
+                    #Text: next_step_control
+                    "exit_next_step_loop"
+                    ## Signal to exit the refinement loop
+                    #Text: refinement_loop_control
+                    "quit_refinement"
+                    ## Ensure main loop continues for new content
+                    #Text: main_loop_control
+                    "continue"
+                #End
+
+                ## Quit
+                #If [user_next_action_choice]="5" #Begin
+                    ## Exit this inner next_action loop
+                    #Text: next_step_control
+                    "exit_next_step_loop"
+                    ## Signal to exit the refinement loop
+                    #Text: refinement_loop_control
+                    "quit_refinement"
+                    ## Signal to exit the main app loop
+                    #Text: main_loop_control
+                    "quit"
+                #End
+            #End
+        #End
+    #End
+#End
+
+#Show: "Thanks for using the SoMe Hook Generator! Come back soon!"

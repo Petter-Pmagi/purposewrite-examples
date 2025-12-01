@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 ##Basic claude
 ##Claude Sonnet 4.5
+=======
+##Basic claude - 250307
+##Claude Sonnet 3.5
+>>>>>>> develop
 
 ##basic chatbot
 

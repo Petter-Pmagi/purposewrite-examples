@@ -1,0 +1,182 @@
+##Localizer 250413
+##Improve the style of a text, considering language and a specific country or region. Also adapt references etc.
+
+#Show: "Welcome to Localizer!
+I will try to make a text seem more natural in its language, and adapt it to a specific country and even local region. I will also try to change local references etc."
+
+#Question: text1
+"Give me a text to try to localize:"
+
+#Question: target-place
+"If you want you can also mention a target country, region or place, if not say 'n'"
+
+#If [target-place]="n" #Begin
+   #Text: location
+   ""
+#Else-Begin
+   #Text: location
+   "also change the text & style to match the location: [target-place]"
+#End
+
+##Show: "[location]"
+
+#Question: minor
+"Only minor changes (answer 'y' or 'n')?"
+
+#If [minor]="y" #Begin
+   #Text: change-level
+   "IMPORTANT: only allow small changes to the sentences and the structure of the text."
+#Else-Begin
+   #Text: change-level
+   ""
+#End
+
+##Show: "[change-level]"
+
+#Text: pRomPt1
+"Please help me make the text below (after Text:) sound more natural in the language that it is written. Consider the following aspects:
+
+Language Flow & Style:
+
+-Keep the original language.
+
+-Adjust expressions to match how native speakers naturally talk, also consider [location]
+
+-Keep the original tone (casual/formal/technical) but make it authentic to the target language, [location]
+
+-Add typical filler words and conversational particles used by natives
+
+-Convert word-for-word translations into natural expressions
+
+-Adjust sentence length patterns to match target language norms
+
+-Consider formality levels and honorifics specific to the target culture, [location]
+
+
+Cultural Elements:
+
+-Replace foreign references with locally relevant ones, [location]
+
+-Adapt metaphors and idioms to local equivalents, [location]
+
+-Use examples that resonate with the target culture, [location]
+
+-Keep technical terms as appropriate for the local context
+
+-Adapt date/time formats and numerical conventions, [location]
+
+-Consider local taboos or sensitivities, [location]
+
+-Adjust humor and wordplay to resonate locally, [location]
+
+-Handle brand names and trademarks appropriately
+
+-Adapt currency and payment-related terms to local standards, [location]
+
+-Make sure to get any proverbs right for [location]
+
+
+Grammar & Structure:
+
+-Fix word order to match native patterns
+
+-Adjust prepositions and articles as used by natives
+
+-Convert any directly translated phrases
+
+-Use natural connecting words and transitions
+
+-Ensure proper handling of gender agreement where applicable
+
+-Account for differences in pronoun usage and formality levels, [location]
+
+-Consider pluralization rules specific to the target language
+
+
+Technical Considerations:
+
+-Handle special characters and diacritics appropriately
+
+-Consider text expansion/contraction between languages
+
+-Maintain any placeholders or variables in the correct format
+
+-Preserve any markup or formatting tags
+
+-Follow industry-specific terminology conventions
+
+-Comply with regulatory/legal requirements for the target market, [location]
+
+
+Regional Variations:
+
+-Consider if any regional dialect or expressions would be appropriate, for example if the original text is written in dialect, try to also make the new version in dialect, [location]
+
+-Adapt to local standards and conventions
+
+-Use measurement units and formats familiar to the target audience, [location]
+
+-Consider official language standards vs common usage
+
+-Account for different numbering systems or conventions, [location]
+
+-Note if certain terms need to be left in English/original language per local practice
+
+
+Please:
+
+-Maintain the original tone and level of expertise
+
+-Keep any technical terms that should remain unchanged
+
+-Preserve the original meaning while making it feel local
+
+-IMPORTANT: Do not explain what you will do or what you have done. 
+Just give me the adjusted text.
+
+-[change-level]
+
+Text: [text1]
+"
+
+##Show: "Debug - [pRomPt1]"
+
+#Show: "Analyzing...."
+
+#claude: claude1
+"[pRomPt1]"
+
+
+#Show: "[claude1]"
+
+#Question: motivations
+"Would you like to get an overview of the changes and the motivations for them? (answer 'y' or 'n') "
+
+
+#If [motivations]="y" #Begin
+   #Show: "Analyzing...."
+
+   #Claude: claude1
+   "Please give me an overview of the changes you made and why you did it." 
+
+   #Show: "[claude1]"
+#End
+
+
+#Question: feedback
+"Do you have any feedback on the new text? (give feedback or 'n' to stop)"
+
+#Loop-Until: [feedback]="n"
+      #Show: "Analyzing...."
+
+      #Claude: claude1
+      "Feedback on the text: [feedback]"
+
+      #Show: "[claude1]"
+
+      #Question: feedback
+      "Do you have any feedback on the new text? (give feedback or 'n' to stop)"
+
+   #End
+
+#Show: "Thank you for using Purposewrite!"

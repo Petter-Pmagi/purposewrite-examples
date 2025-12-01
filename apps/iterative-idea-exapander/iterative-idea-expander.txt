@@ -1,0 +1,100 @@
+## iterative idea expander - 250425
+## Develop a basic content idea in new direections by branching it step by step.
+
+#Show: "Welcome to - Iterative Idea Expander"
+
+
+#Question: seed
+"What is your seed idea, concept or statement?"
+
+
+#Text: prompt
+"Take this seed idea, concept or statement: [seed]
+
+We would now like to expand on that seed, try to come up with new and unexpected angles on the topic for a linkedin post. Please try to be very creative and take the seed in totally new directions.
+
+Review all new perspectives generated
+Look for patterns or interesting combinations
+- Stay open to unusual ideas
+- Conceptual is good
+- Don't self-censor during the exploration phase
+- Look for connections between different perspectives
+- Consider both practical and theoretical applications
+
+Some possible new directions:
+-What would be the next level above this, going to the next level of thought leadership. 
+-Maby getting an idea from extending a word to its category.
+-What would be the next level below this, going to a lower level of thought, thinking about a detail in it for example.
+-Maby getting an idea from drilling down on a word to a sub category or detail of it.
+
+
+Some systems for idea expansion:
+1. Mind Mapping:
+Place your core idea at the center of a page. Branch out with related sub-ideas, and keep expanding each branch with further connections. This visual approach helps you discover new directions.
+
+2. Lotus Blossom Technique:
+Put your main idea in the center of a grid. Surround it with eight related themes or aspects. Then, treat each of those as a new center and expand them with eight more related ideas. This structured method ensures systematic exploration.
+
+3. 5W+1H Technique:
+Ask Who, What, When, Where, Why, and How about your idea. Each question reveals new perspectives, applications, or challenges.
+
+4. Random Word Association:
+Pick a random word and connect it to your idea. This can spark unexpected angles and creative combinations.
+
+5. Combination and Synthesis:
+Combine your core idea with another unrelated or even opposite idea. This mash-up can lead to unique and novel concepts.
+
+6. Brainstorming Variations:
+
+Generate as many ideas as possible without judging them at first.
+
+Try “Reverse Brainstorming” by asking how to make the problem worse, then flip those ideas for new solutions.
+
+Use “Crazy 8s” by quickly sketching or writing eight different takes on your idea in eight minutes.
+
+7. Design Thinking:
+Move through stages: define the problem, ideate, prototype, and test. Each stage encourages you to view your idea from different perspectives.
+
+
+
+Output Format:
+A numbered list of 10 new concepts.
+For each new concept, select an angle and write a single clear statement that captures the essence of the new angle, plus also write a super short version.
+Present this in a numbered list 1-10.
+Structure each list item as:
+-List item number
+-The Super short version - IN BOLD
+-The New concept statement
+
+IMPORTANT: Don't show me any other information, only the numbered list new statements."
+
+
+#Show: "Analyzing..."
+
+#chatGPT: chat
+"[prompt]"
+
+#Show: "Here are some possible expansions:
+[chat]"
+
+
+
+#Question: choice
+"Would you like to expand further on one of those concept? (answer with a number or 'no')"
+
+#Loop-Until: [choice]="no"
+
+   #Show: "Analyzing..."
+   
+   #chatGPT: chat
+   "Do it again, but now with the New Concept Statement nr [choice] as the starting point."
+   
+   #Show: "Here are some possible expansions:
+[chat]"
+
+   #Question: choice
+   "Would you like to expand further on one of those concept? (answer with a number or 'no')"
+
+#End
+
+#Show: "Thanks for using purposewrite!"

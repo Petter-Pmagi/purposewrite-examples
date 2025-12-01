@@ -1,9 +1,5 @@
-##Basic chatGPT35 - 250307
-<<<<<<< HEAD
-##chatGPT 3.5
-=======
+##Basic chatGPT - 250307
 ##chatGPT 4o
->>>>>>> develop
 
 ##basic chatbot
 
@@ -14,7 +10,7 @@
 
 #Show: "Analyzing..."
 
-#chatGPT35: gpt1
+#chatGPT: gpt1
 "[prompt]"
 
 #Show: "[gpt1]"
@@ -24,7 +20,7 @@
 
 #Loop-Until: [feedback]=="no"
    #Show: "Analyzing..."
-   #chatGPT35: gpt1
+   #chatGPT: gpt1
    "[feedback]"
 
    #Show: "[gpt1]"

@@ -1,0 +1,143 @@
+#Show: "Image generation playground"
+
+#Text: quit 
+"n"
+
+#Loop-Until: [quit]="y"
+
+    #Show: "Choose one:
+
+    1. Generate image chatgpt - free prompt
+    2. Generate image chatgpt - realistic photo
+    3. Generate image nano banana - free prompt
+    4. Generate image nano banana - realistic photo
+    5. Generate image chatgpt landscape format - free prompt
+    6. Generate image chatgpt portrait format - free prompt
+    99. Quit
+    "
+
+    #Question: menu
+    "Menu choice"
+
+    #Text: menu_ok
+    "n"
+
+    #If [menu]="1" #Begin
+
+        #Text: menu_ok
+        "y"
+
+        #Question: user_prompt
+        "Enter the prompt to generate image:"
+
+        #Show: "Working...."
+
+        #chatgpt-img: img
+        size: auto
+        "[user_prompt]"
+
+        #showimage: [img]
+
+    #End
+    #If [menu]="2" #Begin
+
+        #Text: menu_ok
+        "y"
+
+        #Question: user_prompt
+        "Enter the prompt to generate image:"
+
+        #Show: "Working...."
+
+        #Text: prompt
+        "[user_prompt] - Do this in a very realistic photo style, dont make it too perfect, include imperfections, realistic details and non perfect lighting as in a real photo. Avoid anything looking like 3d or rendring or too perfect commercial images." 
+
+        #chatgpt-img: img
+        size: auto
+        "[user_prompt]"
+
+        #showimage: [img]
+
+    #End
+    #If [menu]="3" #Begin
+
+        #Text: menu_ok
+        "y"
+
+        #Question: user_prompt
+        "Enter the prompt to generate image:"
+
+        #Show: "Working...."
+
+        #gemini-img: img
+        "[user_prompt]"
+
+        #showimage: [img]
+
+    #End
+    #If [menu]="4" #Begin
+
+        #Text: menu_ok
+        "y"
+
+        #Question: user_prompt
+        "Enter the prompt to generate image:"
+
+        #Show: "Working...."
+
+        #gemini-img: img
+        "[user_prompt]"
+
+        #showimage: [img]
+
+    #End
+    #If [menu]="5" #Begin
+
+        #Text: menu_ok
+        "y"
+
+        #Question: user_prompt
+        "Enter the prompt to generate image:"
+
+        #Show: "Working...."
+
+        #chatgpt-img: img
+        size: 1536x1024
+        "[user_prompt]"
+
+        #showimage: [img]
+
+    #End
+    #If [menu]="6" #Begin
+
+        #Text: menu_ok
+        "y"
+
+        #Question: user_prompt
+        "Enter the prompt to generate image:"
+
+        #Show: "Working...."
+
+        #chatgpt-img: img
+        size: 1024x1536
+        "[user_prompt]"
+
+        #showimage: [img]
+
+    #End
+
+    #If [menu]="99" #Begin
+        #Text: quit
+        "y"
+        #Text: menu_ok
+        "y"
+    #End
+
+    #If [menu_ok]="n" #Begin
+        #Show: "You need to answer with one number from the menu, please."
+    #End
+#End
+
+#Show: "Thanks for using the purposewrite image generation playground."
+
+
