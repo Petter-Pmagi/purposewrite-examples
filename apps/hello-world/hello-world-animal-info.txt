@@ -1,0 +1,26 @@
+##Animal text guide 
+##Will write a text about an animal in your language 
+ 
+#Show: "Hi! I will write a text about an animal for you!" 
+ 
+#Question: language 
+"What language do you want me to write in?" 
+ 
+#Question: animal 
+"What animal should I write about (english name)?" 
+ 
+##chatgpt is better at research 
+#chatGPT: research 
+"Give me the top 3 unusual facts about the animal [animal]" 
+ 
+#Show: "I found some unusual facts about [animal]: 
+[research]" 
+ 
+##Claude is better at writing 
+#Claude: the_text 
+"Writing an engaging article about the animal [animal]. 
+Make sure to include these facts: [research] 
+The text should be written in the language: [language]" 
+ 
+#Show: "Here is a text about [animal]: 
+[the_text]" 

@@ -1,0 +1,189 @@
+##Rewriter - 250307
+##Humanize & rewrite a text for SoMe - with style selections
+
+#Show: "Welcome to Humanizer!"
+
+#Show: "I will help you rewrite and transform your text to make it feel more authentic, human-like and better for social media. You can also specify in detail what you want me to do with the text."
+
+#Question: original_text
+"What text would you like me to rewrite (in the same language)?"
+
+#Text: prompt
+"Original Text: [original_text]"
+
+#Question: minor
+"Try to keep the main structure of the text (answer 'y' or 'n')?"
+
+#If [minor]="y" #Begin
+   #Text: prompt
+   "IMPORTANT! Only allow small changes to the sentences and the structure of the text.\n[prompt]"
+#End
+
+#Question: target_audience
+"Who is your target audience for this text?"
+
+#Text: prompt
+"IMPORTANT! Adjust the text for the Target Audience, that is: [target_audience]\n[prompt]"
+
+#Question: purpose
+"What is the purpose of this text (YOUR own REAL purpose)? "
+
+#Text: prompt
+"IMPORTANT! Adjust the text to make it fullfill it's real Purpose, that is: [purpose]\n[prompt]"
+
+#Text: style
+"1. Slightly funny - Make the text just slightly funny, not too much.
+2. Funny - Make it a litte bit funny.
+3. Hilarious - Make it very funny.
+4. A few abbreviations - Include 1-3 'fast texting abbreviations'.
+5. Many Abbreviations - Include very few 'fast texting abbreviations'.
+6. A few typos - Include 1-2 typos in the first sentence.
+7. Many typos - Include typos throughout the text.
+8. Bad grammar - Include 1-2 occurences of bad or wrong grammar.
+9. Weeeird spelling - Primarily in the hook, include 1-2 words with too many vocals, example: 'waaaay to good'.
+10. CAPITALS - Include 1-2 words emphasized in CAPITALS for max emotions.
+11. !!!! ???? ?!?!? - Include 1-2 occurences of many !!!!! or ???? or ?!?!?!.
+12. ... ( ) - Use dots like ... to indicate hesitation or thinking, and sometimes parts of sentences in parenthesis instead of using comma.
+13. No — EM dash - Remove any use of the special character — in the text.
+14. Odd sentence lengths - Use extremely different sentence lengths, sentences can be one word or very long with many commas.
+15. Short sentences & paragraphs - Write using extremely short sentences and short paragraphs.
+16. Conversational - Write like you're having a real conversation.
+17. Personal - Include occasional casual phrases and conversational transitions like 'you know,' 'actually,' 'well,' but don't overdo it. Also show personality through measured enthusiasm, curiosity, or thoughtfulness when appropriate. Feel free to express uncertainty sometimes using phrases like 'I think' or 'probably'. Use specific examples from your experience. If relevant, include specific examples or personal observations rather than just general statements.
+18. Provocative - Write with some provocative ideas.
+19. Emotional - Express lots of feelings and opinions.
+20. Less certain - Use a lot of phrases like "I think," "maybe," or "it seems that" to show uncertainty or nuanced thinking.
+21. Rhetorical -  Pose questions to engage the reader and stimulate thought.
+22. Digressions - Include digressions, occasionally go off on brief, relevant tangents as humans often do in conversation or writing.
+23. No corporate BS - Use everyday words over formal alternatives, be specific instead of metaphorical, choose simple and clear words over complex ones, avoid buzzwords and business jargon, write actively and directly, avoid corporate style and language.
+24. No statistics - Remove all statistics and numbers like '38%' or 'every 8 out of 10' or '5000 dollars' etc.
+25. Headlines - Insert sub headlines in BOLD where it is logical.
+26. No emojis - Remove all emojis.
+27. Few emojis - Insert emojis, but just a few, don't overdo it.
+28. Many emojis - Insert emojis.
+29. No lists - Remove all bullet points and lists.
+30. One list - Use ONE list with bullet points.
+31. Many lists - Have lots of lists with bullet points.
+32. Hook - Start the text with a strong hook in a short sentence.
+33. Intro - Make a strong lede in the text, meant to sum up the text but also make you want to read more. If the text has a CTA, this lede is below the CTA.
+34. CTA - Write a strong CTA at the end of the text.
+35. Question CTA - Write a strong CTA in the form of a question at the end of the text.
+36. PS section - Include a very brief 'PS.' section at the end that adds a personal touch or unexpected twist to the message, maby providinga a quick, supplementary piece of information.
+37. No hashtags - Remove any hashtags.
+38. 2-3 Hashtags - End the text with 2-3 hashtags.
+39. 4-5 Hashtags - End the text with 4-5 hashtags.
+"
+
+#Show: "Analyzing...."
+
+#chatGPT: menu
+"Show me the following menu, but don't show the prompt part after '-' and dont add any other text before or after. 
+[style]"
+
+#Question: choices
+"What changes do you want in your text?
+[menu]
+Reply with the numbers you like (for example 1,3,9):"
+
+#Show: "Analyzing...."
+
+#chatGPT: menu2
+"From the menu below I select the lines: [choices].
+Now, reply with the all the selections made, one per line. But only reply with the line part AFTER the minus '-' for each line, no other text before or after.
+The original menu: [style]"
+
+##Show: "Debug - Style: [menu2]"
+
+#Text: prompt3
+"Below is a text, please rewrite the text to make it more authentic and human (and show only the rewritten text, don't tell me what you will do first):
+
+-Important: Rewrite in the language the text is written in
+
+-Vary your sentence structure and length - mix short and long sentences like humans do
+- Use contractions naturally (I'm, don't, we're, etc.)
+- Include occasional casual phrases and conversational transitions like 'you know,' 'actually,' 'well,' but don't overdo it
+- Show personality through measured enthusiasm, curiosity, or thoughtfulness when appropriate
+- Make natural connections between ideas instead of just listing points
+- Feel free to express uncertainty sometimes using phrases like 'I think' or 'probably'
+- Avoid overly systematic or robotic structures like numbered lists or rigid formats unless specifically requested
+- Don't overuse the same phrases or transitions repeatedly
+- Express ideas with natural flow rather than perfect organization
+- Avoid buzzwords and dramatic declarations
+- Include natural pauses and transitions
+
+If applicable to this text, also:
+- Use specific examples from your experience
+- Focus on one main insight rather than multiple generic points
+- Share a genuine observation or concern
+- Don't be overly formal or stiff
+- If relevant, include specific examples or personal observations rather than just general statements"
+
+#Text: final_prompt
+"[prompt3]\nStylistic changes:\n[menu2]\n[prompt]"
+
+##Show:"Debug - final prompt: [final_prompt]"
+
+#Show: "Analyzing...."
+
+#Claude: cld1
+"[final_prompt]"
+
+#Show: "Here is the rewritten text:
+[cld1]"
+
+#Question: feedback
+"Would you like to choose new numbers and rewrite? (y/n)"
+
+#Loop-Until: [feedback]="n"
+   #Question: choices
+   "What changes do you want in your text?
+   [menu]
+   Reply with the numbers like 1,3,9:"
+   
+   #Show: "Analyzing...."
+
+   #chatGPT: menu3
+   "From the menu below I select the lines [choices].
+   Now, reply with the all the selections made, one per line, reply in this 
+   format:
+   Only the menu line prompt part after '-', no other text before or after.
+   [style]"
+
+   #Text: final_prompt
+   "[prompt3]\nStylistic changes:\n[menu3]\n[prompt]"
+
+   ##Show:"Debug-final prompt-\n [final_prompt]"
+   
+   #Show: "Analyzing...."
+   
+   #Claude: cld1
+   "[final_prompt]"
+
+   #Show: "Here is the rewritten text:
+   [cld1]"
+
+   #Question: feedback
+   "Would you like to choose new numbers and rewrite? (y/n)"
+
+#End
+
+#Question: feedback
+"Would you like give further feedback? (answer with your feedback or 'n')"
+
+#Loop-Until: [feedback]="n"
+   #Show: "Analyzing...."
+   
+#Claude: cld1
+   "[feedback]"
+
+   #Show: "[cld1]"
+
+   #Question: feedback
+   "Would you like give feedback? (answer with your feedback or 'n')"
+
+   #If [feedback]<>"n" #Begin
+      #Show: "Please note: working in a long chat sequence consumes more credits than starting with a new prompt."
+   #End
+
+#End
+
+#Show: "Thanks for using purposewrite!"

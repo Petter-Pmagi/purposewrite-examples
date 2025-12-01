@@ -1,0 +1,38 @@
+##Basic claude - 250307
+##Claude Sonnet 3.5
+
+##basic chatbot
+
+#Show: "Hi, I am Claude!"
+
+#Question: prompt
+"Give me a prompt: "
+
+#Show: "Analyzing..."
+
+#Claude: cld1
+"[prompt]"
+
+#Show: "[cld1]"
+
+#Question: feedback
+"Would you like give feeback? (answer with your feedback or 'no')"
+
+#Loop-Until: [feedback]="no"
+
+   #Show: "Analyzing..."
+
+   #Claude: cld1
+   "[feedback]"
+
+   #Show: "[cld1]"
+
+   #Question: feedback
+   "Would you like give feeback? (answer with your feedback or 'no')"
+
+   #Show: "Please note: working in a long chat sequence consumes more credits than starting with a new prompt."
+
+#End
+
+#Show: "Thanks for using purposewrite!"
+

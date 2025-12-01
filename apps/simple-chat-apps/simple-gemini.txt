@@ -1,0 +1,38 @@
+##Basic Gemini - 250525
+##Gemini 2.5 preview
+
+##basic chatbot
+
+#Show: "Hi, I am Gemini!"
+
+#Question: prompt
+"Give me a prompt: "
+
+#Show: "Analyzing..."
+
+#gemini: cld1
+"[prompt]"
+
+#Show: "[cld1]"
+
+#Question: feedback
+"Would you like give feeback? (answer with your feedback or 'no')"
+
+#Loop-Until: [feedback]="no"
+
+   #Show: "Analyzing..."
+
+   #gemini: cld1
+   "[feedback]"
+
+   #Show: "[cld1]"
+
+   #Question: feedback
+   "Would you like give feeback? (answer with your feedback or 'no')"
+
+   #Show: "Please note: working in a long chat sequence consumes more credits than starting with a new prompt."
+
+#End
+
+#Show: "Thanks for using purposewrite!"
+

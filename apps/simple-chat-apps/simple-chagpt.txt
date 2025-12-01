@@ -1,0 +1,36 @@
+##Basic chatGPT - 250307
+##chatGPT 4o
+
+##basic chatbot
+
+#Show: "Hi, I am chatGPT!"
+
+#Question: prompt
+"Give me a prompt: "
+
+#Show: "Analyzing..."
+
+#chatGPT: gpt1
+"[prompt]"
+
+#Show: "[gpt1]"
+
+#Question: feedback
+"Would you like give feeback? (answer with your feedback or 'no')"
+
+#Loop-Until: [feedback]=="no"
+   #Show: "Analyzing..."
+   #chatGPT: gpt1
+   "[feedback]"
+
+   #Show: "[gpt1]"
+
+   #Question: feedback
+   "Would you like give feeback? (answer with your feedback or 'no')"
+
+   #Show: "Please note: working in a long chat sequence consumes more credits than starting with a new prompt."
+
+#End
+
+#Show: "Thanks for using purposewrite!"
+

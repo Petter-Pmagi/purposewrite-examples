@@ -1,0 +1,114 @@
+##FAQ Maker 250421
+## Start from a webpage and add / add more FAQ questions
+
+#Show: "**FAQ Writer will do these steps**
+1. Ask for a webpage.
+2. Look for any existing FAQ section.
+6. Suggest new FAQ items to add."
+
+
+#Question: url
+"Webpage - URL?
+(will only look at one page, not the full website)"
+
+#Show: "Scraping the web page....(30 sec)"
+
+#scrape: contentraw
+"[url]"
+
+##Show: "Debug - content: [contentraw]"
+#Show: "Analyzing web content....(30sec)"
+#chatGPT: content
+"Extract all the readable content from this HTML code, include button text and ALT image texts, don't include cookie information. Format nicely. HTML: [contentraw]"
+
+##Show: "Debug - Webpage content: 
+
+[content]"
+
+
+##Show: "Debug - Content
+[content]"
+
+#chatGPT: faq_content
+"Do you find an existing FAQ section in the website content below? Answer with only y or n (representin yes or no).
+Answer with no oher information, give me one character only.
+Website content: [content]"
+
+##Show: "Debug - FAQ found
+-[faq_content]-"
+
+#Text: faq_find
+"y"
+
+#If [faq_content]="n" #Begin
+    #Question: faq_find_q
+    "Cannot identify a FAQ section on this page. Sometimes it hels if you can give the headline of that section.
+    Headline for existing FAQ section?
+    (n = there is no FAQ yet)"
+
+    #If [faq_find_q]="n" #Begin
+        #Text: faq_find
+        "n"
+    #Else-Begin
+        #Text: faq_find
+        "The FAQ section can be found under the headline: [faq_find]"
+    #End
+#End
+
+#If [faq_find]<>"n" #Begin
+    #chatGPT: faq_content
+    "Show me the existing FAQ section from the website content below.
+    [faq_find]
+    Website content: [content]"
+
+    #Show: "Existing FAQ on the page:
+
+    [faq_content]"
+#Else-Begin
+    #Show: "No existing FAQ on the page."
+#End
+
+
+#Text: faq_prompt
+"Look at the faq section of the website content below, and then propose 5 new questions + answers.
+Base the new suggestions on the contents of the website, its target audience and pain points, and the most likely questions they will ask about the topic of the website.
+Dont overlap with any existing FAQ questions.
+Try to emulate the writing style of the web page.
+Write in the same language as the web page.
+[faq_find]
+Existing FAQ section: [faq_content]
+Website content:
+[content]"
+
+#Show: "Analyzing FAQ....(30 sec)"
+
+#Claude: faq_analysis
+"[faq_prompt]"
+
+#Show: "New suggested FAQ:
+
+[faq_analysis]"
+
+
+#Question: feedback
+"Now in chat mode. Do you have any feedback on this?
+('n' = stop)"
+
+#Loop-Until: [feedback]="n"
+    #Show: "Rewriting....(30 sec)"
+
+    #Claude: faq_analysis
+    "[feedback]"
+
+    #Show: "[faq_analysis]"
+
+    #Question: feedback
+    "Now in chat mode. Do you have any feedback on this?
+    (n = stop) "
+#End
+
+
+
+
+
+

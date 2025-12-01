@@ -1,0 +1,91 @@
+Formatting: Certainly! Below are examples of various text formatting options using Markdown, along with the corresponding Markdown code for each:
+
+1. **Bold**
+   - Sample: **This text is bold.**
+   - Markdown: `**This text is bold.**`
+
+2. *Italics*
+   - Sample: *This text is italicized.*
+   - Markdown: `*This text is italicized.*`
+
+3. ***Bold and Italics***
+   - Sample: ***This text is bold and italicized.***
+   - Markdown: `***This text is bold and italicized.***`
+
+4. ~~Strikethrough~~
+   - Sample: ~~This text is strikethrough.~~
+   - Markdown: `~~This text is strikethrough.~~`
+
+5. [Hyperlink](https://www.example.com)
+   - Sample: [This is a hyperlink.](https://www.example.com)
+   - Markdown: `[This is a hyperlink.](https://www.example.com)`
+
+6. `Inline Code`
+   - Sample: `This is inline code.`
+   - Markdown: `` `This is inline code.` ``
+
+7. Code Block
+   - Sample:
+     ```markdown
+     ```
+     This is a code block.
+     ```
+     ```
+   - Markdown:
+     ```markdown
+     ```
+     This is a code block.
+     ```
+     ```
+
+8. Blockquote
+   - Sample:
+     > This is a blockquote.
+   - Markdown: `> This is a blockquote.`
+
+9. Unordered List
+   - Sample:
+     - Item 1
+     - Item 2
+     - Item 3
+   - Markdown:
+     ```markdown
+     - Item 1
+     - Item 2
+     - Item 3
+     ```
+
+10. Ordered List
+    - Sample:
+      1. First item
+      2. Second item
+      3. Third item
+    - Markdown:
+      ```markdown
+      1. First item
+      2. Second item
+      3. Third item
+      ```
+
+11. Horizontal Rule
+    - Sample:
+      ---
+    - Markdown: `---`
+
+12. Heading Levels
+    - Sample:
+      # Heading 1
+      ## Heading 2
+      ### Heading 3
+    - Markdown:
+      ```markdown
+      # Heading 1
+      ## Heading 2
+      ### Heading 3
+      ```
+
+13. Image
+    - Sample: ![Alt text](https://www.example.com/image.jpg)
+    - Markdown: `![Alt text](https://www.example.com/image.jpg)`
+
+These are some of the most common Markdown formatting options. You can combine them to create more complex formatting as needed.

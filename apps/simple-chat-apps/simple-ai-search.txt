@@ -1,0 +1,40 @@
+## Simple AI Search 250603
+ 
+#Question: prompt
+"Your search question:"
+
+#Show: "Analyzing..."
+
+#chatgptsearch: srch
+"[prompt]"
+
+#Show: "[srch]"
+
+#Question: feedback
+"Would you like give feeback? (answer with your feedback or 'q' = quit)"
+
+#Loop-Until: [feedback]="q"
+
+   #Show: "Analyzing..."
+
+   #chatgptsearch: srch
+   "[feedback]"
+
+   #Show: "[srch]"
+
+   #Question: feedback
+   "Would you like give feeback? (answer with your feedback or 'q' = quit)"
+
+   #Show: "Please note: working in a long chat sequence consumes more credits than starting with a new prompt."
+
+#End
+
+#Show: "Thanks for using purposewrite!"
+
+
+
+
+
+
+
+

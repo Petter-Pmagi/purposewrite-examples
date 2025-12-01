@@ -1,0 +1,682 @@
+## --- SCRIPT: Lead Magnet Creator V1.2 ---
+## Date: 2025-05-19
+## Helps users define, structure, and draft content for a lead magnet.
+## V1.2 - Removed inline comments.
+
+#Show: "Welcome to the **Lead Magnet Creator**!
+This script will guide you through defining, structuring, and drafting compelling content for your valuable lead magnet.
+Let's get started!"
+
+## --- Initial Setup: Language ---
+#Text: language_q_default
+"e"
+#Question: language
+"What language do you want the Lead Magnet content to be in?
+(I will continue talking English to you, but you can answer in any language, press 'e' for English)"
+#If [language]=[language_q_default] #Begin
+  #Text: language
+  "english"
+#End
+#Show: "Great, we'll work in [language] for the Lead Magnet content."
+
+## --- PHASE 1: Foundation & Starting Point ---
+#Text: start_choice_q_satisfied
+"n"
+#Loop-Until: [start_choice_q_satisfied]="y"
+  #Question: start_choice
+  "How would you like to start creating your lead magnet?
+  Please choose 1 or 2:
+
+  1.  I have a **basic idea or topic** I want to develop.
+  2.  I have **existing draft content, notes, or an outline** I want to use as a base."
+  #If [start_choice]="1" #Begin
+    #Text: start_choice_q_satisfied
+    "y"
+  #End
+  #If [start_choice]="2" #Begin
+    #Text: start_choice_q_satisfied
+    "y"
+  #End
+  #If [start_choice_q_satisfied]="n" #Begin
+    #Show: "Invalid selection. Please choose 1 or 2."
+  #End
+#End
+
+## --- PHASE 2: Core Concept Development & Refinement ---
+#Text: final_lead_magnet_topic
+""
+#Text: final_lead_magnet_type
+## This refers to the type of content, e.g., Guide, Checklist
+""
+#Text: final_lead_magnet_structure
+""
+#Text: summarized_formats
+"No specific format search conducted or no relevant formats found."
+#Text: chosen_ta
+""
+#Text: chosen_pain_point
+""
+
+#If [start_choice]="1" #Begin ## Path A: Start with Idea
+  #Question: user_idea
+  "Great! Briefly describe your core idea or topic for the lead magnet.
+  (One or two sentences is usually enough)"
+  #Text: final_lead_magnet_topic
+  "[user_idea]"
+  #Show: "Working with topic: [final_lead_magnet_topic]"
+
+  #Text: type_structure_confirmed
+  "n"
+  #Loop-Until: [type_structure_confirmed]="y"
+    #Show: "Suggesting content types and structure for '[final_lead_magnet_topic]'..."
+    #chatGPT: suggested_content_types_raw
+    "Based on the idea '[final_lead_magnet_topic]', dynamically suggest 3 suitable content types for a lead magnet (e.g., E-book, Webinar Slides, Video Script Outline) with a brief (1-line) explanation for each.
+    Also, include these common types:
+    - Ultimate Guide
+    - Checklist
+    - Resource List
+    - Template Pack
+    - Prompt Library
+    Present all these as a single, clear, numbered list (e.g., 1. Type A - Explanation, 2. Type B - Explanation, ... N. Prompt Library - A collection of useful prompts).
+    IMPORTANT: Ensure the list is numbered for user selection."
+    #Question: chosen_content_type_selection
+    "Here are some content type suggestions for your lead magnet on '[final_lead_magnet_topic]':
+
+    [suggested_content_types_raw]
+
+    Which type number sounds best for your lead magnet?
+    (Or type 'm' to specify your own)"
+
+    #If [chosen_content_type_selection]="m" #Begin
+      #Question: manual_content_type
+      "Please specify the exact content type you want to create (e.g., 'White Paper', 'Case Study Analysis'):"
+      #Text: current_content_type
+      "[manual_content_type]"
+    #Else-Begin
+      #chatGPT: extracted_content_type_name
+      "From the following numbered list, the user selected item number [chosen_content_type_selection].
+      Please reply with ONLY the name of the content type selected (e.g., if '1. Ultimate Guide - A deep dive', reply 'Ultimate Guide'). Do not include the explanation or the number.
+
+      The list:
+      [suggested_content_types_raw]"
+      #Text: current_content_type
+      "[extracted_content_type_name]"
+    #End
+    #Show: "You've selected Content Type: **[current_content_type]**"
+
+    #Text: search_formats_default
+    "n"
+    #Question: search_for_type_formats
+    "Would you like me to search online for popular formats or common structures for a '[current_content_type]' on the topic of '[final_lead_magnet_topic]'?
+    This might give us more ideas for the structure. ('y' for yes, 'n' for no - default is 'n')"
+    #If [search_for_type_formats]="y" #Begin
+      #Show: "Searching for format insights for '[current_content_type]' on '[final_lead_magnet_topic]'... (this may take a moment)"
+      #chatgptsearch: search_results_formats
+      "popular content formats and typical structures for [current_content_type] about [final_lead_magnet_topic]"
+      #chatGPT: summarized_formats_temp
+      "Based on these search results: '[search_results_formats]', briefly summarize any key findings or common structural elements for a '[current_content_type]' on '[final_lead_magnet_topic]'. If no clear patterns, say 'No specific structural patterns found'."
+      #Text: summarized_formats
+      "[summarized_formats_temp]"
+      #Show: "Search insights on formats/structures: [summarized_formats]"
+    #Else-If [search_for_type_formats]=[search_formats_default] #Begin
+        #Text: summarized_formats
+        "No specific format search conducted."
+    #Else-Begin
+        #Text: summarized_formats
+        "No specific format search conducted."
+    #End
+
+    #Show: "Suggesting a structure for your '[current_content_type]'..."
+    #chatGPT: suggested_structure_raw
+    "For a lead magnet of type '[current_content_type]' on the topic '[final_lead_magnet_topic]', suggest a logical structure as a list of main sections or chapters.
+    Consider these insights if available: [summarized_formats].
+    Present as a bulleted list (e.g., - Introduction, - Chapter 1: Name, - Key Element X, - Conclusion)."
+    #Text: current_lead_magnet_structure
+    "[suggested_structure_raw]"
+
+    #Question: structure_feedback
+    "Here's a suggested structure for your '[current_content_type]' on '[final_lead_magnet_topic]':
+
+    [current_lead_magnet_structure]
+
+    What do you think?
+    (Type any changes you'd like, e.g., 'add a section on Future Trends', 'remove the section on History', or type 'k' to keep this structure and confirm this content type & structure)"
+    #If [structure_feedback]="k" #Begin
+      #Text: type_structure_confirmed
+      "y"
+      #Text: final_lead_magnet_type
+      "[current_content_type]"
+      #Text: final_lead_magnet_structure
+      "[current_lead_magnet_structure]"
+    #Else-Begin
+      #Show: "Revising structure based on your feedback..."
+      #chatGPT: revised_structure
+      "The user wants to change the structure for their lead magnet.
+      Topic: '[final_lead_magnet_topic]'
+      Content Type: '[current_content_type]'
+      Original Suggested Structure:
+      [current_lead_magnet_structure]
+      User Feedback: '[structure_feedback]'
+      Please provide an updated structure (bulleted list of sections) based on this feedback."
+      #Text: current_lead_magnet_structure
+      "[revised_structure]"
+      #Show: "Updated structure based on your feedback. We will loop again to confirm or allow further changes to this new structure or the content type."
+    #End
+  #End
+
+#Else-Begin
+  #Question: user_content
+  "Please paste your existing draft content, notes, or a detailed outline for your lead magnet:"
+  #Show: "Analyzing your content to suggest content type, topic, and structure..."
+
+  #Text: type_structure_confirmed_content
+  "n"
+  #Loop-Until: [type_structure_confirmed_content]="y"
+    #chatGPT: guessed_details_from_content
+    "Analyze the following user-provided content. Based on this content:
+    1. Infer the main **Topic**.
+    2. Suggest 1 or 2 most suitable **Content Types** for a lead magnet (e.g., 'Guide', 'Report', 'Checklist').
+    3. Suggest a logical **Structure** (as a bulleted list of main sections or chapters) based on the content.
+
+    Format your reply EXACTLY like this, with no extra text:
+    Inferred Topic: [Your inferred topic here]
+    Suggested Content Type 1: [Your first suggested content type]
+    Suggested Content Type 2: [Your second suggested content type, or 'None' if only one clear suggestion]
+    Suggested Structure:
+    - [Section 1]
+    - [Section 2]
+    - ..."
+
+    User Content:
+    [user_content]"
+
+    #chatGPT: extracted_inferred_topic
+    "From the text below, extract only the line that starts with 'Inferred Topic: ' and give me just the text after 'Inferred Topic: '.
+    Text: [guessed_details_from_content]"
+    #Text: final_lead_magnet_topic
+    "[extracted_inferred_topic]"
+
+    #chatGPT: extracted_suggested_type1
+    "From the text below, extract only the line that starts with 'Suggested Content Type 1: ' and give me just the text after 'Suggested Content Type 1: '.
+    Text: [guessed_details_from_content]"
+    #Text: suggested_type_1_content
+    "[extracted_suggested_type1]"
+
+    #chatGPT: extracted_suggested_type2
+    "From the text below, extract only the line that starts with 'Suggested Content Type 2: ' and give me just the text after 'Suggested Content Type 2: '. If it says 'None', reply 'None'.
+    Text: [guessed_details_from_content]"
+    #Text: suggested_type_2_content
+    "[extracted_suggested_type2]"
+
+    #chatGPT: extracted_inferred_structure
+    "From the text below, extract only the content starting from the line 'Suggested Structure:' to the end of the text. Include the 'Suggested Structure:' line itself.
+    Text: [guessed_details_from_content]"
+    #Text: current_lead_magnet_structure
+    "[extracted_inferred_structure]"
+
+    #Show: "Based on your content, it seems your topic is: **[final_lead_magnet_topic]**"
+    #Text: type_options_display
+    "1. [suggested_type_1_content]"
+    #If [suggested_type_2_content]<>"None" #Begin
+      #Text: type_options_display
+      "[type_options_display]\n2. [suggested_type_2_content]"
+    #End
+
+    #Question: chosen_content_type_from_content_raw
+    "Here are suggested content types based on your content:
+    [type_options_display]
+    (Or type 'm' to specify your own, e.g., 'White Paper')"
+    #If [chosen_content_type_from_content_raw]="m" #Begin
+      #Question: manual_content_type_content
+      "Please specify the content type:"
+      #Text: current_content_type
+      "[manual_content_type_content]"
+    #Else-If [chosen_content_type_from_content_raw]="1" #Begin
+      #Text: current_content_type
+      "[suggested_type_1_content]"
+    #Else-If [chosen_content_type_from_content_raw]="2" #Begin
+      #If [suggested_type_2_content]<>"None" #Begin
+        #Text: current_content_type
+        "[suggested_type_2_content]"
+      #Else-Begin
+        #Text: current_content_type
+        "[suggested_type_1_content]"
+        #Show: "Option 2 was not available, defaulting to Type 1: [suggested_type_1_content]"
+      #End
+    #Else-Begin
+        #Text: current_content_type
+        "[suggested_type_1_content]"
+        #Show: "Invalid selection, defaulting to Type 1: [suggested_type_1_content]"
+    #End
+    #Show: "You've selected Content Type: **[current_content_type]**"
+
+    #Question: structure_feedback_content
+    "Current Content Type: **[current_content_type]**
+    Here's the structure inferred from your content:
+    [current_lead_magnet_structure]
+
+    What do you think of this type and structure?
+    (Type any changes to the type or structure, e.g., 'change type to Checklist', 'combine section 1 and 2', or 'k' to keep this and confirm)"
+    #If [structure_feedback_content]="k" #Begin
+      #Text: type_structure_confirmed_content
+      "y"
+      #Text: final_lead_magnet_type
+      "[current_content_type]"
+      #Text: final_lead_magnet_structure
+      "[current_lead_magnet_structure]"
+    #Else-Begin
+      #Show: "Revising type/structure based on your feedback..."
+      #chatGPT: revised_type_structure_from_content
+      "The user provided content, and we inferred a topic, type, and structure. Now they want to change it.
+      Inferred Topic: '[final_lead_magnet_topic]'
+      Current Content Type: '[current_content_type]'
+      Current Structure:
+      [current_lead_magnet_structure]
+      User Feedback: '[structure_feedback_content]'
+      Based on this feedback, provide an updated Content Type AND an updated Structure (bulleted list).
+      Format reply:
+      Updated Content Type: [New Type]
+      Updated Structure:
+      - [New Section 1]
+      - ..."
+      #chatGPT: revised_type_from_feedback
+      "From the text below, extract the line starting 'Updated Content Type: ' and give me just the text after it.
+      Text: [revised_type_structure_from_content]"
+      #Text: current_content_type
+      "[revised_type_from_feedback]"
+
+      #chatGPT: revised_structure_from_feedback
+      "From the text below, extract the content from 'Updated Structure:' to the end.
+      Text: [revised_type_structure_from_content]"
+      #Text: current_lead_magnet_structure
+      "[revised_structure_from_feedback]"
+      #Show: "Updated type to '[current_content_type]' and structure revised. We'll loop again to confirm."
+    #End
+  #End
+#End
+
+## --- Converging Point: TA & Pain Point ---
+#Show: "Now let's define your Target Audience (TA) and the main Pain Point your lead magnet solves."
+#Show: "Suggesting Target Audiences for your lead magnet (Topic: '[final_lead_magnet_topic]', Type: '[final_lead_magnet_type]')..."
+#chatGPT: suggested_tas_raw
+"Based on a lead magnet with Topic: '[final_lead_magnet_topic]' and Type: '[final_lead_magnet_type]', suggest 3 distinct Target Audiences.
+Present as a numbered list (e.g., 1. Marketing Managers, 2. Small Business Owners)."
+#Question: chosen_ta_selection
+"Here are some suggested Target Audiences:
+[suggested_tas_raw]
+
+Which TA number best fits? (Or type 'm' to describe your own)"
+#If [chosen_ta_selection]="m" #Begin
+  #Question: manual_ta
+  "Please describe your specific Target Audience:"
+  #Text: chosen_ta
+  "[manual_ta]"
+#Else-Begin
+  #chatGPT: extracted_ta_name
+  "From the list: '[suggested_tas_raw]', user selected item number [chosen_ta_selection].
+  Reply with ONLY the name/description of that Target Audience."
+  #Text: chosen_ta
+  "[extracted_ta_name]"
+#End
+#Show: "Target Audience selected: **[chosen_ta]**"
+
+#Text: pain_point_method_default
+"1"
+#Question: pain_point_method
+"For '[chosen_ta]' and your lead magnet topic '[final_lead_magnet_topic]', how should we identify their main pain points or the value your lead magnet provides?
+Please choose 1 or 2 (default is 1):
+1.  Suggest options based on my AI knowledge.
+2.  First, search online for discussions/articles about challenges '[chosen_ta]' face regarding '[final_lead_magnet_topic]'."
+#Text: pain_point_context_search
+"No specific search conducted for pain points."
+
+#If [pain_point_method]="2" #Begin
+  #Show: "Searching for pain points for '[chosen_ta]' regarding '[final_lead_magnet_topic]'... (this may take a moment)"
+  #chatgptsearch: search_pain_points_results
+  "common challenges and pain points [chosen_ta] face related to [final_lead_magnet_topic]"
+  #chatGPT: summarized_pain_point_search_temp
+  "Based on these search results: '[search_pain_points_results]', briefly summarize key pain points or challenges faced by '[chosen_ta]' concerning '[final_lead_magnet_topic]'. If no clear patterns, state that."
+  #Text: pain_point_context_search
+  "[summarized_pain_point_search_temp]"
+  #Show: "Search insights on pain points: [pain_point_context_search]"
+  #Show: "Now suggesting pain points based on this search and AI knowledge..."
+  #chatGPT: suggested_pain_points_raw
+  "Based on Lead Magnet Topic: '[final_lead_magnet_topic]', Target Audience: '[chosen_ta]', and these search insights: '[pain_point_context_search]', suggest 3 specific pain points this lead magnet could address or value it could provide. Present as a numbered list."
+#Else-If [pain_point_method]=[pain_point_method_default] #Begin
+  #Show: "Suggesting pain points based on AI knowledge..."
+  #chatGPT: suggested_pain_points_raw
+  "Based on Lead Magnet Topic: '[final_lead_magnet_topic]' and Target Audience: '[chosen_ta]', suggest 3 specific pain points this lead magnet could address or value it could provide. Present as a numbered list."
+#Else-Begin
+  #Show: "Invalid selection for pain point method, defaulting to AI suggestions."
+  #Show: "Suggesting pain points based on AI knowledge..."
+  #chatGPT: suggested_pain_points_raw
+  "Based on Lead Magnet Topic: '[final_lead_magnet_topic]' and Target Audience: '[chosen_ta]', suggest 3 specific pain points this lead magnet could address or value it could provide. Present as a numbered list."
+#End
+
+#Question: chosen_pain_point_selection
+"Here are some potential pain points/value propositions for '[chosen_ta]':
+[suggested_pain_points_raw]
+
+Which number is the primary focus for your lead magnet? (Or type 'm' to state your own)"
+#If [chosen_pain_point_selection]="m" #Begin
+  #Question: manual_pain_point
+  "Please state the primary pain point/value your lead magnet will address:"
+  #Text: chosen_pain_point
+  "[manual_pain_point]"
+#Else-Begin
+  #chatGPT: extracted_pain_point_name
+  "From the list: '[suggested_pain_points_raw]', user selected item number [chosen_pain_point_selection].
+  Reply with ONLY the description of that pain point/value."
+  #Text: chosen_pain_point
+  "[extracted_pain_point_name]"
+#End
+#Show: "Primary Pain Point/Value: **[chosen_pain_point]**"
+
+## --- Consolidate & Final Plan Check ---
+#Text: final_plan_confirmed
+"n"
+#Loop-Until: [final_plan_confirmed]="y"
+  #Show: "## Current Lead Magnet Plan ##
+  **Topic:** [final_lead_magnet_topic]
+  **Content Type:** [final_lead_magnet_type]
+  **Target Audience:** [chosen_ta]
+  **Pain Point Solved / Value Provided:** [chosen_pain_point]
+  **Proposed Structure:**
+  [final_lead_magnet_structure]
+
+  Is this all correct and are you ready to proceed to content drafting?
+  (Type any minor final tweaks you'd like to make, or type 'p' to proceed)"
+  #Question: final_plan_feedback
+  #If [final_plan_feedback]="p" #Begin
+    #Text: final_plan_confirmed
+    "y"
+  #Else-Begin
+    #Show: "Incorporating your final tweaks..."
+    #chatGPT: plan_tweaker_prompt
+    "The user wants to make minor tweaks to the Lead Magnet plan.
+    Current Plan:
+    Topic: [final_lead_magnet_topic]
+    Content Type: [final_lead_magnet_type]
+    Target Audience: [chosen_ta]
+    Pain Point: [chosen_pain_point]
+    Structure: [final_lead_magnet_structure]
+
+    User's requested tweaks: '[final_plan_feedback]'
+
+    Please provide the updated plan elements based on these tweaks.
+    If a tweak is unclear or too major for a minor adjustment, note that and keep the original element.
+    Return ONLY the updated values for each, in this format:
+    Updated Topic: [text]
+    Updated Content Type: [text]
+    Updated Target Audience: [text]
+    Updated Pain Point: [text]
+    Updated Structure:
+    - [section]
+    - ..."
+    #chatGPT: plan_tweaker_response
+    "[plan_tweaker_prompt]"
+    #chatGPT: updated_topic_from_tweak
+    "From text: '[plan_tweaker_response]', extract 'Updated Topic:' value."
+    #Text: final_lead_magnet_topic "[updated_topic_from_tweak]"
+    #chatGPT: updated_type_from_tweak
+    "From text: '[plan_tweaker_response]', extract 'Updated Content Type:' value."
+    #Text: final_lead_magnet_type "[updated_type_from_tweak]"
+    #chatGPT: updated_ta_from_tweak
+    "From text: '[plan_tweaker_response]', extract 'Updated Target Audience:' value."
+    #Text: chosen_ta "[updated_ta_from_tweak]"
+    #chatGPT: updated_pp_from_tweak
+    "From text: '[plan_tweaker_response]', extract 'Updated Pain Point:' value."
+    #Text: chosen_pain_point "[updated_pp_from_tweak]"
+    #chatGPT: updated_structure_from_tweak
+    "From text: '[plan_tweaker_response]', extract 'Updated Structure:' content."
+    #Text: final_lead_magnet_structure "[updated_structure_from_tweak]"
+    #Show: "Plan updated. Let's review again."
+  #End
+#End
+#Show: "Plan confirmed! Moving to content generation."
+
+## --- PHASE 3: Content Generation & Lead Magnet Elements ---
+#Show: "Suggesting tones for your lead magnet..."
+#chatGPT: suggested_tones_raw
+"For a lead magnet of Type: '[final_lead_magnet_type]', targeting '[chosen_ta]' about '[final_lead_magnet_topic]', suggest 4 suitable tones (e.g., 'Expert & Authoritative', 'Friendly & Conversational') with a brief note on when to use them.
+Present as a numbered list."
+#Question: chosen_tone_selection
+"Here are some tone suggestions:
+[suggested_tones_raw]
+
+Which tone number best fits your lead magnet? (Or type 'm' to describe your own)"
+#Text: chosen_tone
+""
+#If [chosen_tone_selection]="m" #Begin
+  #Question: manual_tone
+  "Please describe the desired tone for your lead magnet:"
+  #Text: chosen_tone
+  "[manual_tone]"
+#Else-Begin
+  #chatGPT: extracted_tone_name
+  "From the list: '[suggested_tones_raw]', user selected item number [chosen_tone_selection].
+  Reply with ONLY the name of the tone (e.g., 'Expert & Authoritative')."
+  #Text: chosen_tone
+  "[extracted_tone_name]"
+#End
+#Show: "Tone selected: **[chosen_tone]**"
+
+#Text: search_draft_default
+"n"
+#Question: search_before_draft
+"Before I draft the main content, would you like me to do a quick online search for any very recent statistics, important facts, or unique angles related to '[final_lead_magnet_topic]' for '[chosen_ta]' to potentially include?
+('y' for yes, 'n' for no - default is 'n')"
+#Text: drafting_context_search_info
+"No specific pre-drafting search conducted."
+#If [search_before_draft]="y" #Begin
+  #Show: "Searching for additional context for drafting... (this may take a moment)"
+  #chatgptsearch: draft_search_results
+  "recent statistics important facts unique angles for [final_lead_magnet_topic] targeting [chosen_ta]"
+  #chatGPT: summarized_draft_search
+  "Based on these search results: '[draft_search_results]', briefly summarize any key information (stats, facts, angles) that might be valuable to include when drafting content about '[final_lead_magnet_topic]' for '[chosen_ta]'. If nothing significant, state that."
+  #Text: drafting_context_search_info
+  "[summarized_draft_search]"
+  #Show: "Pre-drafting search summary: [drafting_context_search_info]. I will try to incorporate relevant findings."
+#Else-If [search_before_draft]=[search_draft_default] #Begin
+    #Text: drafting_context_search_info
+    "No specific pre-drafting search conducted."
+#Else-Begin
+    #Text: drafting_context_search_info
+    "No specific pre-drafting search conducted."
+#End
+
+#Show: "Drafting the main content for your lead magnet. This may take a few moments..."
+#claude: drafted_main_content_text
+"You are an expert copywriter. Draft the main body content for a Lead Magnet.
+**Language for Output:** [language]
+**Main Topic of Lead Magnet:** [final_lead_magnet_topic]
+**Type of Content:** [final_lead_magnet_type]
+**Target Audience:** [chosen_ta]
+**Primary Pain Point Addressed / Value Provided:** [chosen_pain_point]
+**Required Structure (Main Sections/Chapters to Cover - elaborate on each):**
+[final_lead_magnet_structure]
+**Overall Tone:** [chosen_tone]
+**Optional Context from Recent Search (consider if relevant):** [drafting_context_search_info]
+
+Instructions:
+- Write engaging and valuable content for each section outlined in the structure.
+- Ensure the tone is consistent throughout.
+- Address the target audience and their pain points effectively.
+- Make the content comprehensive enough for a valuable lead magnet.
+- Do NOT include a title, introduction, or conclusion for the overall lead magnet yet; focus only on the main body content as per the structure.
+- Start directly with the content for the first section from the structure."
+
+#Text: main_content_final
+"[drafted_main_content_text]"
+#Text: main_content_feedback_loop_active
+"y"
+#Loop-Until: [main_content_feedback_loop_active]="n"
+  #Show: "## Draft of Main Lead Magnet Content ##
+  ---
+  [main_content_final]
+  ---
+  Please review the main content.
+  What feedback do you have? (e.g., 'expand on section X', 'rephrase paragraph Y', or type 'n' if it's good and no more changes are needed)"
+  #Question: main_content_feedback
+  #If [main_content_feedback]="n" #Begin
+    #Text: main_content_feedback_loop_active
+    "n"
+  #Else-Begin
+    #Show: "Revising main content based on your feedback... (this may take a moment)"
+    #claude: revised_main_content
+    "The user has provided feedback on the draft main content of a Lead Magnet.
+    Original Main Content Draft:
+    ---
+    [main_content_final]
+    ---
+    User Feedback: '[main_content_feedback]'
+    Please revise the main content based on this feedback, maintaining all original parameters (topic, type, TA, pain point, structure, tone, language: [language]).
+    Provide ONLY the revised full main content."
+    #Text: main_content_final
+    "[revised_main_content]"
+  #End
+#End
+#Show: "Main content finalized!"
+
+#Show: "Now, let's generate a compelling title, introduction, and conclusion for your lead magnet."
+#Show: "Suggesting titles based on the finalized content..."
+#chatGPT: suggested_titles_raw
+"Based on the following finalized main content for a Lead Magnet (Topic: '[final_lead_magnet_topic]', TA: '[chosen_ta]'), suggest 3-5 compelling and relevant titles.
+Present as a numbered list.
+
+Finalized Main Content:
+[main_content_final]"
+#Question: chosen_title_selection
+"Here are some title suggestions for your lead magnet:
+[suggested_titles_raw]
+
+Which title number do you prefer? (Or type 'm' to write your own)"
+#Text: final_lead_magnet_title_text
+""
+#If [chosen_title_selection]="m" #Begin
+  #Question: manual_title
+  "Please enter your preferred title for the lead magnet:"
+  #Text: final_lead_magnet_title_text
+  "[manual_title]"
+#Else-Begin
+  #chatGPT: extracted_title_name
+  "From the list: '[suggested_titles_raw]', user selected item number [chosen_title_selection].
+  Reply with ONLY the text of that title."
+  #Text: final_lead_magnet_title_text
+  "[extracted_title_name]"
+#End
+#Show: "Lead Magnet Title set to: **[final_lead_magnet_title_text]**"
+
+#Show: "Drafting Introduction and Conclusion for '[final_lead_magnet_title_text]'..."
+#claude: drafted_intro_conclusion_combined
+"You are an expert copywriter. For a Lead Magnet titled '**[final_lead_magnet_title_text]**', with the following main content, target audience, and tone:
+Language for Output: [language]
+Target Audience: [chosen_ta]
+Overall Tone: [chosen_tone]
+Main Content (for context):
+---
+[main_content_final]
+---
+Draft:
+1.  A brief, engaging **Introduction** that hooks the reader, states the lead magnet's promise/value, and smoothly leads into the main content.
+2.  A concise **Conclusion** that summarizes the key takeaways/value delivered and perhaps offers a sense of next steps or final encouragement (without being an aggressive sales pitch).
+
+Format your reply EXACTLY like this:
+**DRAFT INTRODUCTION:**
+[Your drafted introduction here]
+
+**DRAFT CONCLUSION:**
+[Your drafted conclusion here]"
+
+#chatGPT: extracted_final_intro
+"From the text below, extract all the content that appears after '**DRAFT INTRODUCTION:**' and before '**DRAFT CONCLUSION:**'.
+Text:
+[drafted_intro_conclusion_combined]"
+#Text: final_intro_text
+"[extracted_final_intro]"
+
+#chatGPT: extracted_final_conclusion
+"From the text below, extract all the content that appears after '**DRAFT CONCLUSION:**'.
+Text:
+[drafted_intro_conclusion_combined]"
+#Text: final_conclusion_text
+"[extracted_final_conclusion]"
+
+
+#Text: intro_conclusion_feedback_loop_active
+"y"
+#Loop-Until: [intro_conclusion_feedback_loop_active]="n"
+  #Show: "## Draft Introduction & Conclusion ##
+  **Introduction:**
+  [final_intro_text]
+  ---
+  **Conclusion:**
+  [final_conclusion_text]
+  ---
+  Please review the Introduction and Conclusion.
+  What feedback do you have? (e.g., 'make intro more impactful', 'add a question to the conclusion', or type 'n' if they are good)"
+  #Question: intro_conclusion_feedback
+  #If [intro_conclusion_feedback]="n" #Begin
+    #Text: intro_conclusion_feedback_loop_active
+    "n"
+  #Else-Begin
+    #Show: "Revising Introduction/Conclusion based on your feedback..."
+    #claude: revised_intro_conclusion
+    "The user has provided feedback on the draft Introduction and Conclusion for their Lead Magnet.
+    Lead Magnet Title: '[final_lead_magnet_title_text]'
+    Language: [language]
+    Original Draft Introduction:
+    [final_intro_text]
+    Original Draft Conclusion:
+    [final_conclusion_text]
+    Main Content (for context):
+    [main_content_final]
+    User Feedback: '[intro_conclusion_feedback]'
+    Please provide the revised Introduction AND Conclusion based on this feedback.
+    Format your reply EXACTLY like this:
+    **REVISED INTRODUCTION:**
+    [Your revised introduction here]
+
+    **REVISED CONCLUSION:**
+    [Your revised conclusion here]"
+    #chatGPT: re_extracted_final_intro
+    "From the text below, extract content after '**REVISED INTRODUCTION:**' and before '**REVISED CONCLUSION:**'.
+    Text: [revised_intro_conclusion]"
+    #Text: final_intro_text
+    "[re_extracted_final_intro]"
+    #chatGPT: re_extracted_final_conclusion
+    "From the text below, extract content after '**REVISED CONCLUSION:**'.
+    Text: [revised_intro_conclusion]"
+    #Text: final_conclusion_text
+    "[re_extracted_final_conclusion]"
+  #End
+#End
+#Show: "Introduction and Conclusion finalized!"
+
+## --- PHASE 4: Final Output ---
+#Show: "All parts of your Lead Magnet have been drafted! Here is the complete text:"
+#Show: "## Your Lead Magnet Content: '[final_lead_magnet_title_text]' ##
+
+---
+**Title:** [final_lead_magnet_title_text]
+---
+
+**Introduction:**
+[final_intro_text]
+---
+
+**Main Content:**
+(Organized by sections as per your defined structure)
+
+[main_content_final]
+---
+
+**Conclusion:**
+[final_conclusion_text]
+---
+
+You can now copy this text and use your preferred tools to format it into a visually appealing document or other lead magnet format.
+Consider adding your branding, images, and any calls-to-action appropriate for your landing page.
+
+Thanks for using the **Lead Magnet Creator**!"
+

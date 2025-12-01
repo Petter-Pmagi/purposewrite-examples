@@ -1,0 +1,343 @@
+##Product Hunt - 250322
+##Helps you come up with a great PH tagline and Description!
+
+#Show: "I will help you come up with a great Product Hunt Tagline and Description. I will start by analyzing a webpage or text for its ideal customer / target audience etc, then come up with ideas that draw their attention."
+
+#Show: "You will potentially provide a lot of information here, I strongly advise you copy and save your answers for future runs of this guide."
+
+#Question: language
+"What language do you want to write in? (you can also answer all my questions in this language)"
+
+
+
+#Question: product
+"What is the name of your product?"
+
+
+
+#Question: web
+"What do you want me to use as starting point information about your Product?
+
+1. Webpage URL
+2. Text
+
+Please choose 1 or 2!"
+
+#If [web]="1" #Begin
+   #Question: url
+   "Webpage to use as base information (will only look at one page, not the full website) - URL:"
+
+   #Show: "Scraping the web page...."
+
+   #scrape: contentraw
+   "[url]"
+
+   ##Show: "Debug - content: [contentraw]"
+   #Show: "Analyzing...."
+   #chatGPT: content
+   "Extract all the readable content from this HTML code, include button text and ALT image texts, don't include cookie information. Format nicely. HTML: [contentraw]"
+   ##Show: "Debug - Webpage content: 
+
+[content]"
+
+#Else-Begin
+   #Question: content
+   "Paste your text to use as base material:"
+#End
+
+
+
+#Question: target_audience
+"Who is your target audience for this product (specify your TA or answer 'h' to let me help you find it)?"
+
+#If [target_audience]="h" #Begin
+
+	#Text: ta_prompt
+    "Provide suggestions for 10 ideal customers or target audiences (end users or corporate buyer roles) based on existing text below. Present this as a numbered list. Each main line in BOLD. Also tell me what is the best choice according to your knowledge (specify nr + description).
+	The text: [content]"
+
+##Show: "Debug - ta_prompt: [ta_prompt]"
+   #Show: "Analyzing...."
+ 
+	#chatGPT: ta_analysis
+	"[ta_prompt]"
+
+	#Question: ta_choice
+	"Here is a list of possible target audience for your context:
+
+	[ta_analysis]
+
+	Which one would you like to focus on? (answer with a number, eg 2)"
+
+    #Show: "Analyzing...."
+    
+	#chatGPT: ta_analysis
+	"I choose to focus on the ideal customer # [ta_choice] from the list.
+	Please write a very short paragraph, summarizing the ideal customer that I selected."
+
+	#Text: target_audience
+    "[ta_analysis]"
+    
+#End
+
+##Show: "Target audience summary:
+
+[target_audience]"
+
+
+#Question: pain_points
+"Your target audience: 
+
+[target_audience]
+
+What pain points or interests do they have that your product solves (specify it or answer 'h' to let me help you find it)?"
+
+#If [pain_points]="h" #Begin
+
+   #Show: "Analyzing...."
+
+   #chatGPT: pp_analysis
+   "Provide suggestions for 10 pain points of our target audience with regards to the text below. Present this as a numbered list. Each main line in BOLD.
+   Target audience: [target_audience]
+   The text: [content]"
+
+	#Question: pp_choice
+	"Here is a list of possible pain points & interests for your target audience in this context:
+
+	[pp_analysis]
+
+	Which ones would you like to focus on? (answer with numbers, eg 2,3,4)"
+ 
+    #Show: "Analyzing...."
+  
+	#chatGPT: pp_analysis
+	"I choose to focus on the pain points # [pp_choice] from the list.
+	Please write a short summary of the pain points that I selected in one paragraph."
+
+	#Text: pain_points
+    "[pp_analysis]"
+
+    #Show: "Pain points summary:
+
+[pain_points]"
+
+#End
+
+
+
+
+
+#Text: suggest_prompt
+"I want to register my product on the listing site 'Product Hunt' so potential customers can find it. To do that I need a great Tagline and Description for listing of my product. 
+
+Tagline:
+The tagline is what is seen in the product listsings so needs to draw the attention of the target audience. 
+It could explain what the product does, but even better what pain points it solves.
+Do not mention the product name.
+The tagline is a minimum of 45 characters and a maximum of 60 characters. 
+
+Title:
+The title is what is seen in the preview product listsings so needs to draw the attention of the target audience. 
+It could explain what the product does, but even better what pain points it solves.
+Do not mention the product name.
+The title has the same specification as the Tagline, but is a minimum of 30 characters and a maximum of 40 characters. 
+
+Description:
+The Description is what the potential customer can read when the click on the Tagline to know a bit more about the product and what it can do for them.
+It should explain what the product does, and what pain points it solves.
+The description is minium of 240 characters and a maximum of 260 characters. 
+
+Based on the text about the product, the target audience chosen and their pain points, now first suggest possible taglines. Please list a list of 20 possible taglines (each 45-60 characters long), present this as a numbered list. Each main line in BOLD.
+
+   --- Language to use is [language]
+   --- The product name is: [product]
+   --- The target audience: [target_audience]
+   --- Their pain points: [pain_points]
+   --- The text to analyze and use as base content: [content]
+   
+   --- General guidelines for taglines from the Product Hunt CEO Rajiv:
+   
+   Keep It Clear Over Clever: Rajiv emphasizes that taglines should clearly communicate what the product does rather than relying on vague or overly clever phrasing. For example, he suggests avoiding distractions like 'world’s first' and focusing on the core concept.
+   
+Focus on the User’s Perspective: He advises framing the tagline from the user’s point of view, highlighting what they gain. For instance, his suggestion to simplify a tagline to 'Listen to music through your hand' puts the user experience front and center.
+
+Avoid Overused Buzzwords: Rajiv critiques phrases like 'world’s first' noting they detract from the product’s essence and can feel generic or gimmicky.
+
+Highlight Unique Value: He encourages taglines that showcase what makes a product stand out. For Tempo Pulse, he proposes 'Feel your music like never before' to emphasize its distinct haptic feature.
+
+Be Concise: His revisions consistently trim excess words, aiming for brevity while retaining impact—e.g., turning 'Essential Tools to Start Your SaaS Faster' into 'Launch your SaaS faster and smarter.'
+
+Test for Curiosity: Rajiv implies that a good tagline should spark intrigue, prompting users to click. He likes 'Listen to music through your hand' for its 'weird and surprising' appeal, suggesting it’s worth testing.
+
+Incorporate Key Features if Relevant: When a product has a standout element (like individualized dashboards in Enzo Avigo’s case), he suggests weaving it into the tagline, e.g., 'Individualized customer success analytics.'
+
+Avoid Generic Claims: He nudges away from broad, uninspired phrasing (e.g., Cloudkoonly’s original tagline) toward something specific and actionable, like 'Everything you need to launch your SaaS faster and smarter.'
+
+Ask Questions if Needed: When unsure about a product’s unique angle (e.g., CryptoMonkey’s 'Learn crypto basics for free'), Rajiv probes for differentiation—how is it better than alternatives?—showing the importance of clarity on this front.
+
+Align with Product Hunt’s Audience: His fixes implicitly cater to Product Hunt’s tech-savvy, early-adopter crowd, ensuring the tagline resonates with their interests, like efficiency, innovation, or practical benefits.
+"
+
+##Show: "Debug - Suggest prompt: [suggest_prompt]"
+#Show: "Analyzing...."
+
+#chatGPT: suggest5
+"[suggest_prompt]"
+
+#Text: taglines
+"[suggest5]"
+
+#chatGPT: suggest5
+"Now also show a list of 20 Titles (each 30-40 characters long), this list is not numbered."
+
+#Show: "First - Here are 20 possible Preview Taglines (max 40 characters):
+
+[suggest5]"
+
+#Show: "And, here are 20 possible Final Taglines (max 60 char):
+
+[taglines]"
+
+#Question: article_nr
+"Next, I will write 5 suggested Descriptions for one of these Taglines.
+
+Which Final Tagline did you like the most (or ‘n’ to quit)"
+
+
+
+#Loop-Until: [article_nr]="n"
+   #Show: "Analyzing...."
+
+   #chatGPT: suggest5
+   "I chose Tagline # [article_nr].
+   Now give me 5 possible (numbered) Descriptions (each 240-260 characters long) for that Tagline. Repeat the Tagline as a BOLD headline for each, and start with the product name.
+
+Layout:
+1. [product] - Tagline
+Description nr 1"
+
+#Show: "Here are the suggested Descriptions (should be max 255 chars for the Preview and max 260 chars for the final posting):
+
+[suggest5]"
+
+ 
+   #Question: feedback
+   "Do you have any feedback on this? ('n' = stop) "
+
+   #Loop-Until: [feedback]="n"
+      #Show: "Analyzing...."
+
+      #chatGPT: suggest5
+      "[feedback]"
+
+      #Show: "[suggest5]"
+
+      #Question: feedback
+      "Do you have any feedback on this text? (n = stop) "
+
+   #End
+
+   #Question: again
+   "Do you want to try another of the suggested Taglines? (will use extra credits, answer 'y' or 'n')
+(If not, we will move on to writing a great 'First Comment' too!)"
+
+   #If [again]="y" #Begin
+
+      #Show: "Here is the list of Taglines again:
+
+      [taglines]"
+
+      #Question: article_nr
+      "You can now write another set of Descriptions based on one of these.
+      Answer with Tagline number or ‘n’ to quit."
+   #Else-Begin
+      #Text: article_nr
+	  "n"
+   #End
+
+#End
+
+
+
+#Show: "We will now write a 'First Comment' for your product. 
+On launch day, make sure you are the first person to comment on your product when it goes live, and make sure you have a great comment that inspires, explains and drives feedback ready. Let's do it!"
+
+#Question: team_q
+"Are you a solo entrepeneur or a team (s or t) ?"
+
+#If [team_q] = "t" #Begin
+   #Text: team
+   "When apropriate, speak about us as a team, not 'me' or 'I'."
+#Else-Begin
+   #Text: team
+   "When apropriate, speak about 'me' or 'I' as teh solo creator."
+#End
+
+#Question: personal
+"Tell me something about you/the team, and how you came up with the idea:"
+
+#Question: future
+"Can you tell me something about the future of the product, special offers, achievements etc:"
+
+
+   #Show: "Analyzing...."
+
+   #chatGPT: suggest5
+   "Now, lets write a compelling 'First Comment' for your Product Hunt launch by following these guidelines. 
+   
+First COmment is the first post in the comments section on their Product Hunt listing. It should be done by the product owner themselves on launch day.
+
+Start with a personal touch: Begin by sharing your personal story or the inspiration behind creating this product. This helps build a connection with the audience.
+Here is som personal details: [personal]
+
+Highlight key features and benefits: Clearly explain what makes your product unique and how it solves a specific problem or improves users' lives.
+
+Invite feedback and engagement: Encourage users to share their thoughts, ask questions, or provide suggestions. This fosters a sense of community and encourages interaction.
+
+Keep it concise and engaging: Use a friendly tone and keep your comment concise. Aim for a text that's easy to read and understand without feeling overwhelming.
+
+Include any relevant updates or announcements: If there are any special offers, upcoming features, or recent achievements, mention them to generate excitement.
+Here is some additional information on that: [future]
+
+Additional style instructions:
+Length should be ca 350 to 400 words.
+[team]
+No — EM dash - Remove any use of the special character — in the text.
+Odd sentence lengths - Use extremely different sentence lengths, sentences can be one word or very long with many commas.
+Short sentences & paragraphs - Write using extremely short sentences and short paragraphs.
+Personal - Include occasional casual phrases and conversational transitions like 'you know,' 'actually,' 'well,' but don't overdo it. Also show personality through measured enthusiasm, curiosity, or thoughtfulness when appropriate. Feel free to express uncertainty sometimes using phrases like 'I think' or 'probably'. Use specific examples from your experience. If relevant, include specific examples or personal observations rather than just general statements.
+Emotional - Express lots of feelings and opinions.
+No corporate BS - Use everyday words over formal alternatives, be specific instead of metaphorical, choose simple and clear words over complex ones, avoid buzzwords and business jargon, write actively and directly, avoid corporate style and language.
+Headlines - Insert sub headlines in BOLD where it is logical.
+Few emojis - Insert emojis, but just a few, don't overdo it.
+One list - Use ONE list with bullet points.
+Hook - Start the text with a strong hook in a short sentence.
+Intro - Make a strong lede in the text, meant to sum up the text but also make you want to read more. If the text has a CTA, this lede is below the CTA.
+No hashtags - Remove any hashtags.
+"
+
+
+
+#Show: "Here is your First Comment:
+
+[suggest5]"
+
+ 
+   #Question: feedback
+   "Do you have any feedback on this? ('n' = stop) "
+
+   #Loop-Until: [feedback]="n"
+      #Show: "Analyzing...."
+
+      #chatGPT: suggest5
+      "[feedback]"
+
+      #Show: "[suggest5]"
+
+      #Question: feedback
+      "Do you have any feedback on this text? (n = stop) "
+
+   #End
+
+
+#Show: "Thanks for using purposewrite!"

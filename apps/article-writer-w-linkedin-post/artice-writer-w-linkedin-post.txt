@@ -1,0 +1,1369 @@
+##Article writer + LI Post 250606
+##Start from your idea or get help coming up with one. Then write an engaging thought leadership article for your target audience.
+
+
+#Show: "**Article Writer**
+Write a great blog article.
+
+Starting from your webpage or other base text I will do research and suggest target audience, topics etc. If you already have an idea you can start from that, if not I will help you. 
+Optionally I can also write a lead-in social media post for the article."
+
+
+
+
+
+## Mode selection with user input validation loop
+#Text: full_q
+"n"
+#Loop-Until: [full_q]="y"
+   #Question: full
+   "Article Writer can run in 2 different modes: 
+   1. Standard - Write a great article by answering 7 questions
+   2. Advanced - More control:specify tone, SEO, length etc
+
+   Please choose 1 or 2!"
+   #If [full]="2" #Begin
+      #Text: full_q
+      "y"
+      #Text: full
+      "y"
+      #Text: choice_level_5
+      "5"
+      #Text: choice_level_10
+      "10"
+      #Text: choice_level_15
+      "15"
+      #Text: choice_level_20
+      "20"
+   #End
+   #If [full]="1" #Begin
+      #Text: full_q
+      "y"
+      #Text: full
+      "n"
+      #Text: choice_level_5
+      "3"
+      #Text: choice_level_10
+      "5"
+      #Text: choice_level_15
+      "5"
+      #Text: choice_level_20
+      "10"
+   #End
+#End
+
+
+
+
+
+
+## Minimal language selection
+#Question: language
+"What language do you want me to write the article in?
+(I will continue talking English to you, but you can answer in any language, 'e'=english)"
+
+#If [language]="h" #Begin
+   #Text: language
+   "english"
+#End
+
+
+
+
+
+
+
+## Base input selection with user input validation loop
+#Text: answer
+"n"
+#Loop-Until: [answer]="y"
+   #Question: web
+   "I will now suggest target audience, topics etc for an article.
+   Where should I look for my research on that?
+
+   1. A webpage
+   2. I have a text
+
+   Please choose 1 or 2!"
+   #If [web]="1" #Begin
+      #Text: answer
+      "y"
+   #End
+   #If [web]="2" #Begin
+      #Text: answer
+      "y"
+   #End
+#End
+
+#If [web]="1" #Begin
+   #Question: url
+   "Webpage with information for my research - URL?
+   (will only look at one page, not the full website)"
+
+   #Show: "Scraping the web page....(30 sec)"
+
+   #scrape: contentraw
+   "[url]"
+
+   ##Show: "Debug - content: [contentraw]"
+   #Show: "Analyzing web content....(30sec)"
+   #chatGPT: content
+   "Extract all the readable content from this HTML code, include button text and ALT image texts, don't include cookie information. Format nicely. HTML: [contentraw]"
+   ##Show: "Debug - Webpage content: 
+
+   [content]"
+
+#Else-Begin
+   #Question: content
+   "Paste a text with basic information/context for my research:"
+#End
+
+
+
+
+
+
+
+## Base idea selection with none as option
+#Question: base_idea_q
+"What is your base idea or topic for an article?
+Describe it and be very brief, one sentence is usually enough.
+(Or say 'h' to let me help you)"
+
+#If [base_idea_q]="h" #Begin
+   #Text: base_idea
+   "Base idea: none" 
+#Else-Begin
+   #Text: base_idea
+   "IMPORTANT: Base idea - one possible article is ( [base_idea_q] ) so be sure to incorporate that in a couple of alternatives at least."  
+#End
+
+##Show: "Debug-Base idea: [base_idea]"
+
+
+
+
+
+
+## Target audience sugegstion and user selection
+#Text: ta_prompt
+"Provide suggestions for [choice_level_15] ideal customers or target audiences (end users or corporate buyer roles) based on the existing text and base idea below. Present this as a numbered list. Each main line in BOLD. Also tell me what is the best choice according to your knowledge (specify nr + description).
+[base_idea]
+The text: [content]"
+
+##Show: "Debug - ta_prompt: [ta_prompt]"
+#Show: "Analyzing target audience....(30 sec)"
+
+#chatGPT: ta_analysis
+"[ta_prompt]"
+
+#Question: ta_choice
+"Here is a list of possible target audiences for your article, choose ONE:
+
+[ta_analysis]
+
+Which Target Audience would you like to focus on?
+(answer with ONE number, or 'm' to enter your own)"
+
+#If [ta_choice]="m" #Begin
+    #Question: target_audience
+    "Who is your Target Audience for this text? (be very specific)"
+#Else-Begin
+    #Show: "Optimizing target audience...."
+    #chatGPT: ta_analysis
+    "I choose to focus on the ideal customer # [ta_choice] from the list.
+    Please write a very short paragraph, summarizing the ideal customer that I selected."
+
+    #Text: target_audience
+    "[ta_analysis]"
+
+#End
+
+##Show: "Debug - Target audience summary:
+[target_audience]"
+
+
+
+
+
+
+
+## Pain point sugegstion and user selection
+
+#Show: "Analyzing pain points...."
+
+#chatGPT: pp_analysis
+"Provide suggestions for [choice_level_15] pain points of our target audience with regards to the text and the base idea below. Present this as a numbered list. Each main line in BOLD.
+Target audience: [target_audience]
+[base_idea]
+The text: [content]"
+
+#Question: pp_choice
+"Here is a list of possible pain points & interests for your target audience in this context.
+(select 1 to 5 of these, like 2,4,5)
+
+[pp_analysis]
+
+Which ones would you like to focus on?
+(you can answer with multiple numbers, eg 2,3,4, or 'm' to enter your own)"
+
+#If [pp_choice]="m" #Begin
+    #Question: pain_points
+    "What relevant pain points or interests does you Target Audience have in this context?"
+#Else-Begin
+
+    #Show: "Optimizing pain points...."
+
+    #chatGPT: pp_analysis
+    "I choose to focus on the pain points # [pp_choice] from the list.
+    Please write a short summary of the pain points that I selected in one paragraph."
+
+    #Text: pain_points
+    "[pp_analysis]"
+
+    ##Show: "Pain points summary:
+    [pain_points]"
+
+#End
+
+##Show: "Summary of chosen Target Audience Pain Points in the relevant context:
+
+[pain_points]"
+
+
+
+
+
+
+## Purpose input, with a default text
+
+#If [full]="y" #Begin
+   #Question: purpose
+   "Why are you writing this text?
+   ('h' = 'position me/us as experts, and make the target audience want to use our products and services')"
+
+   #If [purpose]="h" #Begin
+      #Text: purpose
+      "position me/us as experts, and make the target audience want to use our products and services"
+   #End
+#Else-Begin
+      #Text: purpose
+      "position me/us as experts, and make the target audience want to use our products and services"
+#End
+
+
+##Show: "Debug - purpose: [purpose]"
+
+
+
+
+
+
+## Angle suggestions with user selection
+#Show: "Analyzing article angles...."
+
+#chatGPT: angle_suggest
+"Based on the text, the base idea, the target audience chosen and their pain points, now suggest possible article types for that target audience. The article should be value bringing for them. Please suggest a list of [choice_level_20] possible article types, present this as a numbered list. The list is of very general article types like 'how to guide' or 'raising awareness around a problem' - with no further explanation. Dont suggest angles that rely on specific data or input that you dont have, for example 'Customer case', 'Interview', 'Case study' etc. Each main line in BOLD.
+*** The purpose of the text (between the lines) is: [purpose]
+*** Dont talk about us or try to sell directly.
+*** The target audience: [target_audience]
+*** Their pain points: [pain_points]
+*** [base_idea]
+*** The text: [content]"
+
+#Question: angle_choice
+"What type of article would you like to write?
+Choose ONE.
+
+[angle_suggest]
+
+Answer with ONE number from the list above. 
+(or say 'h' to let me choose, say 'm' to specify your own)"
+
+#If [angle_choice]="h" #Begin
+   #Text: angle
+   "Find the angle and article type that best fits the target audience and their pain points."
+#Else-Begin
+   #If [angle_choice]="m" #Begin
+      #Question: angle
+      "Specify your article type:"
+   #Else-Begin    
+      #Show: "Optimizing article angle...."
+
+      #chatGPT: angle_suggest
+      "I choose to focus on article type # [angle_choice] from the list. Please reply with that article type only, exactly as you wrote it. Reply in one very short line with no other information."
+      #Text: angle
+      "[angle_suggest]"
+   #End
+#End
+
+##Show: "Debug - Angle: [angle]"
+
+
+
+
+
+
+## Tone of voice source, choice module
+#If [full]="y" #Begin
+   #Question: tone
+   "How would you like to specify the basic style & tone of voice of the text?
+   1. I will provide instructions
+   2. I will provide a text style example
+   3. Try to emulate the style of the base text
+   Please answer with one number, eg 3"
+
+   #If [tone]="1" #Begin
+         #Question: tone_prompt
+      "Describe the style & tone you want:"
+   #Else-Begin
+      #If [tone]="2" #Begin
+         #Question: tone_q
+      "Provide a sample text for me to try to emulate:"
+         #Show: "Analyzing your sample text...."
+         #chatGPT: tone_analysis
+         "Analyze the writing style of the following text. Identify key characteristics such as tone, sentence structure, formality, and any distinct stylistic elements. Provide only a brief summary in one paragraph of the style that can be used as a reference for emulating it in future writing prompts.\nThe text: [tone_q]"
+         #Text: tone_prompt
+         "[tone_analysis]"
+      #Else-Begin
+         #Show: "Analyzing your base text tone...."
+         #chatGPT: tone_analysis 
+         "Analyze the writing style of the following text. Identify key characteristics such as tone, sentence structure, formality, and any distinct stylistic elements. Provide only a brief summary in one paragraph of the style that can be used as a reference for emulating it in future writing prompts.\nThe text: [content]"
+         #Text: tone_prompt
+         "[tone_analysis]"
+      #End
+   #End
+#Else-Begin
+         #Show: "Analyzing  your base text...."
+         #chatGPT: tone_analysis 
+         "Analyze the writing style of the following text. Identify key characteristics such as tone, sentence structure, formality, and any distinct stylistic elements. Provide only a brief summary in one paragraph of the style that can be used as a reference for emulating it in future writing prompts.\nThe text: [content]"
+         #Text: tone_prompt
+         "[tone_analysis]"
+#End
+
+##Show: "Writing style analysis: 
+
+[tone_prompt]"
+
+
+
+
+
+
+
+## Choice moduler for additional tone style addons
+##Question: style_fix
+##"Now you should add additional style elements.
+##Do you want that? (y or n)"
+#If [full]="y" #Begin
+   #Text: style_fix
+   "y"
+#Else-Begin
+   #Text: style_fix
+   "n"
+#End
+
+#if [style_fix] = "y" #Begin
+
+   #Text: style
+   "1. Slightly funny - Make the text just slightly funny, not too much.
+   2. Funny - Make it a litte bit funny.
+   3. Hilarious - Make it very funny.
+   4. A few abbreviations - Include 1-3 'fast texting abbreviations'.
+   5. Many Abbreviations - Include very few 'fast texting abbreviations'.
+   6. A few typos - Include 1-2 typos in the first sentence.
+   7. Many typos - Include typos throughout the text.
+   8. Bad grammar - Include 1-2 occurences of bad or wrong grammar.
+   9. Weeeird spelling - Primarily in the hook, include 1-2 words with too many vocals, example: 'waaaay to good'.
+   10. CAPITALS - Include 1-2 words emphasized in CAPITALS for max emotions.
+   11. !!!! ???? ?!?!? - Include 1-2 occurences of many !!!!! or ???? or ?!?!?!.
+   12. ... ( ) - Use dots like ... to indicate hesitation or thinking, and sometimes parts of sentences in parenthesis instead of using comma.
+   13. Odd sentence lengths - Use extremely different sentence lengths, sentences can be one word or very long with many commas.
+   14. Short sentences & paragraphs - Write using extremely short sentences and short paragraphs.
+   15. Conversational - Write like you're having a real conversation.
+   16. Personal - Include occasional casual phrases and conversational transitions like 'you know,' 'actually,' 'well,' but don't overdo it. Also show personality through measured enthusiasm, curiosity, or thoughtfulness when appropriate. Feel free to express uncertainty sometimes using phrases like 'I think' or 'probably'. Use specific examples from your experience. If relevant, include specific examples or personal observations rather than just general statements.
+   17. Provocative - Write with some provocative ideas.
+   18. Emotional - Express lots of feelings.
+   19. Opinionated - Write in a very opinionated style.
+   20. Less certain - Use a lot of phrases like "I think," "maybe," or "it seems that" to show uncertainty or nuanced thinking.
+   21. Rhetorical -  Pose questions to engage the reader and stimulate thought.
+   22. Digressions - Include digressions, occasionally go off on brief, relevant tangents as humans often do in conversation or writing.
+   23. No corporate BS - Use everyday words over formal alternatives, be specific instead of metaphorical, choose simple and clear words over complex ones, avoid buzzwords and business jargon, write actively and directly, avoid corporate style and language.
+   24. No statistics - Remove all statistics and numbers like '38%' or 'every 8 out of 10' or '5000 dollars' etc.
+   25. Few Headlines - Headlines frequency: Only use very few headlines, headlines are in BOLD.
+   26. Many Headlines - Insert sub headlines in BOLD where it is logical, but not too many.
+   27. No lists - Remove all bullet points and lists.
+   28. One list - The text should somewhere contain ONE list with bullet points.
+   29. Many lists - Have lots of lists with bullet points.
+   30. Hook - Start the text with a strong hook in a short sentence.
+   31. Intro - Make a strong lede in the text, meant to sum up the text but also make you want to read more. If the text has a hook, this lede is below the hook.
+   32. CTA - Write a strong CTA at the end of the text.
+   33. Question CTA - Write a strong CTA in the form of a question at the end of the text.
+   40. No selling - Do not talk about us or try to sell.
+   41. Selling - Write about us and sell us or our products or services to the reader in a subtle way.
+   "
+
+   #Show: "Analyzing styles...."
+
+   #chatGPT: menu
+   "Show me the following numbered menu, but don't show the prompt part after '-' and dont add any other text before or after. 
+   [style]"
+
+   #Question: choices
+   "What additional style elements do you want in your text?
+   (choose at least 5 of these, like 13,14,23,24,26,27,30,31,40)
+
+   [menu]
+   
+   Reply with all the numbers you like:
+   (a good start is usually this list: 13,14,23,24,26,27,30,31,40 )"
+
+   #Show: "Optimizing styles...."
+
+   #chatGPT: style_choices
+   "From the menu below I select the lines: [choices].
+   Now, reply with the all the selections I made, one per line.
+   IMPORTANT: Reply ONLY with the part of each line that is AFTER the minus sign '-' in each line. Do not reply with any other information.
+   REMEMBER: I do not want the part before the minus sign, reply with the part AFTER the - 
+   The original menu: [style]"
+
+   ##Show: "Debug - Style Choices: [style_choices]"
+
+#Else-Begin
+
+   ##Standard choices
+   #Text: style_choices
+   "- Use extremely different sentence lengths, sentences can be one word or very long with many commas.
+   - Write using extremely short sentences and short paragraphs.
+   - Write like you're having a real conversation.
+   - Include occasional casual phrases and conversational transitions like 'you know,' 'actually,' 'well,' but don't overdo it. Also show personality through measured enthusiasm, curiosity, or thoughtfulness when appropriate. Feel free to express uncertainty sometimes using phrases like 'I think' or 'probably'. Use specific examples from your experience. If relevant, include specific examples or personal observations rather than just general statements.
+   - Use a lot of phrases like "I think," "maybe," or "it seems that" to show uncertainty or nuanced thinking.
+   - Include digressions, occasionally go off on brief, relevant tangents as humans often do in conversation or writing.
+   - Use everyday words over formal alternatives, be specific instead of metaphorical, choose simple and clear words over complex ones, avoid buzzwords and business jargon, write actively and directly, avoid corporate style and language.
+   - Remove all statistics and numbers like '38%' or 'every 8 out of 10' or '5000 dollars' etc.
+   - Insert sub headlines in BOLD where it is logical, but not too many.
+   - Remove all bullet points and lists.
+   - Start the text with a strong hook in a short sentence.
+   - Make a strong lede in the text, meant to sum up the text but also make you want to read more. If the text has a hook, this lede is below the hook.
+   - Do not talk about us or try to sell."
+
+#End
+
+
+
+
+
+
+## Output length choice
+#If [full]="y" #Begin
+
+   #Question: length_q
+   "Text Length: 
+   1. Long LinkedIn post: 1.000-2.000 char
+   2. Blog Article or Linkedin Article: 3.000-5.000 char
+   3. Long Article: 5.000-8.000 char
+
+   Please choose 1, 2 or 3:"
+#Else-Begin
+      #Text: length_q
+      "2"
+#End
+
+##Allow free answer too
+#Text: length
+"[length_q]"
+#Text: llm
+"claude"
+
+##Additional prompt for each llm to compensate for its behaviour
+#Text: llm_prompt
+""
+
+#If [length_q]="1" #Begin
+   #Text: length
+   "IMPORTANT: The length of the text should be exactly 1500 characters."
+#End
+
+#If [length_q]="2" #Begin
+   #Text: length
+   "IMPORTANT: The length of the text should be exactly 4000 characters, all in one output."
+#End
+
+#If [length_q]="3" #Begin
+   #Text: length
+   "IMPORTANT: Expand the contents and write a very long article. The length of the text should be around 8000 characters, all in one output."
+   #Text: llm_prompt
+   "If this prompt instructs you to use headlines, be sure to include a number or headlines and possibly also sub headlines."
+   #Text: llm
+   "gemini"
+#End
+
+
+
+
+
+
+
+## Article suggest with user choice
+#Text: suggest_prompt
+"Analyse the following text and based on that content, your knowledge of the target audience and its pain points plus the suggested angle and base idea, suggest [choice_level_10] possible articles (as a NUMBERED LIST of articles 1-[choice_level_10]) that could give value to that target audience. Don't mention our product or try to sell, just bring real value. Give a headline (numbered) and 4 topics (not numbered) to cover for each article. The headline in BOLD.
+--- Language to use is [language]
+--- The real purpose (between the lines) of the text is: [purpose]
+--- The target audience: [target_audience]
+--- Their pain points: [pain_points]
+--- The type of each article should be: [angle]
+--- Overall tone and writing style: [tone_prompt]
+--- Writing style details: [style_choices]
+--- [base_idea]
+--- The text to analyze and use as base content: [content]"
+
+##Show: "Debug - Suggest prompt: [suggest_prompt]"
+#Show: "Suggesting topics (30sec)...."
+
+#Show: "Suggesting articles (30sec)...."
+
+#chatGPT: suggest5
+"[suggest_prompt]"
+
+#Show: "Here are [choice_level_10] possible articles I could write:
+(choose ONE)
+
+[suggest5]"
+
+#Question: article_nr
+"I will now write a full article based on one of these.
+(you can come back to this list and write more later)
+
+What article do you want?
+(answer with ONE article number or ‘n’ to quit)"
+
+
+
+
+
+
+
+## Big loop that allows the user to come back and try more article choices 
+#Loop-Until: [article_nr]="n"
+
+   #Show: "Optimizing article (30sec)...."
+
+   #chatGPT: suggest5
+   "I chose article # [article_nr].
+   Give me the headline and the 4 topics from the list for that article, exactly as you wrote them before. Give no additional information."
+   
+   #Text: article_info
+   "[suggest5]"
+
+   ##Show: "Debug - chosen article:
+   [article_info]"
+   
+   #chatGPT: suggest5
+   "Now give me the contents a bit more fleshed out for that article. Aim for 2000 characters"
+
+   ##Show: "Debug - summary of article:
+   [suggest5]"
+   
+
+
+
+
+
+
+   ## Module allowing user to optinally contribute more manual info
+   #If [full]="y" #Begin
+
+      #Text: expertise_menu_prompt
+      "We want to write a long value bringing article. See info below. To write a really good article you could benefit from more user input and expertise in key areas for this specific article. Suggest possible areas of expertise that the user could contribute. Present this as a single spaced and numbered list 1-[choice_level_15]. Each list item consist of a number and a very short sentence in BOLD.
+      --- The real purpose (between the lines) of the text is: [purpose]
+      --- The target audience: [target_audience]
+      --- Their pain points: [pain_points]
+      --- The type of the article should be: [angle]
+      --- The draft for the article: [suggest5]"
+
+      ##Show: "Debug - expertise_menu_prompt - 
+      [expertise_menu_prompt]"
+
+      #chatGPT: expertise_menu
+      "[expertise_menu_prompt]"
+
+      ##Show: "Debug - expertise_menu - 
+      [expertise_menu]"
+
+
+      #Show: "You chose to write the article:
+      [article_info]"
+
+      #Multi-List: expertise
+      #Start-List: "Do you you want to add more of YOUR OWN knowledge to the article?
+      Here are some possible areas (choose 1 to 3 of these or 'n' to skip this step):"
+
+      #List: "[expertise_menu]"
+      #End-List: "Please choose the areas your want to comment on. (multi choice is ok (eg 1,3,9) or answer 'n' to skip this step)"
+
+      ##Show: "Debug - expertise - [expertise]"
+      ##Show: "Debug - expertise_part{1} - [expertise_part{1}]"
+      ##If [expertise]<>"" #Begin
+      ##Show: "expertise<>n"
+      ##End
+
+      #Text: expertise_prompt
+      "For this text I would like to focus on the following expertise and topics as being extra important in this context, formatted as - area : expertise "
+
+      ## Prompt building module - step by step from user multi choice selection
+      #For-All i=[expertise] #Begin
+
+         #Question: expertise_part{i}
+         "Regarding [expertise.i]\nWhat is YOUR OWN input about that area?"
+
+         #Text: expertise_prompt
+         "[expertise_prompt]\n[expertise.i] : [expertise_part{i}]"
+
+         ##Show: "Debug - Expertise prompt: 
+         [expertise_prompt]"
+
+      #End
+   #Else-Begin
+         #Text: expertise_prompt
+         " "
+   #End
+
+
+
+
+
+
+
+
+   ## Ask user for any additional info
+   #If [full]="y" #Begin
+
+      #Question: extra
+      "Is there anything else you would like to address in this text?
+      (specify it or 'n' to skip this step)"
+
+      #If [extra]<>"n" #Begin
+         #Text: expertise_prompt
+         "[expertise_prompt]\nAlso consider the following info for the article: [extra]"
+      #End
+   #End
+
+
+
+
+
+
+
+
+
+   ## SEO module
+   #If [full]="y" #Begin
+
+      #Question: seo_q
+      "For Article # [article_nr]
+
+      What SEO keywords do you want to optimize the text for?
+      First lets choose PRIMARY keywords.
+      (specify a comma seperated list of 1-3 keywords or answer 'h' to let me help you, or 'n' for no SEO)?"
+   #Else-Begin
+         #Text: seo_q
+         "n"
+   #End
+
+   #If [seo_q]="n" #Begin
+      #Text: seo_prompt
+      " "
+   #Else-Begin
+
+      #If [seo_q]="h" #Begin
+
+         #Show: "Analyzing SEO keywords...."
+
+         #chatGPT: seo_analysis_1
+         "Provide suggestions for the most important SEO keywords to use in an article. Look at the base content and the keywords or keyword combinations you think it is SEO optimized for. Give me the top [choice_level_5] keywords. Present this as a comma separated list of SEO keywords with no additional information. 
+         --- Language to use for suggested keywords [language]
+         --- Base content:
+         [content]"
+
+         ##Show: "Debug - SEO kw list 1: [seo_analysis_1]"
+
+         #chatGPT: seo_analysis_2
+         "Provide suggestions for the most important SEO keywords to use in an article. Look at the BASE ARTICLE and suggest the keywords or keyword combinations you think it should be SEO optimized for. You do this by guessing what people might actually search when they want to read an article like this. Give me the top [choice_level_10] keywords. The also consider the target audience and their pain points and give me another [choice_level_5] keywords. Present all the [choice_level_10] + [choice_level_5] keywords as a comma separated list with no additional information. 
+         --- Language to use for suggested keywords [language]
+         --- The target audience: [target_audience]
+         --- Their pain points: [pain_points]
+         --- [expertise_prompt]
+         --- Keywords that I am already considering, do not include these in the list: [seo_analysis_1]
+         --- BASE ARTICLE:
+         [suggest5]"
+
+         ##Show: "Debug - SEO kw list 2: [seo_analysis_2]"
+
+         #chatGPT: seo_analysis
+         "Here are 2 comma separated lists of SEO kewords, please present this as one numbered list of SEO keywords. Each main line in BOLD. No other information.
+         --- List 1: [seo_analysis_1]
+         --- List 2: [seo_analysis_2]
+         "
+
+         #Question: seo_choice
+         "Let's start with PRIMARY keywords. Here is a list of possible SEO keywords:
+         Choose 1-3 of these.
+
+         [seo_analysis]
+
+         Which ones would you like to focus on?
+         (answer with 1 to 3 numbers, eg 2,3,4)"
+
+         #Show: "Optimizing SEO...."
+
+         #chatGPT: seo_analysis
+         "I choose to focus on the seo keywords on lines [seo_choice] from the list.
+         Please give me a clean comma separated list of the SEO keywords that I selected."
+
+         ##Show: "Debug SEO keywords: [seo_analysis]"
+
+         #Text: seo_primary_kw
+         "[seo_analysis]"
+
+
+
+
+
+         ##secondary SEO KW
+         #chatGPT: seo_analysis_2
+         "Here are 2 comma separated lists of SEO kewords, please present this as one numbered list of SEO keywords. Each main line in BOLD. No other information.
+         --- List 1: [seo_analysis_1]
+         --- List 2: [seo_analysis_2]
+         --- Remove these keywords from the list: [seo_primary_kw]
+         "
+
+         #Question: seo_choice
+         "Now, let's choose SECONDARY keywords. Here is a list of possible SEO keywords:
+         Choose 1 to 3 of these.
+
+         [seo_analysis_2]
+
+         Which ones would you like to focus on?
+         (answer with 1 to 3 numbers, eg 2,3,4)"
+
+         #Show: "Analyzing SEO keywords...."
+
+         #chatGPT: seo_analysis_2
+         "I choose to focus on the seo keywords on lines [seo_choice] from the list.
+         Please give me a clean comma separated list of the SEO keywords that I selected."
+
+         ##Show: "Debug SEO keywords: [seo_analysis_2]"
+
+         #Text: seo_secondary_kw
+         "[seo_analysis_2]"
+
+      #Else-Begin
+         #Text: seo_primary_kw
+         "[seo_q]"
+         ##Show: "Debug - Manual SEO: [seo_q]"
+
+         #Question: seo_secondary_kw
+         "Please state your SECONDARY keywords, comma separated:"
+
+      #End
+
+      #Text: seo_prompt
+      "Primary SEO keywords, include each of these exactly 3 times in the text and make sure to include each one once in a header. Keywords: [seo_primary_kw]
+      Secondary SEO keywords, include each of these exactly 3 times in the text but not in the headers. Keywords: [seo_secondary_kw]
+      SEO keywords can be slightly rewritten to fit naturally in a sentence, for example 'dentist Denver' could be 'dentist in denver'."
+
+   #End
+
+   ##Show: "Debug SEO prompt: [seo_prompt]"
+   
+   
+   
+
+
+
+
+   ## Main text output
+   #Text: cld_prompt
+   "Rewrite the BASE ARTICLE you find below. Keep the essence of the BASE ARTICLE but rewrite and expand on it with this additional info:
+   --- Only give me the article, no extra info at the start or end.
+   --- Headlines in BOLD, for the first headline think about the article type: [angle]
+   --- Language to use is [language]
+   --- [length]
+   --- [seo_prompt]
+   --- The real purpose (between the lines) of the text is: [purpose]
+   --- The target audience: [target_audience]
+   --- Their pain points: [pain_points]
+   --- [expertise_prompt] 
+   --- The type of article should be: [angle]
+   --- Overall tone and writing style: [tone_prompt]
+   --- Writing style details: [style_choices]
+   --- BASE ARTICLE:
+  [suggest5]
+   --- End of BASE ARTICLE"
+
+   ##Show: "Debug: cld prompt - [cld_prompt]"
+   #Show: "Writing article....(30 sec)"
+
+   ### Select LLM based on output size
+   #If [llm]="claude" #Begin
+      #Claude: article
+      "[cld_prompt]"
+   #End
+   #If [llm]="chatgpt" #Begin
+      #chatGPT: article
+      "[cld_prompt]"
+   #End
+   #If [llm]="gemini" #Begin
+      #gemini: article
+      "[cld_prompt]"
+   #End
+   
+   #Show: "[article]"
+
+
+
+
+
+
+   ## Feedback loop until user is happy
+   #Question: feedback
+   "Now in chat mode. Do you have any feedback on this text?
+   ('n' = stop) "
+
+   #Loop-Until: [feedback]="n"
+      #Show: "Writing article....(30 sec)"
+
+     #If [llm]="claude" #Begin
+      #Claude: article
+      "[feedback]"
+     #End
+     #If [llm]="chatgpt" #Begin
+      #chatGPT: article
+      "[feedback]"
+     #End
+     #If [llm]="gemini" #Begin
+      #gemini: article
+      "[feedback]"
+     #End
+
+      #Show: "[article]"
+
+      #Question: feedback
+      "Now in chat mode. Do you have any feedback on this text?
+      (n = stop) "
+   #End
+
+
+
+
+
+
+
+
+   ## Make Lead In Post for the article also
+
+   #Question: lead_in
+   "Now the article is done.
+
+   Do you want to also create a LinkedIn Lead In post to make people want to read the full article? (y/n)"
+
+
+
+
+
+
+   ## Suggest post angles and user selects one
+   #If [lead_in]="y" #Begin 
+
+      #Show: "Analyzing post types...."
+
+      #chatGPT: li_angle_suggest
+      "I have written an ARTICLE and now want to make an engaging lead in post for linkedin that will make people curious and want to read the main article.
+      Based on the ARTICLE below, but also the target audience chosen and their pain points, now suggest possible LinkedIn post hook types for that post. 
+      Please suggest a list of [choice_level_20] possible hook types, present this as a numbered list. 
+      The list is of very general hook types - with no further explanation and no specfic details. 
+      Each main line in BOLD.
+      *** Only list HOOK types, not the hooks themselves.
+      *** Dont talk about us or try to sell directly.
+      *** The target audience: [target_audience]
+      *** Their pain points: [pain_points]
+      *** Some hook types for inspiration: Question, Anecdotal story, Quotation, Statistic/fact, Bold statement, Metaphor/simile, Common misconception, How-to, List, If-then, Steal this, Quick keyword, Problem/challenge, Shock/surprise, Personal confession, Scene/description, Challenge, Teaser, Contradiction, Mission/purpose
+      *** The ARTICLE: [article]"
+
+      #Question: li_angle_choice
+      "What angle / type of post would you like to write?
+      (choose ONE)
+
+      [li_angle_suggest]
+
+      Answer with ONE number from the list above. 
+      (or say 'h' to let me choose, say 'm' to specify your own)"
+
+      #If [li_angle_choice]="h" #Begin
+         #Text: li_angle
+         "Find the hook type that best fits the target audience and their pain points."
+      #Else-Begin
+         #If [li_angle_choice]="m" #Begin
+            #Question: li_angle
+            "Specify your hook type (not the hook itself):"
+         #Else-Begin    
+            #Show: "Optimizing post type...."
+
+            #chatGPT: li_angle_suggest
+            "I choose to focus on hook type # [li_angle_choice] from the list. Please reply with that hook type only, exactly as you wrote it. Reply in one very short line with no other information."
+            #Text: li_angle
+            "[li_angle_suggest]"
+         #End
+      #End
+
+      ##Show: "Debug - Angle: [li_angle]"
+
+
+
+
+
+
+
+      ## Tone & style selection with some fixed options and input based ones too
+      #If [full]="y" #Begin
+         #Question: li_tone
+         "Please specify the tone & style for the text or choose from this list:
+         1. Suuuper casual
+         2. Casual
+         3. Neutral
+         4. Formal
+         5. I will provide instructions
+         6. I will provide a text style example
+         7. Emulate the tone of the research text
+
+         Choose ONE number, eg 7."
+      #Else-Begin
+            #Text: li_tone
+            "2"
+      #End
+
+      #Text: li_tone_prompt
+      "IMPORTANT: Use a relaxed SoMe post style of writing."
+
+      #If [li_tone]="1" #Begin
+         #Text: li_tone_prompt
+         "IMPORTANT: Use an extremely relaxed SoMe post style of writing."
+      #End
+
+      #If [li_tone]="2" #Begin
+         #Text: li_tone_prompt
+         "IMPORTANT: Use a relaxed SoMe post style of writing."
+      #End
+
+      #If [li_tone]="3" #Begin
+         #Text: li_tone_prompt
+         "Use a neutral SoMe post style."
+      #End
+
+      #If [li_tone]="4" #Begin
+         #Text: li_tone_prompt
+         "IMPORTANT: Use a quite formal SoMe writing style."
+      #End
+
+      #If [li_tone]="5" #Begin
+            #Question: li_tone_prompt
+         "Describe the style & tone you want:"
+      #End
+
+      #If [li_tone]="6" #Begin
+         #Question: li_tone_q
+         "Provide a sample text for me to try to emulate:"
+         #Show: "Analyzing your sample text...."
+         #chatGPT: li_tone_analysis
+         "Analyze the writing style of the following text. Identify key characteristics such as tone, sentence structure, formality, and any distinct stylistic elements. Provide only a brief summary in one paragraph of the style that can be used as a reference for emulating it in future writing prompts.\nThe text: [li_tone_q]"
+         #Text: li_tone_prompt
+         "[li_tone_analysis]"
+      #End
+
+      #If [li_tone]="7" #Begin
+         #Show: "Analyzing tone...."
+
+         #chatGPT: li_tone_analysis
+         "Analyze the writing style of the following text. Identify key characteristics such as tone, sentence structure, formality, and any distinct stylistic elements. Provide only a brief summary in one paragraph of the style that can be used as a reference for emulating it in future writing prompts.\nThe text: [content]"
+
+         #Text: li_tone_prompt
+         "[li_tone_analysis]"
+
+         ##Show: "Writing style analysis: 
+
+         [li_tone_prompt]"
+      #End
+
+
+
+
+
+
+
+      ## Optionally add additional style elements to the text
+      #If [full]="y" #Begin
+         ##Question: li_style_fix
+         ##"Now you can add additional style elements.
+         ##Do you want that? (y or n)"
+         #Text: li_style_fix
+         "y"
+      #Else-Begin
+            #Text: li_style_fix
+            "n"
+      #End
+
+      #if [li_style_fix] = "y" #Begin
+
+         #Text: li_style
+         "1. Slightly funny - Make the text just slightly funny, not too much.
+         2. Funny - Make it a litte bit funny.
+         3. Hilarious - Make it very funny.
+         4. A few abbreviations - Include 1-3 'fast texting abbreviations'.
+         5. Many Abbreviations - Include very few 'fast texting abbreviations'.
+         6. A few typos - Include 1-2 typos in the first sentence.
+         7. Many typos - Include typos throughout the text.
+         8. Bad grammar - Include 1-2 occurences of bad or wrong grammar.
+         9. Weeeird spelling - Primarily in the hook, include 1-2 words with too many vocals, example: 'waaaay to good'.
+         10. CAPITALS - Include 1-2 words emphasized in CAPITALS for max emotions.
+         11. !!!! ???? ?!?!? - Include 1-2 occurences of many !!!!! or ???? or ?!?!?!.
+         12. ... ( ) - Use dots like ... to indicate hesitation or thinking, and sometimes parts of sentences in parenthesis instead of using comma.
+         13. No — EM dash - Remove any use of the special character — in the text.
+         14. Odd sentence lengths - Use extremely different sentence lengths, sentences can be one word or very long with many commas.
+         15. Short sentences & space - Write using extremely short sentences and make lots of space in the post.
+         16. Conversational - Write like you're having a real conversation.
+         17. Personal - Include occasional casual phrases and conversational transitions like 'you know,' 'actually,' 'well,' but don't overdo it. Also show personality through measured enthusiasm, curiosity, or thoughtfulness when appropriate. Feel free to express uncertainty sometimes using phrases like 'I think' or 'probably'. Use specific examples from your experience. If relevant, include specific examples or personal observations rather than just general statements.
+         18. Provocative - Write with some provocative ideas.
+         19. Emotional - Express lots of feelings.
+         20. Opinionated - Write in a very opinionated style.
+         21. Less certain - Use a lot of phrases like "I think," "maybe," or "it seems that" to show uncertainty or nuanced thinking.
+         22. Rhetorical -  Pose questions to engage the reader and stimulate thought.
+         23. Digressions - Include digressions, occasionally go off on brief, relevant tangents as humans often do in conversation or writing.
+         24. No corporate BS - Use everyday words over formal alternatives, be specific instead of metaphorical, choose simple and clear words over complex ones, avoid buzzwords and business jargon, write actively and directly, avoid corporate style and language.
+         25. No statistics - Remove all statistics and numbers like '38%' or 'every 8 out of 10' or '5000 dollars' etc.
+         26. Headlines - Insert sub headlines in BOLD where it is logical.
+         27. No emojis - Remove all emojis.
+         28. Few emojis - Insert emojis, but just a few, don't overdo it.
+         29. Many emojis - Insert emojis.
+         30. No lists - Remove all bullet points and lists.
+         31. One list - Use ONE list with bullet points.
+         32. Many lists - Have lots of lists with bullet points.
+         33. Hook - Start the text with a strong hook in a short sentence.
+         34. Intro - Make a strong lede in the text, meant to sum up the text but also make you want to read more. If the text has a CTA, this lede is below the CTA.
+         35. CTA - Write a strong CTA at the end of the text.
+         36. Question CTA - Write a strong CTA in the form of a question at the end of the text.
+         37. PS section - Include a very brief 'PS.' section at the end that adds a personal touch or unexpected twist to the message, maby providinga a quick, supplementary piece of information.
+         38. No hashtags - Remove any hahtags.
+         39. 2-3 Hashtags - End the text with 2-3 hashtags.
+         40. 4-5 Hashtags - End the text with 4-5 hashtags.
+         41. No selling - Do not talk about us or try to sell.
+         42. Selling - Write about us and sell us or our products or services to the reader in a subtle way.
+         "
+
+         #Show: "Analyzing styles...."
+
+         #chatGPT: li_menu
+         "Show me the following numbered menu, but don't show the prompt part after '-' and dont add any other text before or after. 
+         [li_style]"
+
+         #Question: li_choices
+         "What additional style elements do you want in your text?
+         (choose as many as you like)
+
+         [li_menu]
+         
+         Reply with all the numbers you like:
+         (a good start is usually this list: 13,14,15,16,17,19,21,24,25,28,30,33,34,35,38,41 )"
+
+         #Show: "Optimizing styles...."
+
+         #chatGPT: li_style_choices
+         "From the menu below I select the lines: [li_choices].
+         Now, reply with the all the selections I made, one per line.
+         IMPORTANT: Reply ONLY with the part of each line that is AFTER the minus sign '-' in each line. Do not reply with any other information.
+         REMEMBER: I do not want the part before the minus sign, reply with the part AFTER the - 
+         The original menu: [li_style]"
+
+         ##Show: "Debug - Style Choices: [li_style_choices]"
+
+      #Else-Begin
+
+         ##Standard choices
+         #Text: li_style_choices
+         "- Remove any use of the special character — in the text.
+         - Use extremely different sentence lengths, sentences can be one word or very long with many commas.
+         - Write using extremely short sentences and make lots of space in the post.
+         - Write like you're having a real conversation.
+         - Include occasional casual phrases and conversational transitions like 'you know,' 'actually,' 'well,' but don't overdo it. Also show personality through measured enthusiasm, curiosity, or thoughtfulness when appropriate. Feel free to express uncertainty sometimes using phrases like 'I think' or 'probably'. Use specific examples from your experience. If relevant, include specific examples or personal observations rather than just general statements.
+         - Use everyday words over formal alternatives, be specific instead of metaphorical, choose simple and clear words over complex ones, avoid buzzwords and business jargon, write actively and directly, avoid corporate style and language.
+         - Remove all statistics and numbers like '38%' or 'every 8 out of 10' or '5000 dollars' etc.
+         - Remove all emojis.
+         - Remove all bullet points and lists.
+         - Start the text with a strong hook in a short sentence.
+         - Make a strong lede in the text, meant to sum up the text but also make you want to read more. If the text has a CTA, this lede is below the CTA.
+         - Write a strong CTA at the end of the text.
+         - Remove any hahtags.
+         - Do not talk about us or try to sell."
+
+      #End
+
+
+
+
+
+
+      ## Length choice, hidden feature to allow user specified length input
+      #If [full]="y" #Begin
+
+         #Question: li_length_q
+         "Text Length: 
+         1. Very short LinkedIn post: 150-300 char
+         2. Short LinkedIn post: 300-600 char
+         3. Medium LinkedIn post: 600-1000 char 
+
+         Please choose 1, 2 or 3:"
+      #Else-Begin
+            #Text: li_length_q
+            "2"
+      #End
+
+      ##Allow free answer too
+      #Text: li_length
+      "[li_length_q]"
+      #Text: li_llm
+      "claude"
+
+      #If [li_length_q]="1" #Begin
+         #Text: li_length
+         "IMPORTANT: The length of the text should be exactly 300 characters."
+      #End
+
+      #If [li_length_q]="2" #Begin
+         #Text: li_length
+         "IMPORTANT: The length of the text should be exactly 500 characters."
+      #End
+
+      #If [li_length_q]="3" #Begin
+         #Text: li_length
+         "IMPORTANT: The length of the text should be exactly 800 characters."
+         ##Text: li_llm
+         ##"chatgpt"
+      #End
+
+
+
+
+
+
+
+      ## Suggest possible hooks for the post, user selects one
+      #Text: li_suggest_prompt
+      "I have written an ARTICLE and now want to make an engaging lead-in post type of post for linkedin that will make people curious and want to read the main article that I link to.
+      Analyse the ARTICLE referenced below. Based on that plus your knowledge of the target audience and its pain points plus the suggested post type, suggest [choice_level_20] possible linkedin post hooks (as a NUMBERED LIST of hooks 1-[choice_level_20]) that could engage the target audience.
+      The headline in BOLD.
+      --- Language to use is [language]
+      --- The target audience: [target_audience]
+      --- Their pain points: [pain_points]
+      --- IMPORTANT: Do not only list hooks with questions, but list a variety of hooks of this type: [li_angle]
+      --- Remember, the hooks should be of type: [li_angle]
+      --- Overall tone and writing style: [li_tone_prompt]
+      --- Writing style details: [li_style_choices]
+      --- The ARTICLE: [article]"
+
+      ##Show: "Debug - Suggest prompt: [li_suggest_prompt]"
+      #Show: "Suggesting posts (30sec)...."
+
+      #Show: "Writing hooks....(30 sec)"
+
+      #chatGPT: li_suggest5
+      "[li_suggest_prompt]"
+
+      #Show: "Here are hooks for [choice_level_20] possible LinkedIn posts I could write, choose ONE:
+
+      [li_suggest5]"
+
+      #Question: li_article_nr
+      "I will now write a full post based on one of these.
+      (you can come back to this list and write more later)
+
+      What post would you want to see?
+      (answer with ONE post number or ‘n’ to quit)"
+
+
+
+
+
+
+      ## Loop to allow user to try more than one choice
+      #Loop-Until: [li_article_nr]="n"
+
+         #Show: "Preparing post (30sec)...."
+
+         #chatGPT: li_suggest5
+         "I chose hook # [li_article_nr].
+         Give me the hook from the list, exactly as you wrote them before. Give no additional information."
+         
+         #Text: li_article_info
+         "[li_suggest5]"
+
+         ##Show: "Debug - chosen article:
+         [li_article_info]"
+         
+         #chatGPT: li_suggest5
+         "Now give me the contents a bit more fleshed out for a post with that hook. Aim for 800 characters"
+
+         ##Show: "Debug - summary of article:
+         [li_suggest5]"
+         
+
+         ## Usar can add more info before generating
+         #If [full]="y" #Begin
+
+            #Question: li_extra
+            "Is there anything else you would like to address in this post?
+            (specify it or 'n' to skip this step)"
+
+            #If [li_extra]<>"n" #Begin
+               #Text: li_expertise_prompt
+               "[expertise_prompt]\nAlso consider the following info for the post: [extra]"
+            #End
+         #End
+
+
+
+
+
+
+         ## Main text generate
+         #Text: li_cld_prompt
+         "I have written an ARTICLE and now want to make an engaging lead-in post for linkedin that will make people curious and want to read the main article.
+         Write the lead in post using the BASE POST INFO you find below. Keep the essence of the BASE POST INFO, but rewrite the post with this additional info:
+         --- Only give me the post, no extra info at the start or end.
+         --- Language to use is [language]
+         --- [li_length]
+         --- The target audience: [target_audience]
+         --- Their pain points: [pain_points]
+         --- The type of post should be: [li_angle]
+         --- Overall tone and writing style: [li_tone_prompt]
+         --- Writing style details: [li_style_choices]
+         --- [llm_prompt]
+         --- Additional info:: [li_expertise_prompt]
+         --- Keep the hook from the base post info below. Minor changes to the hook is allowed to make it more engaging and clickbaity.
+         --- BASE POST INFO with hook:
+         [li_suggest5]
+         --- End of BASE POST INFO
+         --- The ARTICLE that I will link to:
+         [article]
+         --- End of the ARTICLE"
+         "
+
+         ##Show: "Debug: cld prompt - [li_cld_prompt]"
+         #Show: "Writing post....(30 sec)"
+
+         #If [li_llm]="claude" #Begin
+            #Claude: li_article
+            "[li_cld_prompt]"
+         #Else-Begin
+            #chatGPT: li_article
+            "[li_cld_prompt]"
+         #End
+         
+         #Show: "[li_article]"
+
+         #Question: li_feedback
+         "Now in chat mode. Do you have any feedback on this text?
+         ('n' = stop) "
+
+
+
+
+
+
+         ## Feedback loop until user happy
+         #Loop-Until: [li_feedback]="n"
+            #Show: "Writing post....(30 sec)"
+
+            #If [li_llm]="claude" #Begin
+               #Claude: li_article
+               "[li_feedback]"
+            #Else-Begin
+               #chatGPT: li_article
+               "[li_feedback]"
+            #End
+
+            #Show: "[li_article]"
+
+            #Question: li_feedback
+            "Now in chat mode. Do you have any feedback on this text?
+            (n = stop) "
+
+         #End
+
+         ##Bug250420 - fix end problem here
+         #If [li_feedback]="n" #Begin
+            #Text: li_fedback
+            "y"
+
+            #Question: again
+            "Do you want to try another of the suggested lead-in posts for this article?
+            ('y' or 'n')"
+
+            #If [again]="y" #Begin
+               #Show: "Analyzing hooks...."
+               #chatGPT: li_suggest5
+               "Give me the numbered list of posts again."
+
+               #Show: "Here is the list of possible posts again:
+
+               [li_suggest5]"
+
+               #Question: li_article_nr
+               "You can now write another post based on one of these.
+               (answer with ONE post number or ‘n’ to quit)"
+            #Else-Begin
+               #Text: li_article_nr
+               "n"
+            #End
+         #End
+      #End
+   #End
+
+
+
+
+
+
+   ## After done, ask the user if they want to go back and try another of the suggested articles
+   #Question: again
+   "Done! Now, do you want to write another of the suggested base articles?
+   ('y' or 'n')"
+
+   #If [again]="y" #Begin
+      #Show: "Analyzing articles...."
+      #chatGPT: suggest5
+      "Give me the numbered list of articles again."
+
+      #Show: "Here is the list of possible articles again:
+
+      [suggest5]"
+
+      #Question: article_nr
+      "You can now write another article based on one of these.
+      (answer with ONE article number or ‘n’ to quit)"
+   #Else-Begin
+      #Text: article_nr
+	  "n"
+   #End
+
+#End
+
+#Show: "Thanks for using purposewrite!"
+
+
+
+
+
+
+
+
+
+

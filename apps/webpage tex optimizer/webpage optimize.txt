@@ -1,0 +1,628 @@
+##Webpage Optimize 250517
+
+#Show: "Welcome to the **Webpage Optimize**!
+I'll help you rewrite a webpage to better align with your target audience, their pain points, and your SEO goals, while keeping its unique essence."
+
+## --- 1. Original Webpage Input ---
+#Question: original_url
+"Please enter the URL of the webpage you want to rewrite:"
+
+#Show: "Scraping your webpage at [original_url]... (this might take 10-60 seconds)"
+#Scrape: original_content_raw
+"[original_url]"
+
+#Show: "Analyzing the content of your webpage... (this might take 10-30 seconds)"
+#chatGPT: original_content_processed
+"Extract all readable text content from the following scraped content. Include text from headings (H1, H2, H3, H4, H5, H6), paragraphs, list items, button text, and image ALT texts. Preserve the general order of content. Do not include menu navigation items unless they are unique and descriptive. Do not include footer links or cookie consent text. Format it nicely for readability. Content: [original_content_raw]"
+
+
+
+
+
+
+## --- 1b. Language ---
+#Show: "Detecting language of the original webpage..."
+#chatGPT: detected_language_raw
+"Analyze the following text and identify the primary language it is written in. Respond with ONLY the name of the language in lowercase (e.g., 'english', 'spanish', 'french').
+Text:
+[original_content_processed]"
+
+#chatGPT: detected_language
+"From the text '[detected_language_raw]', extract only the language name (e.g., if it says 'The language is english.', just reply 'english'). If it's already just the language name, repeat it."
+
+#Text: lang_default
+"english"
+#Question: language_input
+"The original webpage appears to be in '[detected_language]'.
+- Press 'k' to keep the rewritten content in '[detected_language]'.
+- Press 'e' to switch to English.
+- Or, type the name of any other language you want (e.g., French, Spanish):"
+
+#Text: language
+"[lang_default]"
+#If [language_input]="k" #Begin
+    #Text: language
+    "[detected_language]"
+#Else-Begin
+    #If [language_input]="e" #Begin
+        #Text: language
+        "[lang_default]"
+    #Else-Begin
+        #Text: language
+        "[language_input]"
+    #End
+#End
+
+#Show: "Great, we'll work in [language] for the rewritten content. (I'll keep talking to you in English)."
+
+
+
+
+
+
+
+## --- 2b. Main Goal ---
+#Question: main_goal_q
+"What is your main GOAL with this rewrite?
+(e.g. 'Better explain Y service to Z audience', 'Improve ranking for specific keywords')
+Provide a short description, or press 's' to skip this step."
+
+#If [main_goal_q]="s" #Begin
+    #Text: main_goal
+    "No specific overall goal was provided by the user beyond general improvement and alignment with other inputs."
+#Else-Begin
+    #Text: main_goal
+    "[main_goal_q]"
+#End
+##Show: "Debug - Main Goal: [main_goal]"
+
+
+
+
+
+
+## --- 3. Identify "Must-Keep" Unique Elements ---
+#Show: "Identifying potentially unique or important elements from your page... (this might take 30 seconds)"
+#chatGPT: unique_elements_suggestion_gpt
+"Analyze the following webpage content. Identify and list up to 15 distinct elements that seem unique, important, or are clear value propositions, customer quotes, specific data points, FAQ sections or unique selling points (USPs). Present this as a numbered list with a very brief description for each. Ensure your analysis and suggestions are in English, even if the source text is in another language.
+Webpage Content:
+[original_content_processed]"
+
+#Question: kept_elements_choice
+"Here are some elements I found that might be important to keep (presented in English for review):
+[unique_elements_suggestion_gpt]
+
+Which of these do you DEFINITELY want to keep in the rewritten version?
+- Enter numbers separated by commas (e.g., 1,3,5)
+- Enter 'a' to keep ALL of them
+- Enter 'm' to manually specify elements to keep
+- Enter 'n' if none of these."
+
+#Text: user_kept_elements
+"No specific unique elements from the original page were explicitly selected by the user to be force-kept."
+
+#If [kept_elements_choice]="n" #Begin
+    #Text: user_kept_elements
+    "User chose not to select any automatically identified elements."
+#Else-Begin
+    #If [kept_elements_choice]="m" #Begin
+        #Question: user_kept_elements_manual
+        "Please describe the specific phrases, data, USPs, or quotes from your original page that ABSOLUTELY MUST be included in the rewrite. Separate distinct elements with a semicolon (e.g., 'Our patented X technology; Quote: 'Best service ever!' - John D.; We have Y years of experience')."
+        #Text: user_kept_elements
+        "The user manually specified the following elements to keep: [user_kept_elements_manual]"
+    #Else-Begin
+        #If [kept_elements_choice]="a" #Begin
+            #chatGPT: unique_elements_suggestion_gpt
+            "From the previous list of unique elements you generated (which were presented in English), re-present ALL of them as a single, concise summary paragraph, clearly indicating these are all to be preserved. Output this summary in English."
+            #Text: user_kept_elements
+            "The user wants to keep ALL automatically identified elements. Summary (in English for AI processing): [unique_elements_suggestion_gpt]"
+        #Else-Begin
+            #Show: "Summarizing your selected elements to keep..."
+            #chatGPT: unique_elements_suggestion_gpt
+            "From the list of unique elements you previously generated (which were presented in English), extract ONLY the elements corresponding to the numbers: [kept_elements_choice].
+            Combine these into a concise summary paragraph of elements to be preserved. Output this summary in English."
+            #Text: user_kept_elements
+            "The user selected the following elements to keep (summarized in English for AI processing): [unique_elements_suggestion_gpt]"
+        #End
+    #End
+#End
+##Show: "Debug - User Kept Elements: [user_kept_elements]"
+
+
+
+
+
+
+
+## --- 3b. Additional Information to Include ---
+#Question: additional_info_q
+"Is there anything else specific you want to make sure is mentioned or addressed in the rewritten webpage content?
+(e.g., a new feature, a specific benefit not highlighted before, a common question to answer)
+Please describe, or press 's' to skip."
+
+#If [additional_info_q]="s" #Begin
+   #Text: additional_info_to_mention
+   "No additional specific information was provided by the user to mention."
+#Else-Begin
+    #Text: additional_info_to_mention
+    "[additional_info_q]"
+#End
+##Show: "Debug - Additional Info to Mention: [additional_info_to_mention]"
+
+
+
+
+
+
+
+## --- 4. Define Target Audience ---
+#Show: "Now let's define your Target Audience for the rewritten page... (this might take 30 seconds)"
+#chatGPT: ta_suggestion_gpt
+"Based on the content of the original webpage ([original_content_processed]), suggest 10 potential target audiences. For each, provide a BOLD title and a brief (1-2 sentences) description of their characteristics, needs, and why they might be interested in this page's topic. Present as a numbered list. Ensure your analysis and suggestions are in English.
+Original Webpage Content:
+[original_content_processed]"
+
+#Question: ta_choice
+"Here are 10 potential target audiences based on your page (presented in English):
+[ta_suggestion_gpt]
+
+Which Target Audience(s) do you want to focus on for the rewrite?
+- Enter ONE or MORE numbers from the list, separated by commas (e.g., 2 or 1,4,7).
+- Enter 'm' to describe your target audience manually (in English or your target [language])."
+
+#If [ta_choice]="m" #Begin
+    #Question: target_audience_final
+    "Please describe your Target Audience in detail (e.g., their role, demographics, primary goals, what they value):"
+#Else-Begin
+    #Show: "Defining your chosen Target Audience(s)..."
+    #chatGPT: ta_suggestion_gpt
+    "From the list of 10 target audiences you previously generated (which were in English), extract ONLY the audience(s) corresponding to number(s) [ta_choice].
+    If multiple audiences are selected, synthesize them into a single, coherent target audience profile if possible or keep them seperate like 'X and Y and z'. If only one is selected, provide its profile.
+    Output a concise summary of this target audience profile, in English."
+    #Text: target_audience_final
+    "[ta_suggestion_gpt]"
+#End
+##Show: "Debug - Target Audience: [target_audience_final]"
+
+
+
+
+
+## --- 5. Define Target Audience Pain Points ---
+#Show: "Let's identify the Pain Points of the Target Audience that this page should address... (this might take 30 seconds)"
+#chatGPT: pp_suggestion_gpt
+"For the Target Audience (described as: '[target_audience_final]'), and considering the original webpage content about '[original_url]', suggest up to 10 key pain points, challenges, or strong interests this audience might have that the rewritten page could address. Present as a numbered list, each with a BOLD title and a brief (1-2 sentences) description. Ensure your analysis and suggestions are in English.
+Target Audience (description in English): [target_audience_final]
+Original Page Topic Context (may be in original language): [original_content_processed]"
+
+#Question: pp_choice
+"Here are some potential pain points or interests for your target audience (presented in English):
+[pp_suggestion_gpt]
+
+Which of these pain points/interests should the rewritten page primarily focus on?
+- Enter ONE or MORE numbers separated by commas (e.g., 1,3 or 2,5,8).
+- Enter 'a' to focus on ALL of them.
+- Enter 'm' to describe the pain points manually (in English or your target [language])."
+
+#If [pp_choice]="m" #Begin
+    #Question: pain_points_final
+    "Please describe the key pain points, challenges, or interests of your target audience that the rewritten page should address:"
+#Else-Begin
+    #If [pp_choice]="a" #Begin
+        #Show: "Defining ALL suggested pain points..."
+        #chatGPT: pp_suggestion_gpt
+        "From the list of pain points you previously generated (which were in English), re-present ALL of them as a single, concise summary paragraph, in English."
+        #Text: pain_points_final
+        "[pp_suggestion_gpt]"
+    #Else-Begin
+        #Show: "Defining your chosen pain points..."
+        #chatGPT: pp_suggestion_gpt
+        "From the list of pain points you previously generated (which were in English), extract ONLY the pain points corresponding to the numbers: [pp_choice].
+        Combine these into a concise summary paragraph, in English."
+        #Text: pain_points_final
+        "[pp_suggestion_gpt]"
+    #End
+#End
+##Show: "Debug - Pain Points: [pain_points_final]"
+
+
+
+
+
+
+## --- 6. SEO Keywords ---
+#Show: "Let's set up SEO keywords for the rewrite. These will be suggested in your target language: [language]."
+#Text: seo_primary_kw
+""
+#Text: seo_secondary_kw
+""
+
+#Show: "Suggesting PRIMARY SEO keywords in [language]... (this might take 30 seconds)"
+#chatGPT: seo_primary_suggestion_list
+"Based on the original page content, the target audience, and their pain points, suggest 10 strong PRIMARY SEO keywords or keyphrases in the language '[language]'. Present as a numbered list. These should be terms people would actually search for. Some entries in that 1-10 list should be what you think are the original SEO keywords on the page.
+Target Language for Keywords: [language]
+Original Content (may be in original language): [original_content_processed]
+Target Audience (description in English): [target_audience_final]
+Pain Points (description in English): [pain_points_final]"
+
+#Question: seo_primary_choice
+"Here are 10 suggested PRIMARY keywords in [language]:
+[seo_primary_suggestion_list]
+Please choose 1-3 of these by entering their numbers, comma-separated (e.g., 1,3,5).
+Or, enter 'm' to specify your own primary keywords in [language]."
+
+#If [seo_primary_choice]="m" #Begin
+    #Question: seo_primary_manual
+    "Please enter 1-3 PRIMARY SEO keywords/phrases in [language], separated by commas:"
+    #Text: seo_primary_kw
+    "[seo_primary_manual]"
+#Else-Begin
+    #chatGPT: seo_primary_suggestion_list
+    "From the numbered list of 10 primary SEO keywords you just generated (in [language]), extract ONLY the keywords corresponding to the numbers: [seo_primary_choice].
+    Present these selected keywords as a comma-separated string."
+    #Text: seo_primary_kw
+    "[seo_primary_suggestion_list]"
+#End
+
+#Show: "Suggesting SECONDARY SEO keywords in [language]... (this might take 30 seconds)"
+#chatGPT: seo_secondary_suggestion_list
+"Based on the original page content, target audience, pain points, and AVOIDING the primary keywords '[seo_primary_kw]', suggest 10 strong SECONDARY SEO keywords or keyphrases in the language '[language]'.  Some entries in that 1-10 list should be what you think are the original SEO keywords on the page.
+Present as a numbered list.
+Target Language for Keywords: [language]
+Primary Keywords to Avoid: [seo_primary_kw]
+Original Content (may be in original language): [original_content_processed]
+Target Audience (description in English): [target_audience_final]
+Pain Points (description in English): [pain_points_final]"
+
+#Question: seo_secondary_choice
+"Here are 10 suggested SECONDARY keywords in [language] (different from your primary ones):
+[seo_secondary_suggestion_list]
+Please choose 1-3 of these by entering their numbers, comma-separated (e.g., 2,4,6).
+Or, enter 'm' to specify your own secondary keywords in [language]."
+
+#If [seo_secondary_choice]="m" #Begin
+    #Question: seo_secondary_manual
+    "Please enter 1-3 SECONDARY SEO keywords/phrases in [language], separated by commas:"
+    #Text: seo_secondary_kw
+    "[seo_secondary_manual]"
+#Else-Begin
+    #chatGPT: seo_secondary_suggestion_list
+    "From the numbered list of 10 secondary SEO keywords you just generated (in [language]), extract ONLY the keywords corresponding to the numbers: [seo_secondary_choice].
+    Present these selected keywords as a comma-separated string."
+    #Text: seo_secondary_kw
+    "[seo_secondary_suggestion_list]"
+#End
+##Show: "Debug - Primary SEO: [seo_primary_kw], Secondary SEO: [seo_secondary_kw]"
+
+
+
+
+
+## --- 7. Optional: Add External Insights (Decide-As-You-Go) ---
+#Text: combined_external_insights
+""
+#Text: temp_selected_insights_accumulator
+""
+#Text: add_more_insights_q
+"n"
+#Text: insights_loop_entered_flag
+"n"
+
+#Question: add_insights_init
+"Would you like to add any external insights? This could be competitor webpages, articles with relevant trends, or examples of content you like. This can help generate new ideas or angles for the rewrite. (y/n)"
+#If [add_insights_init]="y" #Begin
+    #Text: add_more_insights_q
+    "y"
+    #Text: insights_loop_entered_flag 
+    "y" 
+    #Text: temp_selected_insights_accumulator
+    "**4. External Insights - for additional ideas or differentiation:**"
+#End
+
+#Loop-Until: [add_more_insights_q]="n"
+    #Question: insight_type
+    "What type of external insight are you adding?
+    1. Competitor Webpage
+    2. Industry Trend/News Article
+    3. Other Inspirational Content/Example
+    Please choose 1, 2, or 3:"
+
+    #Text: insight_type_desc
+    "Other"
+    #If [insight_type]="1" #Begin
+       #Text: insight_type_desc
+       "Competitor"
+    #End
+    #If [insight_type]="2" #Begin
+       #Text: insight_type_desc
+       "Trend/News"
+    #End
+
+    #Question: insight_source_method
+    "How will you provide this '[insight_type_desc]'?
+    1. Provide a URL
+    2. Paste text content
+    Please choose 1 or 2:"
+
+    #If [insight_source_method]="2" #Begin
+        #Question: insight_processed_content_input
+        "Please paste the text content for this '[insight_type_desc]':"
+        #Text: insight_processed_content
+        "[insight_processed_content_input]"
+    #Else-Begin
+        #Question: insight_url
+        "Please enter the URL for this '[insight_type_desc]':"
+        #Show: "Scraping insight from [insight_url]... (this might take 30-60 seconds)"
+        #Scrape: insight_raw_content
+        "[insight_url]"
+        ##Show: "Debug 0- scraped: [insight_raw_content]"
+        #Show: "Analyzing insight content..."
+        #chatGPT: insight_processed_content
+        "Extract all readable text content from the following scraped content. Format it nicely for readability. Content: [insight_raw_content]"
+        ##Show: "Debug 1 - processed [insight_processed_content]"
+    #End
+    ##Show: "Debug 2"
+
+
+    #Show: "Analyzing this external insight for relevance (results will be in English)..."
+    #chatGPT: current_insight_full_analysis_gpt
+    "Analyze the following external insight ([insight_type_desc]).
+    What are the key takeaways, ideas, angles, or structural elements from this insight that could be relevant or inspiring for rewriting a webpage for the Target Audience (described as '[target_audience_final]') who have Pain Points (described as '[pain_points_final]')?
+    Focus on aspects that could differentiate or improve the user's own webpage. Summarize your findings in detail in English. This is a full analysis.
+    Present the results as one numbered list. The user will later select exactlt what parts of this list to incorporate on their own website. Each item in the list consists of a short line in bold + a 1-2 sentence description.
+    External Insight Content (may be in any language):
+    [insight_processed_content]"
+
+
+    #Question: include_this_insight_q
+    "I've analyzed the content and here are what you could consider using from it:
+    
+    [current_insight_full_analysis_gpt]
+    
+    Please choose any number of these by entering their numbers, comma-separated (e.g. 2,4,6).
+    'a' = all
+    'n' = none"
+
+    #If [include_this_insight_q]<>"n" #Begin
+        #If [include_this_insight_q]="a" #Begin
+            #Show: "Adding insight's analysis..."
+            #chatGPT: current_insight_full_analysis_gpt
+           "From the list  you previously generated (which were in English), re-present ALL of them as a single, concise summary paragraph, in English."
+            Combine these into a concise summary paragraph, in English."
+            #Text: temp_selected_insights_accumulator
+            "[temp_selected_insights_accumulator]\n\n---\n\nExternal Insight (Type: [insight_type_desc]):\n[current_insight_full_analysis_gpt]"
+        #Else-Begin
+            #Show: "Adding insight's analysis..."
+            #chatGPT: current_insight_full_analysis_gpt
+            "From the list you previously generated (which were in English), extract ONLY the pain points corresponding to the numbers: [include_this_insight_q].
+            Combine these into a concise summary paragraph, in English."
+            #Text: temp_selected_insights_accumulator
+            "[temp_selected_insights_accumulator]\n\n---\n\nExternal Insight (Type: [insight_type_desc]):\n[current_insight_full_analysis_gpt]"
+        #End
+    #End
+    
+    ##Show: "Debug - Insights: [temp_selected_insights_accumulator]"
+   
+    #Question: add_more_insights_q
+    "Would you like to add another external insight source? (y/n)"
+#End
+
+#Text: combined_external_insights
+"[temp_selected_insights_accumulator]"
+
+##Show: "Debug - Combined External Insights (to be used in master prompt): [combined_external_insights]"
+
+
+
+
+
+
+
+## --- 8. Choose Rewriting Structure ---
+#Show: "Now, let's decide how to handle the structure of the rewritten page."
+#Text: structure_menu
+"How closely should the rewrite follow the structure of your original page?
+1. **Free Rewrite**: I'll have full freedom to restructure the content for best impact, based on all your inputs.
+2. **Keep Roughly Original Number of Headlines/Sections**: I'll aim for a similar number of main H2/H3 headings and content sections as your original page, but the content and order of these sections can change.
+3. **Keep Rough Intention/Content of Each Original Headline/Section**: I'll try to identify the main sections and their purpose from your original page, and rewrite each to fulfill a similar purpose, but optimized with new TA/Pain Point/SEO focus. Headings might change.
+Please choose 1, 2, or 3:"
+#Question: structure_choice_num
+"[structure_menu]"
+
+#Text: structure_details_for_prompt
+""
+#If [structure_choice_num]="2" #Begin
+    #Text: structure_choice
+    "rough_count"
+    #Text: structure_details_for_prompt
+    "Instruction for AI: Aim to create a rewritten page that has a roughly similar number of main headlines (e.g., H2s, H3s) and distinct content sections as the original page. However, you have freedom in what those headlines are, their order, and the specific content within them, as long as it's guided by all other inputs."
+#Else-Begin
+    #If [structure_choice_num]="3" #Begin
+        #Text: structure_choice
+        "keep_intention"
+        #Show: "Analyzing original page structure for section intentions... (this might take 30 seconds, analysis in English)"
+        #chatGPT: original_sections_list_gpt
+        "Analyze the original webpage content provided below. Identify its main logical sections, likely demarcated by H2 or H3 headings. For each section, provide:
+        1. The original heading (if clear).
+        2. A brief (1-sentence) summary of that section's apparent purpose or key message.
+        Present this as a numbered list, in English.
+        Original Webpage Content (may be in original language):
+        [original_content_processed]"
+        #Text: structure_details_for_prompt
+        "Instruction for AI: The user wants to keep the rough intention of the original page's sections. Below is an analysis (in English) of the original page's likely sections and their purposes. In your rewrite, ensure each of these original purposes/topics is covered and updated according to all other inputs (TA, pain points, SEO, goal). You can rephrase headlines and content extensively. The new page should flow logically.
+        Original Page Section Analysis (in English):
+        [original_sections_list_gpt]"
+    #Else-Begin
+        #Text: structure_choice
+        "free_rewrite"
+        #Text: structure_details_for_prompt
+        "Instruction for AI: You have full freedom to restructure the content. Create the optimal flow and structure based on all inputs (TA, pain points, SEO, goal). The original page content is for informational basis."
+    #End
+#End
+##Show: "Debug - Structure Choice: [structure_choice], Details: [structure_details_for_prompt]"
+
+
+
+
+
+
+
+## --- 9. Define Tone & Style ---
+#Show: "Finally, let's set the Tone & Style for the rewritten page."
+#Text: tone_menu
+"How would you like to specify the tone and style for the rewritten content in [language]?
+1. Emulate the tone & style of your original webpage.
+2. Provide a URL with content whose tone & style I should emulate.
+3. Describe the tone & style you want (in English or [language]).
+4. Provide a sample text for me to emulate (can be in any language, I will analyze its style).
+Please choose 1, 2, 3 or 4:"
+#Question: tone_method_choice
+"[tone_menu]"
+
+#Text: tone_final_prompt
+"Default tone for AI: professional, clear, engaging, and tailored to the target audience, written in [language]."
+
+#If [tone_method_choice]="3" #Begin
+    #Question: tone_description_input
+    "Please describe the desired tone and style (e.g., 'conversational and friendly', 'formal and authoritative', 'witty and playful', 'empathetic and supportive'):"
+    #Text: tone_final_prompt
+    "The desired tone and style is: [tone_description_input]. This description should guide the tone of the output in [language]."
+#Else-Begin
+    #If [tone_method_choice]="4" #Begin
+        #Question: tone_sample_text_input
+        "Please paste a sample text (at least a few paragraphs) whose style I should try to emulate:"
+        #Show: "Analyzing sample text for tone & style (analysis will be in English)..."
+        #chatGPT: tone_analysis_gpt
+        "Analyze the writing style of the following text. Identify key characteristics such as tone, sentence structure, formality, typical vocabulary, and any distinct stylistic elements. Provide a concise summary of this style, in English, that can be used as a reference for emulating it in the target language '[language]'.
+        Sample Text (may be in any language):
+        [tone_sample_text_input]"
+        #Text: tone_final_prompt
+        "Emulate the following writing style (analysis in English, apply to [language] output): [tone_analysis_gpt]"
+    #Else-Begin
+        #If [tone_method_choice]="2" #Begin
+            #Question: tone_ref_url_input
+            "Please enter the URL of a webpage whose tone & style I should try to emulate:"
+            #Show: "Scraping tone reference URL: [tone_ref_url_input]..."
+            #Scrape: tone_ref_scraped_raw
+            "[tone_ref_url_input]"
+            #Show: "Analyzing tone reference content (analysis in English)..."
+            #chatGPT: tone_ref_processed_content
+            "Extract all readable text content from the following scraped content. Format it nicely for readability. Content: [tone_ref_scraped_raw]"
+            #chatGPT: tone_analysis_gpt
+            "Analyze the writing style of the content from the URL [tone_ref_url_input]. Identify key characteristics... Provide a concise summary of this style, in English, for emulation in [language].
+            Reference Content (may be in any language):
+            [tone_ref_processed_content]"
+            #Text: tone_final_prompt
+            "Emulate the writing style of the content from [tone_ref_url_input] (analysis in English, apply to [language] output), which is: [tone_analysis_gpt]"
+        #Else-Begin
+            #Show: "Analyzing original webpage for tone & style (analysis will be in English)..."
+            #chatGPT: tone_analysis_gpt
+            "Analyze the writing style of the original webpage content provided below. Identify key characteristics such as tone, sentence structure, formality, typical vocabulary, and any distinct stylistic elements. Provide a concise summary of this style, in English, for emulation in [language].
+            Original Webpage Content (may be in original language):
+            [original_content_processed]"
+            #Text: tone_final_prompt
+            "Emulate the writing style of the original webpage (analysis in English, apply to [language] output), which is: [tone_analysis_gpt]"
+        #End
+    #End
+#End
+##Show: "Debug - Tone & Style Prompt: [tone_final_prompt]"
+
+
+
+
+
+
+
+
+## --- 10. Review & Rewrite (Main Logic) ---
+#Show: "All inputs gathered! I'm now preparing the master prompt to rewrite your webpage. This is the most complex step and may take a few minutes for the AI to process."
+
+#Text: master_rewrite_prompt
+"You are an expert direct response copywriter and SEO specialist tasked with rewriting a webpage.
+Your primary mission is to create content that deeply resonates with the target audience, addresses their specific pain points, incorporates strategic SEO keywords, achieves the user's main goal for the page, all while preserving any critical unique elements from the original content, including any other specific information the user wants to mention, and adhering to the desired tone and structural guidance. The final output must be in the language: **[language]**. All your analysis of supporting materials provided below (like TA descriptions, pain points, style analyses) is in English, but you must use these to inform your final writing in **[language]**.
+
+**1. User's Main Goal for this Rewrite (in English or original input language):**
+[main_goal]
+
+**2. Original Webpage Content (for context, information, and structural reference if applicable - may be in original language):**
+[original_content_processed]
+
+
+**3. Core Instructions & Parameters (Supporting information for your task, mostly in English):**
+
+   **a. Target Audience Profile (description in English):**
+   [target_audience_final]
+
+   **b. Key Pain Points / Interests to Address Directly (description in English):**
+   [pain_points_final]
+
+   **c. Unique Elements from Original to Preserve/Integrate Naturally (description in English of what to preserve from the original text, which might be in another language):**
+   --- IMPORTANT: Keep any exact information like quotes, adresses, statistics, numbers etc exactly as they are, do not change them even slightly.
+   [user_kept_elements]
+
+   **d. Additional Specific Information to Mention/Address (provided by user, may be in English or target language):**
+   [additional_info_to_mention]
+
+   **e. SEO Keywords (these are in the target language '[language]'):**
+      - **Primary Keywords (use 2-3 times each, at least once in a significant heading if possible, in '[language]'):** [seo_primary_kw]
+      - **Secondary Keywords (use 1-2 times each, naturally within body text, in '[language]'):** [seo_secondary_kw]
+      Integrate all keywords naturally into the [language] text; do not stuff. The content must read fluently.
+
+   **f. Structural Guidance for Rewrite (analysis/instructions in English):**
+   [structure_details_for_prompt]
+
+   **g. Desired Tone & Style (analysis/description in English, to be applied to [language] output):**
+   [tone_final_prompt]
+   (Apply this consistently throughout the rewritten content in [language].)
+
+   **h. Language for Output: [language]** (Reconfirming this is critical)
+
+[combined_external_insights]
+
+**5. Your Task - The Rewritten Webpage in [language]:**
+Based *comprehensively* on all the above information, produce the FULL rewritten webpage content **in the [language] language**.
+- Start directly with the content (e.g., main headline). Do not add any introductory phrases like 'Here is the rewritten content:'.
+- End with the content. Do not add any finishing phrases like 'END OF CONTENT'.
+- Use appropriate Markdown for formatting (e.g., # for H1, **bold**, *italics*, lists) suitable for the [language] text.
+- Ensure the rewritten content is coherent, engaging, persuasive, and directly speaks to the target audience, fulfilling their needs and the user's goals, all in [language].
+- If the structural guidance involved keeping the intention of original sections, make sure your rewritten page clearly covers those intentions in [language], even if the headlines and specific wording are entirely new and optimized.
+- Double-check that all specified unique elements (from the original content, which might be in a different language but described in English), the additional information to mention, and SEO keywords (which are provided in [language]) are naturally incorporated into your [language] rewrite.
+
+Output ONLY the rewritten webpage content in **[language]**."
+
+##Show: "Debug - MASTER REWRITE PROMPT (very long): [master_rewrite_prompt]"
+
+#Show: "Rewriting your webpage now in [language]... This is a complex task and may take 1-3 minutes. Please be patient."
+#Claude: rewritten_webpage_content
+"[master_rewrite_prompt]"
+
+#Show: "**--- YOUR REWRITTEN WEBPAGE CONTENT ---**"
+
+#Show: "[rewritten_webpage_content]"
+
+## --- 11. Feedback & Refinement (Loop) ---
+#Text: feedback_q_text
+"What do you think of the rewritten webpage?
+- Give feedback like 'Make the intro more punchy', 'Add a stronger call to action at the end', 'Rephrase the section about X'
+- You can type feedback in English or [language]
+- If you're happy, type 'h' to finish."
+#Question: feedback_text
+"[feedback_q_text]"
+
+#Loop-Until: [feedback_text]="h"
+    #Show: "Revising the webpage based on your feedback... (this might take 1-2 minutes)"
+    #Claude: rewritten_webpage_content
+    "You are an expert copywriter. Your previous output was the rewritten webpage in [language]. Now, based on the following user feedback, please revise ONLY the necessary parts of that rewritten webpage content, ensuring the final output remains in **[language]**.
+    User Feedback (may be in English or [language]): '[feedback_text]'
+
+    Apply this feedback to the last version of the webpage you generated in [language]. Maintain all other original instructions (TA, SEO, Tone, etc., which were mostly provided in English as guidance) unless the feedback specifically overrides them for a section. The output must be in **[language]**.
+    Output ONLY the revised and complete webpage content in **[language]**."
+
+    #Show: "[rewritten_webpage_content]"
+
+    #Question: feedback_text
+    "[feedback_q_text]"
+#End
+
+## --- 12. End ---
+#Show: "Thanks for using Webpage Optimize!"
