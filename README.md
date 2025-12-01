@@ -75,5 +75,6 @@ script-language-reference/
     purposewrite-script-language-reference.txt
     
 app-writing-app/
-    purposewrite-app-writing-prompt-for-gemini.txt    #use this to generated apps through an interactive process, without coding
-
+    purposewrite-app-writing-prompt-for-gemini.txt    #use this to 
+    
+    generated apps through an interactive process, without coding
