@@ -1,0 +1,2271 @@
+##Content Manager & Creator V1.8
+##Updated with enhanced menus, variable safety, and debug modes.
+##Status indicators now update instantly upon data entry.
+
+#Show: "Welcome to the Content Manager V1.8."
+
+##Initialize Status Indicators
+#Text: s_own
+"(-)"
+#Text: s_expert
+"(-)"
+#Text: s_comp
+"(-)"
+#Text: s_trend
+"(-)"
+#Text: s_add
+"(-)"
+#Text: s_diff
+"(-)"
+#Text: s_news_sel
+"(-)"
+#Text: s_int_prep
+"(-)"
+#Text: s_react
+"(-)"
+#Text: s_tone
+"(-)"
+#Text: s_style
+"(-)"
+#Text: s_type
+"(-)"
+#Text: s_level
+"(-)"
+#Text: s_aud
+"(-)"
+#Text: s_pain
+"(-)"
+#Text: s_seo
+"(-)"
+#Text: s_lang
+"(ENG)"
+
+##Initialize Data Variables
+#Text: own_content_text
+""
+#Text: interview_block
+""
+#Text: competitor_content_text
+""
+#Text: trend_content_text
+""
+#Text: additional_content_text
+""
+#Text: diff_final
+""
+#Text: trends_final
+""
+#Text: int_prep_result
+""
+#Text: is_reaction
+"n"
+#Text: react_url
+""
+#Text: react_content_text
+""
+#Text: react_prompt
+""
+#Text: tone_prompt
+""
+#Text: style_choices
+""
+#Text: project_type
+""
+#Text: length
+""
+#Text: project_level
+""
+#Text: ta_final
+""
+#Text: pain_final
+""
+#Text: seo_prompt
+""
+#Text: language
+"english"
+#Text: llm
+"claude"
+#Text: all_selected_kws
+""
+
+##Default Tone/Style
+#Text: tone_prompt
+""
+#Text: style_choices
+""
+
+##Main Application Loop
+#Text: exit_app
+"n"
+
+#Loop-Until: [exit_app]="y"
+
+   ##Update Status Indicators (Fail-safe check at start of loop)
+   #If [own_content_text]<>"" #Begin
+      #Text: s_own
+      "(X)"
+   #End
+   #If [interview_block]<>"" #Begin
+      #Text: s_expert
+      "(X)"
+   #End
+   #If [competitor_content_text]<>"" #Begin
+      #Text: s_comp
+      "(X)"
+   #End
+   #If [trend_content_text]<>"" #Begin
+      #Text: s_trend
+      "(X)"
+   #End
+   #If [additional_content_text]<>"" #Begin
+      #Text: s_add
+      "(X)"
+   #End
+   #If [diff_final]<>"" #Begin
+      #Text: s_diff
+      "(X)"
+   #End
+   #If [trends_final]<>"" #Begin
+      #Text: s_news_sel
+      "(X)"
+   #End
+   #If [int_prep_result]<>"" #Begin
+      #Text: s_int_prep
+      "(X)"
+   #End
+   #If [is_reaction]="y" #Begin
+      #Text: s_react
+      "(ON)"
+   #Else-Begin
+      #Text: s_react
+      "(OFF)"
+   #End
+   #If [tone_prompt]<>"" #Begin
+      #Text: s_tone
+      "(X)"
+   #End
+   #If [style_choices]<>"" #Begin
+      #Text: s_style
+      "(X)"
+   #End
+   #If [project_type]<>"" #Begin
+      #Text: s_type
+      "(X)"
+   #End
+   #If [project_level]<>"" #Begin
+      #Text: s_level
+      "(X)"
+   #End
+   #If [ta_final]<>"" #Begin
+      #Text: s_aud
+      "(X)"
+   #End
+   #If [pain_final]<>"" #Begin
+      #Text: s_pain
+      "(X)"
+   #End
+   #If [seo_prompt]<>"" #Begin
+      #Text: s_seo
+      "(X)"
+   #End
+   #If [language]="english" #Begin
+      #Text: s_lang
+      "(ENG)"
+   #Else-Begin
+      #Text: s_lang
+      "([language])"
+   #End
+
+   ##Main Menu
+   #Question: main_choice
+   "## CONTENT DASHBOARD
+   **SOURCE MATERIAL**
+   1. Manage Sources [s_own][s_expert][s_comp]...
+   
+   **WORK WITH BASE MATERIAL**
+   2. Differentiators [s_diff] / Trends [s_news_sel] / Interview Prep [s_int_prep]
+   
+   **SETTINGS & STRATEGY**
+   3. Reaction Mode [s_react]
+   4. Tone & Style [s_tone][s_style]
+   5. Output Type (Format/Level) [s_type][s_level]
+   6. Audience & Pain Points [s_aud][s_pain]
+   7. SEO Keywords [s_seo]
+   8. Language [s_lang]
+   
+   **ACTIONS**
+   9. Image Generation
+   10. Free Prompting
+   11. Generate standard content
+   12. Exit
+   
+   Select an option:"
+
+
+   ##Manage Sources Section
+   #If [main_choice]="1" #Begin
+      #Text: exit_sources
+      "n"
+      
+      #Loop-Until: [exit_sources]="y"
+         #Question: source_choice
+         "--- SOURCE MATERIAL MANAGER ---
+         1. [s_own] Own Products/Services
+         2. [s_expert] Expert Interview (Transcript)
+         3. [s_comp] Competitor Info
+         4. [s_trend] Market News & Trends
+         5. [s_add] Additional Sources
+         6. Back to Main Menu
+
+         Choose a source to view/edit:"
+
+         #If [source_choice]="6" #Begin
+            #Text: exit_sources
+            "y"
+         #End
+
+         ##Own Content Manager
+         #If [source_choice]="1" #Begin
+             #Text: exit_sub
+             "n"
+             #Loop-Until: [exit_sub]="y"
+                #Question: sub_choice
+                "--- OWN CONTENT ---
+                1. See current
+                2. Replace All
+                3. Add more
+                4. Back"
+                
+                #If [sub_choice]="4" #Begin
+                    #Text: exit_sub
+                    "y"
+                #End
+
+                #If [sub_choice]="1" #Begin
+                    #Show: "CURRENT: [own_content_text]"
+                #End
+                
+                #If [sub_choice]="2" #Begin
+                    #Text: own_content_text
+                    ""
+                    #Text: s_own
+                    "(-)"
+                    #Text: mode
+                    "add"
+                #End
+                
+                #If [sub_choice]="3" #Begin
+                    #Text: mode
+                    "add"
+                #End
+
+                #If [mode]="add" #Begin
+                   #Question: own_source_q
+                   "1. URL (Scrape)
+                   2. Paste Text
+                   Choice:"
+                   
+                   #If [own_source_q]="1" #Begin
+                      #Question: url
+                      "Enter URL:"
+                      #Show: "Scraping..."
+                      #scrape: raw
+                      "[url]"
+                      #gemini: clean
+                      "Extract readable content from HTML.
+                      Dont add any other information like: 'Yes, here is your answer:'
+                      HTML: [raw]"
+                      
+                      #Show: "Debug
+                      Prompt: Extract readable content. HTML: [raw]
+                      --------------------------
+                      Output: [clean]"
+
+                      #Show: "Cleaned content:
+                      ---------------
+                      [clean]"
+                      #Question: add_how
+                      "Do you want to:
+                      1. Add this as is
+                      2. Add a summary of this
+                      3. Not add it"
+
+                      #If [add_how]="1" #Begin
+                          #Text: own_content_text
+                          "[own_content_text] \n [clean]"
+                          #Text: s_own
+                          "(X)"
+                      #Else-Begin
+                          #If [add_how]="2" #Begin
+                             #gemini: summary
+                             "Make a summary of all relevant information in this text:
+                             [clean]"
+                             #Show: "Added summary: 
+                             -----------
+                             [summary]"
+                             #Text: own_content_text
+                             "[own_content_text] \n [summary]"
+                             #Text: s_own
+                             "(X)"
+                          #Else-Begin
+                             #Show: "Content not added"
+                          #End
+                      #End    
+
+                   #Else-Begin
+                      #Question: txt
+                      "Paste text:"
+                      #Text: own_content_text
+                      "[own_content_text] \n [txt]"
+                      #Text: s_own
+                      "(X)"
+                   #End
+                   #Text: mode
+                   "done"
+                #End
+             #End
+         #End
+
+
+         ##Expert Interview Manager
+         #If [source_choice]="2" #Begin
+             #Text: exit_sub
+             "n"
+             #Loop-Until: [exit_sub]="y"
+                #Question: sub_choice
+                "--- EXPERT INTERVIEW ---
+                1. See current
+                2. Replace All
+                3. Add more
+                4. Back"
+                
+                #If [sub_choice]="4" #Begin
+                    #Text: exit_sub
+                    "y"
+                #End
+
+                #If [sub_choice]="1" #Begin
+                    #Show: "CURRENT: [interview_block]"
+                #End
+                
+                #If [sub_choice]="2" #Begin
+                    #Text: interview_block
+                    ""
+                    #Text: s_expert
+                    "(-)"
+                    #Text: mode
+                    "add"
+                #End
+                
+                #If [sub_choice]="3" #Begin
+                    #Text: mode
+                    "add"
+                #End
+
+                #If [mode]="add" #Begin
+                   #Question: expert_info
+                   "Expert Name & Title:"
+                   #Question: raw_int
+                   "Paste transcript:"
+
+                   #Question: add_how
+                   "Do you want to:
+                   1. Add this as is
+                   2. Add a summary of this
+                   3. Not add it"
+
+                   #If [add_how]="1" #Begin
+                      #Text: interview_block
+                      "[interview_block] \n SOURCE: [expert_info] \n TRANSCRIPT: [raw_int]"
+                      #Text: s_expert
+                      "(X)"
+                   #Else-Begin
+                      #If [add_how]="2" #Begin
+                          #gemini: summary
+                          "Make a summary of all relevant information in this text:
+                          [raw_int]"
+                          #Show: "Added summary: 
+                          -----------
+                          [summary]"
+                          #Text: interview_block
+                          "[interview_block] \n SOURCE: [expert_info] \n TRANSCRIPT: [summary]" 
+                          #Text: s_expert
+                          "(X)"
+                      #Else-Begin
+                          #Show: "Content not added"
+                      #End
+                   #End    
+                #End
+                #Text: mode
+                "done"
+             #End
+         #End
+
+         ##Competitor Manager
+         #If [source_choice]="3" #Begin
+             #Text: exit_sub
+             "n"
+             #Loop-Until: [exit_sub]="y"
+                #Question: sub_choice
+                "--- COMPETITOR INFO ---
+                1. See current
+                2. Replace All
+                3. Add more
+                4. Back"
+                
+                #If [sub_choice]="4" #Begin
+                    #Text: exit_sub
+                    "y"
+                #End
+
+                #If [sub_choice]="1" #Begin
+                    #Show: "CURRENT: [competitor_content_text]"
+                #End
+                
+                #If [sub_choice]="2" #Begin
+                    #Text: competitor_content_text
+                    ""
+                    #Text: s_comp
+                    "(-)"
+                    #Text: mode
+                    "add"
+                #End
+                
+                #If [sub_choice]="3" #Begin
+                    #Text: mode
+                    "add"
+                #End
+
+                #If [mode]="add" #Begin
+                   #Question: comp_source_q
+                   "1. URL (Scrape)
+                   2. Paste Text
+                   Choice:"
+                   
+                   #If [comp_source_q]="1" #Begin
+                      #Question: url
+                      "Enter URL:"
+                      #Show: "Scraping..."
+                      #scrape: raw
+                      "[url]"
+                      #gemini: clean
+                      "Extract readable content from HTML. 
+                      Dont add any other information like: 'Yes, here is your answer:'
+                      HTML: [raw]"
+
+                      #Show: "Debug
+                      Prompt: Extract readable content. HTML: [raw]
+                      --------------------------
+                      Output: [clean]"
+
+                      #Show: "Cleaned content:
+                      ---------------
+                      [clean]"
+                      #Question: add_how
+                      "Do you want to:
+                      1. Add this as is
+                      2. Add a summary of this
+                      3. Not add it"
+
+                      #If [add_how]="1" #Begin
+                          #Text: competitor_content_text
+                          "[competitor_content_text] \n [clean]"
+                          #Text: s_comp
+                          "(X)"
+                      #Else-Begin
+                          #If [add_how]="2" #Begin
+                             #gemini: summary
+                             "Make a summary of all relevant information in this text:
+                             [clean]"
+                             #Show: "Added summary: 
+                             -----------
+                             [summary]"
+                             #Text: competitor_content_text
+                             "[competitor_content_text] \n [summary]"
+                             #Text: s_comp
+                             "(X)"
+                          #Else-Begin
+                             #Show: "Content not added"
+                          #End
+                      #End    
+
+                   #Else-Begin
+                      #Question: txt
+                      "Paste text:"
+                      #Text: competitor_content_text
+                      "[competitor_content_text] \n [txt]"
+                      #Text: s_comp
+                      "(X)"
+                   #End
+                   #Text: mode
+                   "done"
+                #End
+             #End
+         #End
+
+         ##Trends Manager
+         #If [source_choice]="4" #Begin
+             #Text: exit_sub
+             "n"
+             #Loop-Until: [exit_sub]="y"
+                #Question: sub_choice
+                "--- TRENDS ---
+                1. See current
+                2. Replace All
+                3. Add more
+                4. Back"
+                
+                #If [sub_choice]="4" #Begin
+                    #Text: exit_sub
+                    "y"
+                #End
+
+                #If [sub_choice]="1" #Begin
+                    #Show: "CURRENT: [trend_content_text]"
+                #End
+                
+                #If [sub_choice]="2" #Begin
+                    #Text: trend_content_text
+                    ""
+                    #Text: s_trend
+                    "(-)"
+                    #Text: mode
+                    "add"
+                #End
+                
+                #If [sub_choice]="3" #Begin
+                    #Text: mode
+                    "add"
+                #End
+
+                #If [mode]="add" #Begin
+                   #Question: trend_source_q
+                   "1. General AI Search
+                   2. URL (Scrape)
+                   3. Paste Text
+                   Choice:"
+                   
+                   #If [trend_source_q]="1" #Begin
+                      #Question: topic
+                      "Topic area:"
+                      #chatgptsearch: res
+                      "Find news and trends on topic.
+                      Dont add any other information like: 'Yes, here is your answer:'
+                      Topic: [topic]"
+
+                      #Show: "Debug
+                      Prompt: Find news and trends on: [topic]
+                      --------------------------
+                      Output: [res]"
+
+                      #Show: "Found news&trends:
+                      ---------------
+                      [res]"
+                      #Question: add_how
+                      "Do you want to:
+                      1. Add this as is
+                      2. Add a summary of this
+                      3. Not add it"
+
+                      #If [add_how]="1" #Begin
+                          #Text: trend_content_text
+                          "[trend_content_text] \n [res]"
+                          #Text: s_trend
+                          "(X)"
+                      #Else-Begin
+                          #If [add_how]="2" #Begin
+                             #gemini: summary
+                             "Make a summary of all relevant information in this text:
+                             [res]"
+                             #Show: "Added summary: 
+                             -----------
+                             [summary]"
+                             #Text: trend_content_text
+                             "[trend_content_text] \n [summary]"
+                             #Text: s_trend
+                             "(X)"
+                         #Else-Begin
+                             #Show: "Content not added"
+                          #End
+                      #End    
+                   #End
+
+                   #If [trend_source_q]="2" #Begin
+                      #Question: url
+                      "Enter URL:"
+                      #Show: "Scraping..."
+                      #scrape: raw
+                      "[url]"
+                      #gemini: clean
+                      "Extract readable content from HTML. 
+                      Dont add any other information like: 'Yes, here is your answer:'
+                      HTML: [raw]"
+
+                      #Show: "Debug
+                      Prompt: Extract readable content. HTML: [raw]
+                      --------------------------
+                      Output: [clean]"
+
+                      #Show: "Cleaned content:
+                      ---------------
+                      [clean]"
+                      #Question: add_how
+                      "Do you want to:
+                      1. Add this as is
+                      2. Add a summary of this
+                      3. Not add it"
+
+                      #If [add_how]="1" #Begin
+                          #Text: trend_content_text
+                          "[trend_content_text] \n [clean]"
+                          #Text: s_trend
+                          "(X)"
+                      #Else-Begin
+                          #If [add_how]="2" #Begin
+                             #gemini: summary
+                             "Make a summary of all relevant information in this text:
+                             [clean]"
+                             #Show: "Added summary: 
+                             -----------
+                             [summary]"
+                             #Text: trend_content_text
+                             "[trend_content_text] \n [summary]"
+                             #Text: s_trend
+                             "(X)"
+                          #Else-Begin
+                             #Show: "Content not added"
+                          #End
+                      #End    
+                   #End
+
+                   #If [trend_source_q]="3" #Begin
+                      #Question: txt
+                      "Paste text:"
+                      #Text: trend_content_text
+                      "[trend_content_text] \n [txt]"
+                      #Text: s_trend
+                      "(X)"
+                   #End
+                   #Text: mode
+                   "done"
+                #End
+             #End
+         #End
+
+
+         ##Additional Sources Manager
+         #If [source_choice]="5" #Begin
+             #Text: exit_sub
+             "n"
+             #Loop-Until: [exit_sub]="y"
+                #Question: sub_choice
+                "--- ADDITIONAL SOURCES ---
+                1. See current
+                2. Replace All
+                3. Add more
+                4. Back"
+                
+                #If [sub_choice]="4" #Begin
+                    #Text: exit_sub
+                    "y"
+                #End
+
+                #If [sub_choice]="1" #Begin
+                    #Show: "CURRENT: [additional_content_text]"
+                #End
+                
+                #If [sub_choice]="2" #Begin
+                    #Text: additional_content_text
+                    ""
+                    #Text: s_add
+                    "(-)"
+                    #Text: mode
+                    "add"
+                #End
+                
+                #If [sub_choice]="3" #Begin
+                    #Text: mode
+                    "add"
+                #End
+
+                #If [mode]="add" #Begin
+                   #Question: add_source_q
+                   "1. URL (Scrape)
+                   2. Paste Text
+                   Choice:"
+                   
+                   #If [add_source_q]="1" #Begin
+                      #Question: url
+                      "Enter URL:"
+                      #Show: "Scraping..."
+                      #scrape: raw
+                      "[url]"
+                      #gemini: clean
+                      "Extract readable content from HTML. 
+                      Dont add any other information like: 'Yes, here is your answer:'
+                      HTML: [raw]"
+
+                      #Show: "Debug
+                      Prompt: Extract readable content. HTML: [raw]
+                      --------------------------
+                      Output: [clean]"
+
+                      #Show: "Cleaned content:
+                      ---------------
+                      [clean]"
+                      #Question: add_how
+                      "Do you want to:
+                      1. Add this as is
+                      2. Add a summary of this
+                      3. Not add it"
+
+                      #If [add_how]="1" #Begin
+                          #Text: additional_content_text
+                          "[additional_content_text] \n [clean]"
+                          #Text: s_add
+                          "(X)"
+                      #Else-Begin
+                          #If [add_how]="2" #Begin
+                             #gemini: summary
+                             "Make a summary of all relevant information in this text:
+                             [clean]"
+                             #Show: "Added summary: 
+                             -----------
+                             [summary]"
+                             #Text: additional_content_text
+                             "[additional_content_text] \n [summary]"
+                             #Text: s_add
+                             "(X)"
+                          #Else-Begin
+                             #Show: "Content not added"
+                          #End
+                      #End    
+                   #End
+
+                   #If [add_source_q]="2" #Begin
+                      #Question: txt
+                      "Paste text:"
+                      #Text: additional_content_text
+                      "[additional_content_text] \n [txt]"
+                      #Text: s_add
+                      "(X)"
+                   #End
+                   #Text: mode
+                   "done"
+                #End
+             #End
+         #End
+      #End
+   #End
+
+
+   ##Work With Base Material Section
+   #If [main_choice]="2" #Begin
+      #Question: base_choice
+      "--- WORK WITH BASE MATERIAL ---
+      1. [s_diff] Choose Competitor Differentiators
+      2. [s_news_sel] Choose News & Trends to Highlight
+      3. [s_int_prep] Prepare for Expert Interview
+      4. Back
+      Choice:"
+
+      ##Differentiators
+      #If [base_choice]="1" #Begin
+         #If [competitor_content_text]="" #Begin
+            #Show: "Error: No competitor content added yet."
+         #Else-Begin
+            #Show: "Analyzing differentiators..."
+            #Text: diff_prompt
+            "Identify 10 differentiators based on:
+            My Product: [own_content_text]
+            Competitor: [competitor_content_text]
+            Target Audience: [ta_final]
+            List them numbered 1-10.
+            Dont add any other information like: 'Yes, here is your answer:'"
+            
+            #chatgpt: diff_opts
+            "[diff_prompt]"
+
+            #Show: "Debug
+            Prompt: [diff_prompt]
+            --------------------------
+            Output: [diff_opts]"
+            
+            #Question: diff_sel
+            "Found these:
+            [diff_opts]
+            Select numbers (e.g., 1,3) or 'm' for manual:"
+
+            #If [diff_sel]="m" #Begin
+               #Question: diff_input
+               "Enter differentiators:"
+               #Text: diff_final
+               "[diff_input]"
+               #Text: s_diff
+               "(X)"
+            #Else-Begin
+               #Text: diff_select_prompt
+               "Extract items [diff_sel] from: [diff_opts]. List only."
+               #chatgpt: diff_gpt_out
+               "[diff_select_prompt]"
+
+               #Show: "Debug
+               Prompt: [diff_select_prompt]
+               --------------------------
+               Output: [diff_gpt_out]"
+
+               #Text: diff_final
+               "[diff_gpt_out]"
+               #Text: s_diff
+               "(X)"
+            #End
+         #End
+      #End
+
+      ##News Selection
+      #If [base_choice]="2" #Begin
+         #If [trend_content_text]="" #Begin
+            #Show: "Error: No trend content added yet."
+         #Else-Begin
+            #Show: "Analyzing trends..."
+            #Text: tr_prompt
+            "Identify 10 key trends to highlight from:
+            [trend_content_text]
+            List them numbered 1-10.
+            Dont add any other information like: 'Yes, here is your answer:'"
+
+            #chatgpt: trend_opts
+            "[tr_prompt]"
+
+            #Show: "Debug
+            Prompt: [tr_prompt]
+            --------------------------
+            Output: [trend_opts]"
+
+            #Question: tr_sel
+            "Found these:
+            [trend_opts]
+            Select numbers (e.g., 1,3) or 'm' for manual:"
+
+            #If [tr_sel]="m" #Begin
+               #Question: trends_input
+               "Enter trends to use:"
+               #Text: trends_final
+               "[trends_input]"
+               #Text: s_news_sel
+               "(X)"
+            #Else-Begin
+               #Text: tr_sel_prompt
+               "Extract items [tr_sel] from: [trend_opts]. List only."
+               #chatgpt: trends_gpt_out
+               "[tr_sel_prompt]"
+
+               #Show: "Debug
+               Prompt: [tr_sel_prompt]
+               --------------------------
+               Output: [trends_gpt_out]"
+
+               #Text: trends_final
+               "[trends_gpt_out]"
+               #Text: s_news_sel
+               "(X)"
+            #End
+         #End
+      #End
+
+      ##Interview Prep
+      #If [base_choice]="3" #Begin
+         #Question: int_goal
+         "What is the goal of the interview?"
+         #Show: "Generating questions based on all current source data..."
+         
+         #Text: int_prompt
+         "Generate interview questions based on:
+         --- Goal: [int_goal]
+         --- Data: [own_content_text] [competitor_content_text] [trend_content_text]
+         --- Output a script."
+
+         #chatgpt: int_prep_gpt
+         "[int_prompt]"
+
+         #Show: "Debug
+         Prompt: [int_prompt]
+         --------------------------
+         Output: [int_prep_gpt]"
+
+         #Text: int_prep_result
+         "[int_prep_gpt]"
+         #Text: s_int_prep
+         "(X)"
+
+         #Show: "[int_prep_result]"
+      #End
+   #End
+
+   ##Reaction Mode Section
+   #If [main_choice]="3" #Begin
+      #Text: exit_sub
+      "n"
+      #Loop-Until: [exit_sub]="y"
+         #Question: sub_choice
+         "--- REACTION MODE ---
+         Current Status: [s_react]
+         1. See current content
+         2. Replace All
+         3. Add more
+         4. Reaction mode OFF
+         5. Back"
+         
+         #If [sub_choice]="5" #Begin
+             #Text: exit_sub
+             "y"
+         #End
+
+         #If [sub_choice]="4" #Begin
+             #Text: is_reaction
+             "n"
+             #Text: react_content_text
+             ""
+             #Text: s_react
+             "(OFF)"
+             #Show: "Reaction mode disabled."
+         #End
+
+         #If [sub_choice]="1" #Begin
+             #Show: "URL/Source: [react_url] \n Content Summary: [react_content_text]"
+         #End
+
+         #If [sub_choice]="2" #Begin
+             #Text: react_content_text
+             ""
+             #Text: react_url
+             ""
+             #Text: mode
+             "add"
+         #End
+
+         #If [sub_choice]="3" #Begin
+             #Text: mode
+             "add"
+         #End
+
+         #If [mode]="add" #Begin
+             #Text: is_reaction
+             "y"
+             #Question: r_src
+             "1. Have URL
+             2. Search Topic
+             Choice:"
+
+             #If [r_src]="1" #Begin
+                #Question: url_in
+                "URL:"
+                #Text: react_url
+                "[react_url] [url_in]"
+                #Show: "Scraping..."
+                #scrape: raw
+                "[url_in]"
+                #gemini: clean
+                "Extract body text. HTML: [raw]"
+
+                #Show: "Debug
+                Prompt: Extract body text. HTML: [raw]
+                --------------------------
+                Output: [clean]"
+
+                #Text: react_content_text
+                "[react_content_text] \n [clean]"
+                #Text: s_react
+                "(ON)"
+             #End
+
+             #If [r_src]="2" #Begin
+                #Question: topic
+                "Topic:"
+                #chatgptsearch: list
+                "Find 5 articles on [topic]. Numbered list with URLs. Show the full URL for each, not just 'Read More'."
+
+                #Show: "Debug
+                Prompt: Find 5 articles on [topic]. Numbered list with URLs.
+                --------------------------
+                Output: [list]"
+
+                #Question: sel
+                "Select article number:
+                [list]"
+                
+                #Text: url_extract_prompt
+                "Extract URL for #[sel] from: [list]. URL Only."
+                #chatgpt: react_url_gpt
+                "[url_extract_prompt]"
+
+                #Show: "Debug
+                Prompt: [url_extract_prompt]
+                --------------------------
+                Output: [react_url_gpt]"
+                
+                #Text: react_url
+                "[react_url] [react_url_gpt]"
+
+                #Show: "Scraping [react_url_gpt]..."
+                #scrape: raw
+                "[react_url_gpt]"
+                #gemini: clean
+                "Extract body text. HTML: [raw]"
+
+                #Show: "Debug
+                Prompt: Extract body text. HTML: [raw]
+                --------------------------
+                Output: [clean]"
+
+                #Text: react_content_text
+                "[react_content_text] \n [clean]"
+                #Text: s_react
+                "(ON)"
+             #End
+             #Text: react_prompt
+             "This is a reaction piece to: [react_url]. Reference it. Context: [react_content_text]"
+             #Text: mode
+             "done"
+         #End
+      #End
+   #End
+
+   ##Tone and Style Section
+   #If [main_choice]="4" #Begin
+      #Question: tone_menu
+      "--- TONE & STYLE ---
+      1. [s_tone] Tone of Voice
+      2. [s_style] Style Addons
+      3. Back
+      Choice:"
+      
+      #If [tone_menu]="1" #Begin
+         #Text: exit_sub
+         "n"
+         #Loop-Until: [exit_sub]="y"
+            #Question: sub_choice
+            "--- TONE OF VOICE ---
+            1. See current
+            2. Replace All
+            3. Add more
+            4. Back"
+
+            #If [sub_choice]="4" #Begin
+                #Text: exit_sub
+                "y"
+            #End
+
+            #If [sub_choice]="1" #Begin
+                #Show: "Current Tone: [tone_prompt]"
+            #End
+            
+            #If [sub_choice]="2" #Begin
+                #Text: tone_prompt
+                ""
+                #Text: s_tone
+                "(-)"
+                #Text: mode
+                "add"
+            #End
+            
+            #If [sub_choice]="3" #Begin
+                #Text: mode
+                "add"
+            #End
+
+            #If [mode]="add" #Begin
+                #Question: t_mode
+                "1. Manual Input
+                2. Analyze Sample
+                3. Analyze Own Content
+                4. Back
+                Choice:"
+                
+                #If [t_mode]="1" #Begin
+                   #Question: tone_in
+                   "Describe tone:"
+                   #Text: tone_prompt
+                   "[tone_prompt] [tone_in]"
+                   #Text: s_tone
+                   "(X)"
+                #End
+
+                #If [t_mode]="2" #Begin
+                   #Question: samp
+                   "Paste sample:"
+                   #Text: t_analyze_p
+                   "Analyze tone of: [samp]. One paragraph summary."
+                   #chatgpt: tone_gpt_out
+                   "[t_analyze_p]"
+
+                   #Show: "Debug
+                   Prompt: [t_analyze_p]
+                   --------------------------
+                   Output: [tone_gpt_out]"
+
+                   #Text: tone_prompt
+                   "[tone_prompt] [tone_gpt_out]"
+                   #Text: s_tone
+                   "(X)"
+                #End
+
+                #If [t_mode]="3" #Begin
+                   #If [own_content_text]="" #Begin
+                      #Show: "No Own Content to analyze."
+                   #Else-Begin
+                      #Text: t_analyze_p
+                      "Analyze tone of: [own_content_text]. One paragraph summary."
+                      #chatgpt: tone_gpt_out
+                      "[t_analyze_p]"
+
+                      #Show: "Debug
+                      Prompt: [t_analyze_p]
+                      --------------------------
+                      Output: [tone_gpt_out]"
+
+                      #Text: tone_prompt
+                      "[tone_prompt] [tone_gpt_out]"
+                      #Text: s_tone
+                      "(X)"
+                   #End
+                #End
+                #Text: mode
+                "done"
+            #End
+         #End
+      #End
+
+      #If [tone_menu]="2" #Begin
+         #Text: styles_list
+         "1.Slightly funny - Make the text just slightly funny, not too much.
+         2. Funny - Make it a litte bit funny.
+         3. Hilarious - Make it very funny.
+         4. A few abbreviations - Include 1-3 'fast texting abbreviations'.
+         5. Many Abbreviations - Include very few 'fast texting abbreviations'.
+         6. A few typos - Include 1-2 typos in the first sentence.
+         7. Many typos - Include typos throughout the text.
+         8. Bad grammar - Include 1-2 occurences of bad or wrong grammar.
+         9. Weeeird spelling - Primarily in the hook, include 1-2 words with too many vocals, example: 'waaaay to good'.
+         10. CAPITALS - Include 1-2 words emphasized in CAPITALS for max emotions.
+         11. !!!! ???? ?!?!? - Include 1-2 occurences of many !!!!! or ???? or ?!?!?!.
+         12. ... ( ) - Use dots like ... to indicate hesitation or thinking, and sometimes parts of sentences in parenthesis instead of using comma.
+         13. Odd sentence lengths - Use extremely different sentence lengths, sentences can be one word or very long with many commas.
+         14. Short sentences & paragraphs - Write using extremely short sentences and short paragraphs.
+         15. Conversational - Write like you're having a real conversation.
+         16. Personal - Include occasional casual phrases and conversational transitions like 'you know,' 'actually,' 'well,' but don't overdo it.
+         17. Provocative - Write with some provocative ideas.
+         18. Emotional - Express lots of feelings.
+         19. Opinionated - Write in a very opinionated style.
+         20. Less certain - Use a lot of phrases like 'I think,' 'maybe,' or 'it seems that' to show uncertainty or nuanced thinking.
+         21. Rhetorical - Pose questions to engage the reader and stimulate thought.
+         22. No rethorical - Don't use rhetorical question.
+         23. No 'Here's the....' - Don't use phrasing like 'Here's the kicker' or 'Here's the plot twist'.
+         24. Digressions - Include digressions, occasionally go off on brief, relevant tangents as humans often do in conversation or writing.
+         25. No corporate BS - Use everyday words over formal alternatives, be specific instead of metaphorical, choose simple and clear words over complex ones, avoid buzzwords and business jargon, write actively and directly, avoid corporate style and language.
+         26. No statistics - Remove all statistics and numbers like '38%' or 'every 8 out of 10' or '5000 dollars' etc.
+         27. Few Headlines - Headlines frequency: Only use very few headlines, headlines are in BOLD.
+         28. Many Headlines - Insert sub headlines in BOLD where it is logical, but not too many.
+         29. No lists - Remove all bullet points and lists.
+         30. One list - The text should somewhere contain ONE list with bullet points.
+         31. Many lists - Have lots of lists with bullet points.
+         32. Hook - Start the text with a strong hook in a short sentence.
+         33. Intro - Make a strong lede in the text, meant to sum up the text but also make you want to read more.
+         34. CTA - Write a strong CTA at the end of the text.
+         35. Question CTA - Write a strong CTA in the form of a question at the end of the text.
+         36. No selling - Do not talk about us or try to sell.
+         37. Selling - Write about us and sell us or our products or services to the reader in a subtle way."
+
+         #Text: exit_sub
+         "n"
+         #Loop-Until: [exit_sub]="y"
+            #Question: sub_choice
+            "--- STYLE ADDONS ---
+            1. See current + list
+            2. Replace All
+            3. Add more
+            4. Back"
+
+            #If [sub_choice]="4" #Begin
+                #Text: exit_sub
+                "y"
+            #End
+
+            #If [sub_choice]="1" #Begin
+                #Show: "Menu Options: \n [styles_list]"
+                #Show: "Current: [style_choices]"
+            #End
+
+            #If [sub_choice]="2" #Begin
+                #Text: style_choices
+                ""
+                #Text: s_style
+                "(-)"
+                #Text: mode
+                "add"
+            #End
+
+            #If [sub_choice]="3" #Begin
+                #Text: mode
+                "add"
+            #End
+
+            #If [mode]="add" #Begin
+                 #Show: "Generating Menu..."
+                 #Text: menu_p
+                 "Show me the following numbered menu, but don't show the prompt part after '-' and dont add any other text before or after.
+                 [styles_list]"
+                 #chatgpt: menu_display
+                 "[menu_p]"
+                 
+                 #Show: "Debug
+                 Prompt: [menu_p]
+                 --------------------------
+                 Output: [menu_display]"
+
+                 #Question: s_sel
+                 "What additional style elements do you want in your text?
+                 (choose the ones you like, for eexample 13,16,20)
+                 [menu_display]
+                 Reply with all the numbers you like (comma separated):"
+
+                 #Show: "Optimizing choices..."
+                 #Text: style_select_p
+                 "From the menu below I select the lines: [s_sel].
+                 Now, reply with the all the selections I made, one per line.
+                 IMPORTANT: Reply ONLY with the part of each line that is AFTER the minus sign '-' in each line.
+                 Do not reply with any other information.
+                 The original menu: [styles_list]"
+                 #chatgpt: style_gpt_out
+                 "[style_select_p]"
+
+                 #Show: "Debug
+                 Prompt: [style_select_p]
+                 --------------------------
+                 Output: [style_gpt_out]"
+
+                 #Text: style_choices
+                 "[style_choices] [style_gpt_out]"
+                 #Text: s_style
+                 "(X)"
+                 #Text: mode
+                 "done"
+            #End
+         #End
+      #End
+   #End
+
+   ##Output Type Section
+   #If [main_choice]="5" #Begin
+      #Question: type_q
+      "What type of content project are you working on?
+      1. Web page (General content, About Us, Home, etc.)
+      2. Landing page (Sales page, Squeeze page, Funnel)
+      3. Product/service description
+      4. Newsletter
+      5. SoMe Post
+      6. SoMe or Blog Article
+      7. Talking head Video
+      8. Corporate Video
+      9. Explainer/info Video
+      10. Other
+      11. Add - Content level (TOFU/BOFU...)
+      12. Back
+      Choice:"
+
+      #If [type_q]="1" #Begin
+         #Text: project_type
+         "Web page (Standard website content)"
+         #Question: len_input
+         "Approximate desired length (e.g. '500 words' or '3 sections'):"
+         #Text: length
+         "Format: Web Page Content. Length: [len_input]"
+         #Text: s_type
+         "(X)"
+      #End
+
+      #If [type_q]="2" #Begin
+         #Text: project_type
+         "Landing page (Conversion/Sales focused)"
+         #Question: len_input
+         "Approximate desired length (e.g. 'Long form sales letter' or 'Short squeeze page'):"
+         #Text: length
+         "Format: Landing Page (High Conversion). Length: [len_input]"
+         #Text: s_type
+         "(X)"
+      #End
+
+      #If [type_q]="3" #Begin
+         #Text: project_type
+         "Product/service description"
+         #Text: length
+         "Format: Product Description. Length: Approx 300-500 words."
+         #Text: s_type
+         "(X)"
+      #End
+
+      #If [type_q]="4" #Begin
+         #Text: project_type
+         "Newsletter"
+         #Text: length
+         "Format: Newsletter. Length: Approx 600-1000 words."
+         #Text: s_type
+         "(X)"
+      #End
+
+      #If [type_q]="5" #Begin
+         #Text: project_type
+         "SoMe post"
+         #Text: length
+         "Format: Social Media Post. Length: Approx 1000-1500 characters (Short form)."
+         #Text: s_type
+         "(X)"
+      #End
+
+      #If [type_q]="6" #Begin
+         #Text: project_type
+         "SoMe or Blog Article"
+         #Question: len_article
+         "Select Article Length:
+         1. Standard (Approx 800-1200 words)
+         2. Long Form / Deep Dive (2000+ words)
+         Choice:"
+         #If [len_article]="1" #Begin
+            #Text: length
+            "Format: Standard Article. Length: 800-1200 words."
+         #End
+         #If [len_article]="2" #Begin
+            #Text: length
+            "Format: Long Form Article. Length: 2000+ words."
+            #Text: llm
+            "gemini"
+         #End
+         #Text: s_type
+         "(X)"
+      #End
+
+      #If [type_q]="7" #Begin
+         #Text: project_type
+         "Short talking head video"
+         #Text: length
+         "Format: Video Script. Duration: Approx 60-90 seconds."
+         #Text: s_type
+         "(X)"
+      #End
+
+      #If [type_q]="8" #Begin
+         #Text: project_type
+         "Corporate Video"
+         #Text: length
+         "Format: Video Script. Duration: Approx 2-3 minutes."
+         #Text: s_type
+         "(X)"
+      #End
+
+      #If [type_q]="9" #Begin
+         #Text: project_type
+         "Explainer/info video"
+         #Text: length
+         "Format: Video Script. Duration: Approx 2-3 minutes."
+         #Text: s_type
+         "(X)"
+      #End
+
+      #If [type_q]="10" #Begin
+         #Question: custom_project
+         "Please briefly describe your project (one sentence is fine):"
+         #Question: custom_len
+         "What is the desired length?"
+         #Text: project_type
+         "[custom_project]"
+         #Text: length
+         "Format: Custom ([custom_project]). Length: [custom_len]"
+         #Text: s_type
+         "(X)"
+      #End
+
+      #If [type_q]="11" #Begin
+         #Question: lev_q
+         "What primary content LEVEL do you want to target?
+         1. Thought leadership - Build authority
+         2. TOFU - Pain points & Awareness
+         3. MOFU - Info about products & solutions
+         4. BOFU - Drive action, sell
+         5. Other
+         Choice:"
+
+         #If [lev_q]="1" #Begin
+            #Text: project_level
+            "Thought Leadership (Above TOFU): Goal: Build authority, spark conversations. No direct pitch."
+            #Text: s_level
+            "(X)"
+         #End
+
+         #If [lev_q]="2" #Begin
+            #Text: project_level
+            "TOFU (Top of Funnel): Goal: Create awareness by highlighting relatable pain points. Soft and broad."
+            #Text: s_level
+            "(X)"
+         #End
+
+         #If [lev_q]="3" #Begin
+            #Text: project_level
+            "MOFU (Middle of Funnel): Goal: Educate and show how your product helps."
+            #Text: s_level
+            "(X)"
+         #End
+
+         #If [lev_q]="4" #Begin
+            #Text: project_level
+            "BOFU (Bottom of Funnel): Goal: Drive action — sign up, try, buy now."
+            #Text: s_level
+            "(X)"
+         #End
+
+         #If [lev_q]="5" #Begin
+            #Question: custom_level
+            "Describe level:"
+            #Text: project_level
+            "[custom_level]"
+            #Text: s_level
+            "(X)"
+         #End
+      #End
+   #End
+
+   ##Audience and Pains Section
+   #If [main_choice]="6" #Begin
+      #Text: exit_sub
+      "n"
+      #Loop-Until: [exit_sub]="y"
+         #Question: sub_choice
+         "--- AUDIENCE ---
+         1. See existing TA
+         2. Find (Suggest from list)
+         3. Specify (Manual)
+         4. Back"
+
+         #If [sub_choice]="4" #Begin
+            #Text: exit_sub
+            "y"
+         #End
+
+         #If [sub_choice]="1" #Begin
+            #Show: "Target Audience: [ta_final]"
+         #End
+
+         #If [sub_choice]="3" #Begin
+            #Question: ta_in
+            "Describe audience:"
+            #Text: ta_final
+            "[ta_in]"
+            #Text: s_aud
+            "(X)"
+         #End
+
+         #If [sub_choice]="2" #Begin
+             #If [own_content_text]="" #Begin
+                #Show: "Need Own Content to suggest audience."
+             #Else-Begin
+                #Text: ta_prompt
+                "Suggest 10 target audiences based on:
+                [own_content_text] [trend_content_text]
+                Numbered list."
+                #chatgpt: aud_list
+                "[ta_prompt]"
+
+                #Show: "Debug
+                Prompt: [ta_prompt]
+                --------------------------
+                Output: [aud_list]"
+
+                #Question: aud_sel
+                "Audiences:
+                [aud_list]
+                Select (e.g. 1):"
+                
+                #Text: ta_select_p
+                "Extract item [aud_sel] from [aud_list]."
+                #chatgpt: ta_gpt_out
+                "[ta_select_p]"
+                
+                #Show: "Debug
+                Prompt: [ta_select_p]
+                --------------------------
+                Output: [ta_gpt_out]"
+
+                #Text: ta_final
+                "[ta_gpt_out]"
+                #Text: s_aud
+                "(X)"
+             #End
+         #End
+      #End
+
+      #Text: exit_sub
+      "n"
+      #Loop-Until: [exit_sub]="y"
+         #Question: sub_choice
+         "--- PAIN POINTS ---
+         1. See existing Pain Points
+         2. Find (Suggest from list)
+         3. Specify (Manual)
+         4. Back"
+         
+         #If [sub_choice]="4" #Begin
+             #Text: exit_sub
+             "y"
+         #End
+
+         #If [sub_choice]="1" #Begin
+             #Show: "Pain Points: [pain_final]"
+         #End
+
+         #If [sub_choice]="3" #Begin
+             #Question: pp_in
+             "Describe pain points:"
+             #Text: pain_final
+             "[pp_in]"
+             #Text: s_pain
+             "(X)"
+         #End
+
+         #If [sub_choice]="2" #Begin
+             #If [ta_final]="" #Begin
+                 #Show: "Need Target Audience defined first."
+             #Else-Begin
+                 #Text: pp_prompt
+                 "Suggest 10 pain points for [ta_final]. Numbered list."
+                 #chatgpt: pain_list
+                 "[pp_prompt]"
+
+                 #Show: "Debug
+                 Prompt: [pp_prompt]
+                 --------------------------
+                 Output: [pain_list]"
+
+                 #Question: pain_sel
+                 "Pain Points:
+                 [pain_list]
+                 Select (e.g. 1,2):"
+
+                 #Text: pp_select_p
+                 "Extract items [pain_sel] from [pain_list]."
+                 #chatgpt: pain_gpt_out
+                 "[pp_select_p]"
+
+                 #Show: "Debug
+                 Prompt: [pp_select_p]
+                 --------------------------
+                 Output: [pain_gpt_out]"
+                 
+                 #Text: pain_final
+                 "[pain_gpt_out]"
+                 #Text: s_pain
+                 "(X)"
+             #End
+         #End
+      #End
+   #End
+
+   ##SEO Section
+   #If [main_choice]="7" #Begin
+      #Text: exit_sub
+      "n"
+      #Loop-Until: [exit_sub]="y"
+          #Question: seo_q
+          "--- SEO ---
+          1. See current
+          2. Get help to find (Keyword Research)
+          3. Manual input
+          4. Back"
+
+          #If [seo_q]="4" #Begin
+             #Text: exit_sub
+             "y"
+          #End
+          
+          #If [seo_q]="1" #Begin
+             #Show: "SEO Keywords: [seo_prompt]"
+          #End
+
+          #If [seo_q]="3" #Begin
+             #Question: seo_in
+             "Enter keywords:"
+             #Text: seo_prompt
+             "[seo_in]"
+             #Text: s_seo
+             "(X)"
+          #End
+
+          #If [seo_q]="2" #Begin
+             #Text: lc_p
+             "give me the language code according to ISO 639-1 of the language most fitting the following text. Output ONLY the clean code. Text: [language]"
+             #chatgpt: lang_code
+             "[lc_p]"
+
+             #Show: "Debug
+             Prompt: [lc_p]
+             --------------------------
+             Output: [lang_code]"
+
+             #Text: gc_p
+             "give me the numeric 'Geotarget ID' code used by google ads API (e.g. 2840 for USA) of the place most fitting the following language. Output ONLY ONE clean code, no other information. Language: [language]"
+             #chatgpt: loc_code
+             "[gc_p]"
+
+             #Show: "Debug
+             Prompt: [gc_p]
+             --------------------------
+             Output: [loc_code]"
+
+             #Question: seed
+             "Seed keyword:"
+             #Show: "Fetching data..."
+             #seo: seodata
+             URL = https://api.dataforseo.com/v3/dataforseo_labs/google/keyword_suggestions/live
+             JSON = {"keyword":"${seed}", "location_code":${loc_code}, "language_code":"${lang_code}", "limit": 10}
+
+             #Text: seo_an_p
+             "Analyze JSON. Extract keywords as numbered list. JSON: [seodata]"
+             #chatgpt: seo_analysis
+             "[seo_an_p]"
+
+             #Show: "Debug
+             Prompt: [seo_an_p]
+             --------------------------
+             Output: [seo_analysis]"
+
+             #Question: seo_select
+             "Here are the top opportunities found:
+             [seo_analysis]
+             Which keywords do you want to add to your list? (e.g. 1,3,5)"
+             
+             #Text: seo_fin_p
+             "Extract the keywords corresponding to numbers [seo_select] from the list below.
+             Return ONLY a comma-separated list of the keywords.
+             List: [seo_analysis]"
+             #chatgpt: seo_final_list
+             "[seo_fin_p]"
+
+             #Show: "Debug
+             Prompt: [seo_fin_p]
+             --------------------------
+             Output: [seo_final_list]"
+
+             #Text: all_selected_kws
+             "[all_selected_kws], [seo_final_list]"
+
+             #Text: seo_prompt
+             "[all_selected_kws]"
+             #Text: s_seo
+             "(X)"
+          #End
+      #End
+   #End
+
+   ##Language Section
+   #If [main_choice]="8" #Begin
+      #Question: language
+      "What language would you prefer for your research results?
+      ('e'= english)"
+      #If [language]="e" #Begin
+         #Text: language
+         "english"
+         #Text: s_lang
+         "(ENG)"
+      #Else-Begin
+         #Text: s_lang
+         "([language])"
+      #End
+      #Show: "Language updated to: [language]"
+   #End
+
+
+
+
+##Image Generation Section
+   #If [main_choice]="9" #Begin
+      #Text: exit_img
+      "n"
+      
+      #Loop-Until: [exit_img]="y"
+         #Question: img_q
+         "--- IMAGE GENERATION ---
+         1. Free prompting (Manual only)
+         2. From Gemini Free Chat Context + Prompt
+         3. From ChatGPT Free Chat Context + Prompt
+         4. From Claude Free Chat Context + Prompt
+         5. From Standard Content (Latest Output) + Prompt
+         6. Back"
+         
+         #If [img_q]="6" #Begin
+            #Text: exit_img
+            "y"
+         #End
+
+         #Text: final_img_prompt
+         ""
+         
+         ## We use a dedicated ChatGPT variable for image context to avoid conflicts
+         ## Note: We do NOT initialize it with #Text, only via #chatgpt calls.
+
+         ## Option 1: Manual Free Prompting
+         #If [img_q]="1" #Begin
+             #Question: free_img_p
+             "Enter full image prompt:"
+             
+             #Text: final_img_prompt
+             "[free_img_p]"
+
+             ## Seed the bot so it is ready for the loop
+             #chatgpt: img_context_bot
+             "Here is a new image prompt I am working on:
+             [free_img_p]"
+         #End
+
+         ## Options 2-5: Context + User Prompt Logic
+         #Text: base_context
+         ""
+
+         ## Map Selection to Variables
+         #If [img_q]="2" #Begin
+            #Text: base_context
+            "[free_res_gemini]"
+         #End
+         #If [img_q]="3" #Begin
+            #Text: base_context
+            "[free_res_gpt]"
+         #End
+         #If [img_q]="4" #Begin
+            #Text: base_context
+            "[free_res_claude]"
+         #End
+         #If [img_q]="5" #Begin
+            #Text: base_context
+            "[final_txt]"
+         #End
+
+         ## Generate Prompt from Context if needed
+         #If [img_q]<>"1" #Begin
+            #If [img_q]<>"6" #Begin
+                
+                #If [base_context]="" #Begin
+                    #Show: "Error: No content found in that selection. Run that generator first."
+                #Else-Begin
+                    #Question: style_add
+                    "Add specific instructions or style (e.g. 'Photorealistic', 'Cyberpunk', 'Diagram'):"
+                    
+                    #Show: "Designing prompt..."
+                    
+                    #Text: img_p_draft
+                    "Create a detailed image generation prompt based on the 'Context Text' below.
+                    The image must represent the core ideas of the text visually.
+                    
+                    IMPORTANT USER INSTRUCTION: [style_add]
+                    
+                    Context Text:
+                    [base_context]
+                    
+                    IMPORTANT: Return ONLY the final prompt text. No intro/outro."
+                    
+                    ## Generate draft
+                    #chatgpt: img_context_bot
+                    "[img_p_draft]"
+                    
+                    #Show: "Debug
+                    Prompt: [img_p_draft]
+                    --------------------------
+                    Output: [img_context_bot]"
+                    
+                    #Text: final_img_prompt
+                    "[img_context_bot]"
+                #End
+            #End
+         #End
+
+         ## Generator Selection, Approval & Execution Loop
+         #If [final_img_prompt]<>"" #Begin
+             #Question: gen_model
+             "Select Image Generator:
+             1. ChatGPT (DALL-E 3)
+             2. Gemini (Imagen 3)
+             Choice:"
+
+             #Text: img_adj_loop
+             "y"
+             
+             #Loop-Until: [img_adj_loop]="n"
+                 
+                 ## Pre-Generation Approval Loop
+                 #Text: approve_loop
+                 "n"
+                 #Loop-Until: [approve_loop]="y"
+                     #Question: approval
+                     "CURRENT PROMPT:
+                     [final_img_prompt]
+                     
+                     OPTIONS:
+                     'y' = Approve & Generate Image
+                     'q' = Quit to Menu
+                     (Or type instructions to adjust the prompt now)"
+                     
+                     #If [approval]="y" #Begin
+                         #Text: approve_loop
+                         "y"
+                     #Else-Begin
+                         #If [approval]="q" #Begin
+                             #Text: approve_loop
+                             "y"
+                             #Text: img_adj_loop
+                             "n"
+                         #Else-Begin
+                             #Show: "Refining prompt..."
+                             #Text: update_instruction
+                             "The current image prompt is:
+                             [final_img_prompt]
+                             
+                             The user wants to make this adjustment:
+                             [approval]
+                             
+                             Write the NEW full image prompt that incorporates this change. 
+                             Return ONLY the prompt text."
+                             
+                             #chatgpt: img_context_bot
+                             "[update_instruction]"
+                             
+                             #Text: final_img_prompt
+                             "[img_context_bot]"
+                         #End
+                     #End
+                 #End
+
+                 ## If we didn't quit, generate the image
+                 #If [img_adj_loop]="y" #Begin
+                     #Show: "Generating Image..."
+
+                     #If [gen_model]="1" #Begin
+                         #chatgpt-img: img
+                         size: 1024x1024
+                         "[final_img_prompt]"
+                     #End
+
+                     #If [gen_model]="2" #Begin
+                         #gemini-img: img
+                         "[final_img_prompt]"
+                     #End
+                     
+                     #showimage: [img]
+                     
+                     ## Post-Generation Adjustment Opportunity
+                     #Question: adj_in
+                     "Do you want to adjust this image?
+                     Enter your instructions (e.g. 'Make it darker').
+                     ('q' = Return to menu)"
+                     
+                     #If [adj_in]="q" #Begin
+                         #Text: img_adj_loop
+                         "n"
+                     #Else-Begin
+                         #Show: "Updating prompt..."
+                         
+                         #Text: update_instruction
+                         "The current image prompt is:
+                         [final_img_prompt]
+                         
+                         The user wants to make this adjustment:
+                         [adj_in]
+                         
+                         Write the NEW full image prompt that incorporates this change. 
+                         Return ONLY the prompt text."
+                         
+                         #chatgpt: img_context_bot
+                         "[update_instruction]"
+                         
+                         #Show: "Debug
+                         Adjustment: [adj_in]
+                         New Prompt: [img_context_bot]"
+                         
+                         #Text: final_img_prompt
+                         "[img_context_bot]"
+                     #End
+                 #End
+             #End
+         #End
+      #End
+   #End
+
+
+
+
+
+##Free Prompt Section
+   #If [main_choice]="10" #Begin
+      #Text: exit_free
+      "n"
+      
+      #Loop-Until: [exit_free]="y"
+         #Question: llm_choice
+         "--- FREE PROMPT / CUSTOM TASK ---
+         Select LLM to use:
+         1. ChatGPT (Standard)
+         2. Claude (Better for writing)
+         3. Gemini (Large context/Web)
+         4. Flush Contexts (Reset Memory)
+         5. Back
+         Choice:"
+
+         #If [llm_choice]="5" #Begin
+             #Text: exit_free
+             "y"
+         #End
+
+         ##Flush Logic - Using Unique Variables
+         #If [llm_choice]="4" #Begin
+             #Question: flush_q
+             "Flush which context memory?
+             1. ChatGPT
+             2. Claude
+             3. Gemini
+             4. All"
+             
+             #If [flush_q]="1" #Begin
+                 #chatGPT: free_res_gpt
+                 "--flush"
+                 #Show: "ChatGPT memory flushed."
+             #End
+             #If [flush_q]="2" #Begin
+                 #claude: free_res_claude
+                 "--flush"
+                 #Show: "Claude memory flushed."
+             #End
+             #If [flush_q]="3" #Begin
+                 #gemini: free_res_gemini
+                 "--flush"
+                 #Show: "Gemini memory flushed."
+             #End
+             #If [flush_q]="4" #Begin
+                 #chatGPT: free_res_gpt
+                 "--flush"
+                 #claude: free_res_claude
+                 "--flush"
+                 #gemini: free_res_gemini
+                 "--flush"
+                 #Show: "All memories flushed."
+             #End
+         #End
+
+         ##Setup Chat Variables
+         #Text: run_chat
+         "n"
+         #If [llm_choice]="1" #Begin
+             #Text: current_llm
+             "chatgpt"
+             #Text: run_chat
+             "y"
+             #If [free_res_gpt]<>"" #Begin
+                #Show: "Last output: 
+                
+                [free_res_gpt]"
+             #End
+         #End
+         #If [llm_choice]="2" #Begin
+             #Text: current_llm
+             "claude"
+             #Text: run_chat
+             "y"
+             #If [free_res_claude]<>"" #Begin
+                #Show: "Last output: 
+                
+                [free_res_claude]"
+             #End
+         #End
+         #If [llm_choice]="3" #Begin
+             #Text: current_llm
+             "gemini"
+             #Text: run_chat
+             "y"
+             #If [free_res_gemini]<>"" #Begin
+                #Show: "Last output: 
+                
+                [free_res_gemini]"
+             #End
+         #End
+
+         ##Chat Loop
+         #If [run_chat]="y" #Begin
+             #Text: free_p
+             ""
+             #Show: "Starting chat with [current_llm]."
+
+            ##Construct the context string
+            #Text: free_p_full
+            "--- FULL CONTEXT DATA ---
+            --- Language: [language]
+            --- Project Type: [project_type]
+            --- Project Level: [project_level]
+            --- Length Constraint: [length]
+
+            --- Source Data Our Own: [own_content_text]
+            --- Source Data Competitors: [competitor_content_text]
+            --- Source Data News and Trends: [trend_content_text]
+            --- Additional Source Data: [additional_content_text]
+            --- Expert Interview: [interview_block]
+
+            --- Reaction Context: [react_content_text] ([react_prompt])
+
+            --- Target Audience: [ta_final]
+            --- Pain Points: [pain_final]
+
+            --- Strategic Differentiators: [diff_final]
+            --- Selected Trends to Highlight: [trends_final]
+
+            --- Tone of Voice: [tone_prompt]
+            --- Style Choices: [style_choices]
+            --- SEO Keywords: [seo_prompt]
+
+            --- TASK ---
+            Execute the USER INSTRUCTION using the Context Data above."
+
+             #Loop-Until: [free_p]="q"
+                 #Question: free_p
+                 "([current_llm]) Write your instructions (q=quit):"
+                 
+                 #If [free_p]<>"q" #Begin
+                     #Show: "Working..."
+                     
+                     #Text: free_p_full
+                     "IMPORTANT: USER INSTRUCTION: [free_p]
+                     ------------------------
+                     [free_p_full]"
+
+#Show: "Debug- prompt: [free_p_full]"
+
+                     ##Route to selected LLM using UNIQUE variables
+                     #If [current_llm]="chatgpt" #Begin
+                         #chatGPT: free_res_gpt
+                         "[free_p_full]"
+                         
+                         ##Show: "Debug
+                         Prompt: [free_p_full]
+                         --------------------------
+                         Output: [free_res_gpt]"
+
+                         #Show: "[free_res_gpt]"
+                     #End
+                     
+                     #If [current_llm]="claude" #Begin
+                         #claude: free_res_claude
+                         "[free_p_full]"
+
+                         ##Show: "Debug
+                         Prompt: [free_p_full]
+                         --------------------------
+                         Output: [free_res_claude]"
+
+                         #Show: "[free_res_claude]"
+                     #End
+                     
+                     #If [current_llm]="gemini" #Begin
+                         #gemini: free_res_gemini
+                         "[free_p_full]"
+
+                         ##Show: "Debug
+                         Prompt: [free_p_full]
+                         --------------------------
+                         Output: [free_res_gemini]"
+
+                         #Show: "[free_res_gemini]"
+                     #End
+                     ## Empty the prompt
+                     #Text: free_p_full
+                     ""
+                 #End
+             #End
+         #End
+      #End
+   #End
+
+   ##Standard Content Generation Section
+   #If [main_choice]="11" #Begin
+      #Show: "Generating 5 Angles..."
+      #Text: angle_prompt
+      "Based on the information below, suggest 5 unique content angles.
+      IMPORTANT: Consider that the final format will be: [length]
+      Present this as ONE numbered list 1-5, starting with a very short headline for each, presenting the angle. And then a 3 line summary of each angle.
+      --- Language: [language]
+      --- Project type: [project_type]
+      --- Project level: [project_level]
+      --- Write for this target audience: [ta_final]
+      --- IMPORTANT: The content should address these pain points: [pain_final]
+      --- Try to bring up these differentiations from the competition: [diff_final]
+      --- Try to bring up these trends: [trends_final]
+      --- [react_prompt]
+      --- Base Content:
+      --- Expert Interview
+      [interview_block]
+      --- Our own base content
+      [own_content_text]
+      --- Competitors base content
+      [competitor_content_text]
+      --- News and Trends base content
+      [trend_content_text]
+      --- Additional base content
+      [additional_content_text]"
+
+      #chatgpt: angle_gpt
+      "[angle_prompt]"
+
+      #Show: "Debug
+      Prompt: [angle_prompt]
+      --------------------------
+      Output: [angle_gpt]"
+
+      #Question: angle_choice
+      "Based on my analysis, here are unique content ANGLES to explore:
+      (Select ONE number to make a content draft)
+      [angle_gpt]
+      Which content angle would you like to focus on?"
+      
+      #Text: ang_sel_p
+      "My selection(s) from the list are: [angle_choice]
+      Extract ONLY THAT/THOSE specific list items with their text and combine them into a new list, with no additional information.
+      From List: [angle_gpt]"
+
+      #chatGPT: selected_angle_raw
+      "[ang_sel_p]"
+
+      #Show: "Debug
+      Prompt: [ang_sel_p]
+      --------------------------
+      Output: [selected_angle_raw]"
+
+      #Text: selected_angle
+      "[selected_angle_raw]"
+
+      #Show: "Generating Outline based on: [selected_angle]..."
+
+      #Text: out_p
+      "--- Create outline for [project_type].
+      --- Angle: [selected_angle]
+      --- Data: [own_content_text] [competitor_content_text] [trend_content_text]
+      --- SEO: [seo_prompt]"
+
+      #chatgpt: outline_gpt
+      "[out_p]"
+      
+      #Show: "Debug
+      Prompt: [out_p]
+      --------------------------
+      Output: [outline_gpt]"
+      
+      #Text: outline_text
+      "[outline_gpt]"
+
+      #Show: "[outline_text]"
+
+      #Question: angle_feedback
+      "Now in chat mode.
+      Do you have any feedback or instructions on the outline?
+      ('n' = stop) "
+
+      #Loop-Until: [angle_feedback]="n"
+         #Show: "Processing feedback....(10-45 sec)"
+         #Text: out_re_p
+         "Rewrite the outline based on this feedback: [angle_feedback]
+         Current Outline: [outline_text]"
+         
+         #chatGPT: outline_gpt_re
+         "[out_re_p]"
+
+         #Show: "Debug
+         Prompt: [out_re_p]
+         --------------------------
+         Output: [outline_gpt_re]"
+         
+         #Text: outline_text
+         "[outline_gpt_re]"
+
+         #Show: "[outline_text]"
+         #Question: angle_feedback
+         "Do you have any more feedback or instructions?
+         ('n' = stop) "
+      #End
+
+      #Question: ok_write
+      "Outline ready. Write full text now? (y/n)"
+      #If [ok_write]="y" #Begin
+         #Show: "Writing..."
+         #Text: final_prompt
+         "--- Write full [project_type].
+         --- Length: [length]
+         --- Tone: [tone_prompt]
+         --- Style: [style_choices]
+         --- Audience: [ta_final]
+         --- SEO: [seo_prompt]
+         --- Outline: [outline_text]
+         --- Data: [own_content_text] [competitor_content_text]"
+
+         #If [llm]="claude" #Begin
+            #claude: final_txt_raw
+            "[final_prompt]"
+         #End
+
+         #If [llm]="gemini" #Begin
+            #gemini: final_txt_raw
+            "[final_prompt]"
+         #End
+         
+         #Show: "Debug
+         Prompt: [final_prompt]
+         --------------------------
+         Output: [final_txt_raw]"
+
+         #Text: final_txt
+         "[final_txt_raw]"
+
+         #Show: "[final_txt]"
+         
+         ##Final Feedback Loop
+         #Question: feedback
+         "Now in chat mode.
+         Do you have any feedback on this text?
+         ('n' = stop) "
+
+         #Loop-Until: [feedback]="n"
+            #Show: "Re-writing....(30 sec)"
+            #If [llm]="claude" #Begin
+               #Claude: final_txt_raw
+               "[feedback]"
+            #End
+            #If [llm]="gemini" #Begin
+               #gemini: final_txt_raw
+               "[feedback]"
+            #End
+            
+            #Show: "Debug
+            Prompt: [feedback]
+            --------------------------
+            Output: [final_txt_raw]"
+            
+            #Text: final_txt
+            "[final_txt_raw]"
+
+            #Show: "[final_txt]"
+
+            #Question: feedback
+            "Now in chat mode.
+            Do you have any feedback on this text?
+            (n = stop) "
+         #End
+      #End
+   #End
+
+   ##Exit Section
+   #If [main_choice]="12" #Begin
+      #Text: exit_app
+      "y"
+   #End
+
+#End
+#Show: "Exiting Content Manager. Goodbye!"

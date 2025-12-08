@@ -1,0 +1,27 @@
+
+#chatgpt: test
+"Dog A is red"
+
+#gemini: test
+"Dog B is blue"
+
+#claude: test
+"Dog C is green"
+
+#chatgpt: test
+"What color is:
+Dog A 
+Dog B 
+Dog C"
+
+#gemini: test
+"What color is:
+Dog A 
+Dog B 
+Dog C"
+
+#claude: test
+"What color is:
+Dog A 
+Dog B 
+Dog C"

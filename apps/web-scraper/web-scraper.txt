@@ -1,0 +1,208 @@
+## Purposewrite App: Scraper, Master Doc & Auto-Deep Dive
+## Scrapes URLs, cleans content, builds a master doc, and auto-scrapes related links.
+
+#Show: "Welcome to the Advanced Web Scraper & Research Assistant."
+#Show: "I can scrape pages, build a master document, and automatically research related links for you."
+
+## Initialize master doc
+#Text: master_doc
+" "
+
+## Initialize next_url flag to "empty" so the first run asks for input
+#Text: next_url
+"empty"
+
+## Initialize main loop
+#Text: run_loop
+"y"
+
+#Loop-Until: [run_loop]="n"
+
+    ## CHECK: Do we have a queued URL from the previous Deep Dive?
+    #If [next_url]="empty" #Begin
+        #Question: url
+        "Please enter the URL to scrape (e.g., https://example.com):"
+    #End
+
+#Show: "Debug next url: [next_url]"
+
+    #If [next_url]<>"empty" #Begin
+#Show: "Debug: not empty"
+        #Text: url
+        "[next_url]"
+        ##Show: "Automatically loading selected URL: [url]"
+        ## Reset next_url for the future
+        #Text: next_url
+        "empty"
+    #End
+
+    #Show: "Scraping [url]..."
+
+    ## Scrape raw HTML
+    #Scrape: raw_html
+    "[url]"
+##Show: "Debug: [url]
+---
+[raw_html]"
+
+    ## Generic status message
+    #Show: "Cleaning content (30-60sec)..."
+
+    ## Initial Clean
+    #gemini: content
+    "You are a content extractor. Extract ONLY the main article text from the following raw HTML.
+    Remove navigation menus, footers, ads, sidebar links, and code.
+    Format the output in clean Markdown.
+    Raw HTML:
+    [raw_html]"
+
+    ## Review Loop
+    #Text: review_loop
+    "y"
+
+    #Loop-Until: [review_loop]="n"
+        #Show: "--- CONTENT PREVIEW ---"
+        #Show: "[content]"
+        #Show: "-----------------------"
+        
+        #Question: review_choice
+        "Is this content correct?
+        1. Yes, proceed.
+        2. No, re-clean.
+        (Enter 1 or 2)"
+
+        #If [review_choice]="1" #Begin
+            #Text: review_loop
+            "n"
+        #End
+
+        #If [review_choice]="2" #Begin
+            #Question: custom_clean
+            "How should I fix it? (e.g. 'Keep raw format', 'Include buttons'):"
+            #Show: "Re-cleaning..."
+            #gemini: content
+            "User instruction: [custom_clean]
+            Raw HTML: [raw_html]
+            Re-extract the content following the instruction exactly."
+        #End
+    #End
+
+    ## Processing Menu
+    #Question: process_opt
+    "Process this text?
+    1. Summarize
+    2. Extract Key Points
+    3. Custom Prompt
+    4. No, keep as is
+    (Enter 1, 2, 3, or 4)"
+
+    ## Store content in final_text (Text variable) to separate from LLM variable
+    #Text: final_text
+    "[content]"
+
+    #If [process_opt]="1" #Begin
+        #Show: "Summarizing..."
+        #gemini: processed_output
+        "Summarize this in bullet points: [content]"
+        #Text: final_text
+        "[processed_output]"
+    #End
+
+    #If [process_opt]="2" #Begin
+        #Show: "Extracting Key Points..."
+        #gemini: processed_output
+        "Extract main key points: [content]"
+        #Text: final_text
+        "[processed_output]"
+    #End
+
+    #If [process_opt]="3" #Begin
+        #Question: custom_p
+        "Enter prompt:"
+        #Show: "Processing..."
+        #gemini: processed_output
+        "[custom_p]: [content]"
+        #Text: final_text
+        "[processed_output]"
+    #End
+
+    ## Only show FINAL RESULT if the user actually processed the text (Options 1, 2, 3)
+    ## If they chose 4 (Keep as is), they already saw the preview, so we skip this.
+    #If [process_opt]<>"4" #Begin
+        #Show: "--- FINAL RESULT ---"
+        #Show: "[final_text]"
+    #End
+
+    ## Add to Master Doc
+    #Question: add_doc
+    "Add to Master Document? (y/n)"
+
+    #If [add_doc]="y" #Begin
+        #Text: master_doc
+        "[master_doc]\n\n--- Source: [url] ---\n[final_text]"
+        #Show: "Saved."
+    #End
+
+    ## --- Deep Dive with Auto-Select ---
+    #Question: deep_dive
+    "Do you want to research 5 related sources and pick one to scrape next? (y/n)"
+
+    #If [deep_dive]="y" #Begin
+        #Show: "Researching related sources..."
+        
+        #chatgptsearch: search_results
+        "Find 5 high-quality articles related to: [url]
+        For each, provide a numbered list (1-5) with a short summary and the URL.
+        Show the URL for each, not like 'Read More'"
+
+        #Show: "--- RESEARCH RESULTS ---"
+        #Show: "[search_results]"
+        
+        #Question: next_choice
+        "Enter the number (1-5) of the source you want to scrape next.
+        (Enter 0 for none)"
+
+        #If [next_choice]<>"0" #Begin
+            #Show: "Extracting URL for choice #[next_choice]..."
+            
+            ## Use LLM to read the search results and pick the correct URL
+            #gemini: next_url_clean
+            "Look at the text below. The user chose option number [next_choice].
+            Extract ONLY the URL for that specific option. 
+            Do not output any other text, just the raw URL.
+            
+            Text:
+            [search_results]"
+            
+#Show: "Debug: [next_url_clean]"
+
+            ## Store result in the control variable
+            #Text: next_url
+            "[next_url_clean]"
+            
+            ## Force the loop to continue
+            #Text: run_loop
+            "y"
+            ##Show: "Queued [next_url] for next run..."
+        #End
+    #End
+
+    ## Only ask to continue if we haven't already selected a URL
+    #If [next_url]="empty" #Begin
+        #Question: run_loop
+        "Scrape another URL? (y/n)"
+    #End
+
+    ## Flush context for cleanliness
+    #If [run_loop]="y" #Begin
+        #gemini: content
+        "--flush"
+        #gemini: processed_output
+        "--flush"
+    #End
+
+#End
+
+#Show: "Final Master Document:"
+#Show: "[master_doc]"
+#Show: "Finished."

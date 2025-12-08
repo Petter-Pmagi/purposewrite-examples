@@ -1,0 +1,28 @@
+#Show: "Problem 1"
+
+#Text: var
+"yyy"
+
+#If [var]<>"yyy" #Begin
+   #Show: "not yyy"
+#Else-Begin
+   #Show: "is yyy"
+#End
+
+#If [var]<>"yyy yyy" #Begin
+   #Show: "not yyy yyy"
+#Else-Begin
+   #Show: "is yyy yyy"
+#End
+
+
+#Show: "Problem 2"
+
+#question: input
+"Input long text:"
+
+#If [input]<>"" #Begin
+   #Show: "not empty"
+#Else-Begin
+   #Show: "is empty"
+#End

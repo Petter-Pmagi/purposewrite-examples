@@ -1,6 +1,6 @@
-##Content Manager & Creator V1.8
+##Content Manager & Creator V1.7
 ##A non-linear tool to gather research, define strategy, and generate content or prompts.
-#Show: "Welcome to the Content Manager V1.8. This tool allows you to build your content strategy in any order."
+#Show: "Welcome to the Content Manager V1.7. This tool allows you to build your content strategy in any order."
 
 ##Initialize Status Indicators
 #Text: s_own
