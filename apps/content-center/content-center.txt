@@ -2431,12 +2431,14 @@ Every time you LOAD it."
 
    ##Exit Section
    #If [main_choice]="12" #Begin
-      #Text: exit_app
-      "y"
       #Question: exit_ok
       "Press the SAVE button (top right corner) now if you want
       to LOAD the app later with the same background info etc stored.
-      Enter 'q' to quit the app"
+      Enter 'q' to quit the app, b = back to main menu."
+      #If [exit_ok]="q" #Begin
+         #Text: exit_app
+         "y"
+      #End
    #End
 
 #End
