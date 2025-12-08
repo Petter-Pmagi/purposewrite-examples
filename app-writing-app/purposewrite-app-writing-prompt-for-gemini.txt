@@ -8,7 +8,7 @@ The interactive steps to take:
 1. Ask the user: "What appp do you wan to make? (describe with a few sentetces)"
 2. Research best way to do the actual task the wanted script is meant to do. How can we improve the idea to do the task even better than the instructions given? 
 3. Keep in mind the language and what is possible to do in this script language.
-4. Propose to the user any improvements and what this app could do and how.
+4. Propose to the user any improvements and what this app could do and how. Be creative!
 5. Now stop, and WAIT for user feedback on that in a loop until the user is ready to go to the next stage.
 6. Now think a little bit more in detail: What inputs would be good to ask for, what parameters to avaluate, what outputs, what flexibility? 
 7. Show draft of the app functionality to the user. Keep it on a very high idea based level as this is the very first step in a process to develop a new app.
@@ -159,7 +159,7 @@ The language supports these commands:
 "prompt"
 ## gemini 2.5 pro preview
 ## can search the web and provide links
-## Gemini supports longer output
+## Gemini supports longer output and is good at processing large data in and out, for example cleaning scraped website data 
 
 
 ##The script language supports flushing the context window for an llm variable, this can be useful in specific situations like in a loop where we dont want the old context to remain, to save tokens or to start with a clean context)
@@ -206,12 +206,14 @@ The language supports these commands:
 
 
 ##generate image using chatgpt: gpt image 1
+##this will not preserve context or remember the previously generated image
 ##Supported Sizes: 1024x1024, 1024x1536, 1536x1024, auto (defaults to 1024x1024)
 #chatgpt-img: img
 size: widthxheight
 "[prompt]"
 
 ##generate image using gemini 2.5 Flash Image Preview (nano-banana)
+##this will not preserve context or remember the previously generated image
 ##Supported Sizes: only defaults to 1024x1024
 #gemini-img: img
 "[prompt]"
@@ -227,7 +229,7 @@ size: widthxheight
 ##Note that some endpoint json input data need https://www and some should not have it in an url/domain name
 ##Also note that sometimes the language can only be selected from a valid list for the chosen country, USA=english+spanish for example
 ##quotation marks are allowed in the json, and purposewrite script variable can be accessed by ${variable_name} in the json - example:
-#SEOkw: seo_answer
+#SEO: seo_answer
 URL = https://api.dataforseo.com/v3/serp/google/organic/live/advanced
 JSON = {"keyword":"${kw}", "location_code":${location}, "language_code":"${language}", "device":"desktop", "os":"windows", "depth":30, "load_async_ai_overview":true, "people_also_ask_click_depth":4}
 ##The file SEO.txt gives examples of exactly how to use each endpoint.
@@ -502,25 +504,30 @@ Just make sure to use indexes before writing the options"
 #Show: "Final prompt: [prompt]"
 
 
-
+General instructions:
 ## Since we can do limited used input checks, make sure to always have a good default kick in if the user inputs something unexpected. Like in a menu 1,2,3 they input 23, you should defualt to the best choice, usually #1.
+## Never mention the APIs used, like "Scraping with Gemini"
+## Use LLM prompting for adanced functions not found in this script language
 
 
 ## Most common bugs:
 - Using comments that are not at the start of a line (inline comments).
-- Using the same variable for #Text: and llm, like #chatGPT:
 - Not following the line break rules for syntax of #Text: #Question etc
 - When specifying user choices as numbers in an llm prompt, only give the number like "The user chose: [choice]" and not something like "The user chose: #[choice]." - so dont add a # in the prompt to the llm.
 - Space at the end of a line (syntax bug in interpreter, can not handle this)
 - Each llm variable remembers its own context history, so if you want to refer to old context you must keep refering to the same llm variable name, this is better than manually injecting old context data into the new prompt in a new llm variable  
 - The dataforseo api is sensitive to the combination of location + language, only some specific languages are allowed for each country, and may result in an error code, so we can not allow free choice here
+- Using the same variable name for #Text: #Question and llm calls, like #chatGPT: is NOT allowed, look for any occurence of that and remove it, example of bad use:
+#If [var]="y #Begin
+   #Question: answer
+   "Answer:"
+#Else-Begin
+   #gemini: answer
+   "Give me the answer"
+#End
+- Never use the same var name for diffrenet llms
 
 See the attached example script "Article Writer + LI post V4" for how it all works.
 
 In Article Writer you can choose a full or light version of the app at the start, that is a nice concept for more advanced apps.
-
-
-
-
-
 
